@@ -1,0 +1,806 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Padel Week</title>
+<script>try{var t=JSON.parse(localStorage.getItem('pw.theme'));if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Court glass: a blue-turf header band with a white court line, then the week board as frosted glass panels.
+   Days are columns split into court lanes on a real time axis; phones get a day-by-day agenda. */
+:root{
+  --bg:#eef5f8; --surface:#ffffff; --fg:#13222c; --muted:#5d6f7b; --line:#d3e3eb;
+  --band:#0085b2; --on-band:#ffffff; --band-soft:#cfeaf5;
+  --court:#0085b2; --court-soft:#e3f2f8; --free:#4a6f0a; --free-bg:#eef7dc; --free-line:#a3c642; --ball:#c9d82b; --now:#e0452b; --win:#13222c;
+  --l1:#d4762a; --l2:#7c4bc0; --l3:#1f9d6b; --l4:#c23d6b; --l5:#8a7a12; --l6:#0085b2;
+  --f-display:"Outfit",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  --r-tile:10px; --r-panel:14px; --hour:58px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0a1419; --surface:#12222b; --fg:#e4eef2; --muted:#8ea4af; --line:#223843;
+  --band:#0b5f80; --on-band:#ffffff; --band-soft:#a9d9ec;
+  --court:#3bb4de; --court-soft:#15313d; --free:#d6e24a; --free-bg:#1d2b12; --free-line:#6f8f24; --ball:#d6e24a; --now:#ff6a4f; --win:#ffffff;
+  --l1:#f0954a; --l2:#a77ee8; --l3:#3cc48e; --l4:#ec6a96; --l5:#cdb93a; --l6:#3bb4de;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0a1419; --surface:#12222b; --fg:#e4eef2; --muted:#8ea4af; --line:#223843;
+  --band:#0b5f80; --on-band:#ffffff; --band-soft:#a9d9ec;
+  --court:#3bb4de; --court-soft:#15313d; --free:#d6e24a; --free-bg:#1d2b12; --free-line:#6f8f24; --ball:#d6e24a; --now:#ff6a4f; --win:#ffffff;
+  --l1:#f0954a; --l2:#a77ee8; --l3:#3cc48e; --l4:#ec6a96; --l5:#cdb93a; --l6:#3bb4de;
+  color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font:14px/1.45 var(--f-body);padding-bottom:40px}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--court);outline-offset:2px}
+.wrap{max-width:1500px;margin:0 auto;padding-inline:16px;display:flex;flex-direction:column;gap:16px}
+.wrap>*{min-width:0}
+#weekView{width:100%;padding-inline:0}
+
+/* Header band: blue turf with the court's white line along the bottom */
+.band{background:var(--band);color:var(--on-band);border-bottom:3px solid #fff;margin-bottom:4px}
+.band .wrap{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding-block:16px}
+.brand h1{font:600 1.7rem/1.1 var(--f-display);margin:0;letter-spacing:-.01em}
+.brand p{margin:2px 0 0;color:var(--band-soft);font-size:.85rem}
+.nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.nav .range{font:500 1.05rem var(--f-display);min-width:11ch;text-align:center;font-variant-numeric:tabular-nums}
+.pill{border:1px solid color-mix(in srgb,var(--on-band) 70%,transparent);background:transparent;color:var(--on-band);border-radius:999px;padding:5px 13px;font-size:.85rem}
+.pill:hover{background:color-mix(in srgb,var(--on-band) 14%,transparent)}
+.pill.solid{background:var(--on-band);color:var(--band);border-color:var(--on-band)}
+.pill:focus-visible{outline-color:var(--on-band)}
+
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px}
+.btn:hover{border-color:var(--court)}
+.btn.primary{background:var(--court);border-color:var(--court);color:#fff}
+.tabs{display:flex;gap:4px}
+.tabs button{border:1px solid transparent;background:none;padding:6px 16px;font:500 .95rem var(--f-display);color:var(--muted);border-radius:999px}
+.tabs button[aria-selected="true"]{color:var(--court);background:var(--surface);border-color:var(--line)}
+
+.summary{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:baseline}
+.stat{display:flex;align-items:baseline;gap:6px}
+.stat b{font:600 1.6rem/1 var(--f-display);font-variant-numeric:tabular-nums}
+.stat span{color:var(--muted);font-size:.82rem}
+.stat.hi b{color:var(--court)}
+
+.filters{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 12px 4px 9px;font-size:.82rem}
+.chip i{width:10px;height:10px;border-radius:50%;background:var(--c,var(--court));flex:none}
+.chip[aria-pressed="false"]{opacity:.45}
+.chip[aria-pressed="false"] i{background:transparent;outline:1.5px solid var(--c,var(--court))}
+.chip .n{color:var(--muted);font-variant-numeric:tabular-nums}
+.chip.free i{background:var(--free-bg);border:1.5px solid var(--free-line)}
+
+.status{color:var(--muted);font-size:.85rem}
+.status.err{color:var(--now)}
+.loading{opacity:.45;transition:opacity .15s;pointer-events:none}
+@media (prefers-reduced-motion:reduce){.loading{transition:none}}
+
+/* Week board */
+.board-scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-panel)}
+.board{display:grid;grid-template-columns:52px repeat(7,minmax(150px,1fr));min-width:1100px;position:relative}
+.dayhead{position:sticky;top:0;z-index:3;background:var(--surface);border-bottom:1px solid var(--line);border-left:1px solid var(--line);padding:10px 8px 0}
+.dayhead .d{font:500 1rem var(--f-display);display:flex;justify-content:space-between;align-items:baseline}
+.dayhead .d small{font:400 .8rem var(--f-body);color:var(--muted)}
+.dayhead.today .d,.dayhead.today .d small{color:var(--court)}
+.dayhead.today{box-shadow:inset 0 3px 0 var(--court)}
+.lanes-h{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;margin-top:4px}
+.lanes-h span{font-size:.68rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-bottom:6px}
+.corner{border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--surface);z-index:3}
+.axis{position:relative}
+.axis span{position:absolute;right:6px;transform:translateY(-50%);font:400 .72rem var(--f-mono);color:var(--muted)}
+.daycol{position:relative;border-left:1px solid var(--line);display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;padding:0 4px;
+  background-image:repeating-linear-gradient(to bottom,color-mix(in srgb,var(--line) 70%,transparent) 0 1px,transparent 1px var(--hour))}
+.daycol.today{background-color:color-mix(in srgb,var(--court-soft) 60%,transparent)}
+.lane{position:relative}
+.now{position:absolute;left:0;right:0;height:0;border-top:2px solid var(--now);z-index:2;pointer-events:none}
+.now::before{content:"";position:absolute;left:-4px;top:-5px;width:8px;height:8px;border-radius:50%;background:var(--now)}
+
+.slot{position:absolute;left:0;right:0;border-radius:var(--r-tile);padding:5px 8px;overflow:hidden;text-align:left;font-size:.74rem;line-height:1.25;display:flex;flex-direction:column;gap:1px;
+  background:var(--surface);border:1px solid var(--line);color:var(--fg)}
+.slot .t{font:400 .7rem var(--f-mono);color:var(--muted)}
+.slot .l{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slot .x{white-space:normal;overflow:hidden}
+.slot .sub{color:var(--muted)}
+.slot .sc{font:500 .72rem var(--f-mono);margin-top:auto}
+.slot.league{border-color:color-mix(in srgb,var(--c) 65%,transparent);background:color-mix(in srgb,var(--c) 6%,var(--surface))}
+.slot.league .sub,.slot.league .sc{color:var(--c)}
+.slot.booking{border-color:color-mix(in srgb,var(--court) 25%,var(--line))}
+.slot.free{background:var(--free-bg);border:1px solid var(--free-line);color:var(--free)}
+.slot.free .t{color:var(--free);opacity:.75}
+.slot.free .l{font-weight:600}
+.slot.free .open{font:600 .62rem var(--f-body);letter-spacing:.06em;text-transform:uppercase;opacity:.8}
+.slot.mine{background:var(--court);border-color:var(--court);color:#fff}
+.slot.mine .t,.slot.mine .sub,.slot.mine .sc{color:color-mix(in srgb,#fff 82%,transparent)}
+.slot:hover{border-color:var(--c,var(--court))}
+.slot.free:hover{background:color-mix(in srgb,var(--free-line) 30%,var(--free-bg));border-color:var(--free)}
+.slot.past{opacity:.55}
+.tag{display:inline-block;font:500 .62rem var(--f-body);padding:0 5px;border-radius:999px;background:var(--court-soft);color:var(--court);vertical-align:1px}
+.slot.mine .tag{background:color-mix(in srgb,#fff 22%,transparent);color:#fff}
+
+/* Agenda (phone) */
+.agenda{display:none;flex-direction:column;gap:18px}
+.agenda h3{font:500 1.1rem var(--f-display);margin:0 0 6px;display:flex;gap:8px;align-items:baseline}
+.agenda h3 small{font:400 .82rem var(--f-body);color:var(--muted)}
+.agenda h3.today,.agenda h3.today small{color:var(--court)}
+.agenda ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.agenda .slot{position:static;flex-direction:row;align-items:center;gap:10px;padding:9px 12px;font-size:.85rem;width:100%}
+.agenda .slot .t{min-width:4.2em}
+.agenda .slot .body{min-width:0;flex:1;display:flex;flex-direction:column}
+.agenda .slot .court{color:var(--muted);font-size:.75rem}
+.agenda .slot.mine .court{color:color-mix(in srgb,#fff 82%,transparent)}
+.agenda .slot.league .court{color:var(--c)}
+.agenda .slot .sc{margin:0}
+.empty{color:var(--muted);font-size:.85rem}
+@media (max-width:760px){.board-scroll{display:none}.agenda{display:flex}.brand h1{font-size:1.4rem}.nav .range{min-width:0}}
+
+/* Results */
+.results{display:flex;flex-direction:column;gap:18px}
+.results h3{font:500 1rem var(--f-display);margin:0 0 6px;color:var(--muted)}
+.res{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-panel);padding:12px 16px;margin-bottom:8px}
+.res .team{min-width:0;display:flex;flex-direction:column}
+.res .team b{font-weight:500}
+.res .team.w b{font-weight:600;color:var(--win)}
+.res .team.w b::after{content:" ●";color:var(--ball);font-size:.7em;vertical-align:2px}
+.res .team small{color:var(--muted);font-size:.75rem}
+.res .sets{display:flex;gap:10px;font:500 1rem var(--f-mono);align-self:center}
+.res .sets span{display:flex;flex-direction:column;align-items:center;line-height:1.35}
+.res .sets em{font-style:normal;font-weight:600}
+.res .meta{grid-column:1/-1;color:var(--muted);font-size:.74rem;margin-top:4px}
+
+/* Drawer */
+.drawer{position:fixed;inset:0;display:flex;justify-content:flex-end;z-index:10;background:color-mix(in srgb,#0a1419 40%,transparent)}
+.drawer .panel{width:min(420px,100%);height:100%;background:var(--surface);padding:calc(20px + env(safe-area-inset-top,0px)) 20px 24px;overflow:auto;display:flex;flex-direction:column;gap:14px;box-shadow:-8px 0 30px rgba(0,0,0,.18);border-left:3px solid var(--court)}
+.drawer h2{font:600 1.45rem/1.15 var(--f-display);margin:0;text-wrap:balance}
+.drawer .when{font:400 .85rem var(--f-mono);color:var(--muted)}
+.kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 14px;margin:0}
+.kv dt{color:var(--muted);font-size:.8rem;padding-top:1px}
+.kv dd{margin:0}
+.vs{display:flex;flex-direction:column;gap:8px;border-block:1px solid var(--line);padding-block:12px}
+.vs .side b{display:block;font-weight:600}
+.vs .side small{color:var(--muted)}
+.vs .sep{font:500 .75rem var(--f-display);color:var(--muted);letter-spacing:.1em}
+.drawer a{color:var(--court)}
+.drawer .close{align-self:flex-end}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:.8rem;color:var(--muted)}
+.field input{border:1px solid var(--line);background:var(--bg);border-radius:var(--r-tile);padding:8px 11px;width:100%}
+.hint{color:var(--muted);font-size:.8rem;margin:0}
+
+/* Booking */
+.confirm{display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);border-radius:var(--r-panel);padding:14px;background:var(--court-soft)}
+.confirm .price{font:600 1.5rem var(--f-display);font-variant-numeric:tabular-nums;color:var(--court)}
+.msg{font-size:.85rem;margin:0}
+.msg.err{color:var(--now)}
+.msg.ok{color:var(--l3)}
+</style>
+</head>
+<body>
+<header class="band">
+  <div class="wrap">
+    <div class="brand">
+      <h1 id="clubName">Padel week</h1>
+      <p id="clubSub">Live from Sporty.plus</p>
+    </div>
+    <div class="nav">
+      <button class="pill" id="prev" aria-label="Previous week">←</button>
+      <button class="pill solid" id="today">This week</button>
+      <span class="range" id="range"></span>
+      <button class="pill" id="next" aria-label="Next week">→</button>
+      <button class="pill" id="refresh" title="Reload data" aria-label="Reload data">↻</button>
+      <button class="pill" id="themeBtn" title="Switch between automatic, light and dark">Auto</button>
+      <button class="pill" id="settingsBtn">Settings</button>
+      <button class="pill solid" id="accountBtn">Log in</button>
+    </div>
+  </div>
+</header>
+<div class="wrap">
+  <div class="tabs" role="tablist">
+    <button role="tab" id="tabWeek" aria-selected="true">Schedule</button>
+    <button role="tab" id="tabResults" aria-selected="false">Results</button>
+  </div>
+
+  <section id="weekView" class="wrap" style="gap:12px">
+    <div class="summary" id="summary"></div>
+    <div class="filters" id="filters"></div>
+    <div class="status" id="status">Loading…</div>
+    <div class="board-scroll"><div class="board" id="board"></div></div>
+    <div class="agenda" id="agenda"></div>
+  </section>
+
+  <section id="resultsView" class="results" hidden></section>
+</div>
+
+<div class="drawer" id="drawer" hidden><div class="panel" id="panel" role="dialog" aria-modal="true"></div></div>
+
+<script>
+const API = 'https://api.tenis.plus';
+const LEAGUE_COLORS = ['--l1','--l2','--l3','--l4','--l5','--l6'];
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem('pw.'+k); return v==null?d:JSON.parse(v);}catch(e){return d;} },
+  set(k, v){ try{ localStorage.setItem('pw.'+k, JSON.stringify(v)); }catch(e){} }
+};
+const cfg = {
+  club: store.get('club', 139),
+  sub: store.get('sub', 'modesto'),
+  token: store.get('token', ''),
+  nick: store.get('nick', {}),          // league id -> nickname
+  hidden: store.get('hidden', {free:false}) // filter keys -> hidden?
+};
+
+const state = { monday: mondayOf(new Date()), days: [], courts: [], teams: new Map(), results: [], resultsByGame: new Map(), leagues: new Map(), club: null, me: null };
+
+/* ---------- helpers ---------- */
+function mondayOf(d){ const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); const wd = (x.getDay()+6)%7; x.setDate(x.getDate()-wd); return x; }
+function addDays(d,n){ const x = new Date(d); x.setDate(x.getDate()+n); return x; }
+function ymd(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+// Sporty+ encodes times as decimal hours ×100: 850 = 8:30, 1450 = 14:30
+function hrs(t){ return t/100; }
+function hm(t){ const h = Math.floor(t/100), m = Math.round((t%100)*0.6); return h+':'+String(m).padStart(2,'0'); }
+function esc(s){ return String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function rangeText(m){ const f = d => d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}); return f(m)+' – '+f(addDays(m,6)); }
+function sameDay(a,b){ return ymd(a)===ymd(b); }
+
+async function api(path, body){
+  const h = { 'Accept':'application/json', 'x-club': String(cfg.club) };
+  if (cfg.token) h.Authorization = cfg.token.startsWith('Bearer') ? cfg.token : 'Bearer '+cfg.token;
+  const opt = { headers:h };
+  if (body !== undefined) { opt.method = 'POST'; h['Content-Type'] = 'application/json'; opt.body = JSON.stringify(body); }
+  const r = await fetch(API+path, opt);
+  if (!r.ok) {
+    let msg = ''; try { const j = await r.json(); msg = j.error || j.message || ''; } catch(_){}
+    const e = new Error(msg || (r.status+' '+path)); e.status = r.status; e.apiMessage = msg; throw e;
+  }
+  const txt = await r.text(); try { return JSON.parse(txt); } catch(_) { return txt; }
+}
+
+/* ---------- logged-in user (needed to book in your own name) ---------- */
+async function loadMe(){
+  state.me = null;
+  if (!cfg.token) return;
+  try { const r = await api('/v2/me'); state.me = r.user || r.data || r; } catch(e){}
+}
+
+/* ---------- data ---------- */
+async function loadClub(){
+  try { state.club = await api('/v2/club/this'); } catch(e){ state.club = null; }
+  const n = state.club?.name || 'Padel';
+  document.getElementById('clubName').textContent = n;
+  document.getElementById('clubSub').textContent = state.club ? [state.club.city, 'live from Sporty.plus'].filter(Boolean).join(' · ') : 'Live from Sporty.plus';
+  document.title = n + ' · Padel Week';
+}
+
+/* Results are public and carry team + player names (slots only carry team ids), but the
+   endpoint is slow (~4-6 s per page), so they load in the background and are cached in a
+   trimmed form so the next visit has names and scores straight away. */
+function trimResult(r){
+  const team = t => t && { id:t.id, display_name:t.display_name, players:(t.players||[]).map(p=>({display_name:p.display_name})) };
+  return { id:r.id, date:r.date, sets:r.sets, winner_side:r.winner_side, winner_team_id:r.winner_team_id, game_id:r.game_id,
+           official:r.official, verified:r.verified, game: r.game ? { round:r.game.round } : null, players:(r.players||[]).map(team) };
+}
+function setResults(list){
+  const seen = new Set(); state.results = [];
+  for (const r of list) {
+    if (seen.has(r.id)) continue; seen.add(r.id); state.results.push(r);
+    for (const t of r.players||[]) if (t) state.teams.set(t.id, t);
+    if (r.game_id) state.resultsByGame.set(r.game_id, r);
+  }
+  state.results.sort((a,b)=> b.date.localeCompare(a.date));
+}
+function loadCachedResults(){ const c = store.get('results.'+cfg.club, null); if (c && Array.isArray(c)) setResults(c); }
+async function loadResults(){
+  const pages = await Promise.allSettled([1,2,3,4,5,6].map(p => api(`/v2/result?filter[club]=${cfg.club}&limit=50&page=${p}`)));
+  const fresh = pages.flatMap(p => p.status==='fulfilled' ? p.value.data.map(trimResult) : []);
+  if (!fresh.length) return;
+  setResults(fresh);
+  store.set('results.'+cfg.club, state.results);
+}
+
+async function loadLeague(id){
+  if (state.leagues.has(id)) return;
+  state.leagues.set(id, { id, name:null });
+  try { const l = await api(`/v2/league/${id}`); state.leagues.set(id, { id, name:l.name, link:l.link, data:l }); }
+  catch(e){ /* private league: needs login token */ }
+}
+
+/* ---------- weeks: cached in memory, prefetched, and the current one kept in localStorage ---------- */
+const weekCache = new Map();      // monday ymd -> { at, days:[courts[] per day] }
+const inflight = new Map();       // monday ymd -> Promise
+const FRESH_MS = 60_000;
+let showSeq = 0;
+
+function fetchWeek(monday){
+  const key = ymd(monday);
+  if (inflight.has(key)) return inflight.get(key);
+  const q = d => `/v2/court?filter[is_active]=1&filter[club_id]=${cfg.club}&page=1&limit=50&date=${ymd(d)}&parsed2=true` + (cfg.token?'':'&unauth=true');
+  const p = Promise.all([...Array(7)].map((_,i) => api(q(addDays(monday,i)))))
+    .then(res => {
+      // keep only what the page uses, so the cache stays small
+      const days = res.map(r => r.data.map(c => ({ id:c.id, name:c.name, reservation_duration:c.reservation_duration, parsed_reservations:c.parsed_reservations })));
+      const entry = { at: Date.now(), days };
+      weekCache.set(key, entry);
+      if (key === ymd(mondayOf(new Date()))) store.set('week.'+cfg.club+'.'+(cfg.token?'auth':'anon'), { key, ...entry });
+      return entry;
+    })
+    .finally(() => inflight.delete(key));
+  inflight.set(key, p);
+  return p;
+}
+
+function applyWeek(monday, entry){
+  const dates = [...Array(7)].map((_,i)=>addDays(monday,i));
+  const courts = new Map();
+  state.days = entry.days.map((list,i) => {
+    const slots = [];
+    for (const c of list) {
+      courts.set(c.id, { id:c.id, name:c.name, dur:c.reservation_duration });
+      for (const s of Object.values(c.parsed_reservations||{})) if (!s.hidden) slots.push(normalize(s, c, dates[i]));
+    }
+    return { date: dates[i], slots };
+  });
+  state.courts = [...courts.values()];
+  const ids = new Set(); state.days.forEach(d=>d.slots.forEach(s=>s.leagueId && ids.add(s.leagueId)));
+  const missing = [...ids].filter(id => !state.leagues.has(id));
+  if (missing.length) Promise.all(missing.map(loadLeague)).then(() => { if (ymd(state.monday)===ymd(monday)) render(); });
+}
+
+function setLoading(on){
+  document.getElementById('status').className = 'status';
+  document.getElementById('status').textContent = on ? 'Loading week…' : '';
+  document.querySelector('.board-scroll').classList.toggle('loading', on);
+  document.getElementById('agenda').classList.toggle('loading', on);
+}
+
+// Show a week: instantly from cache when we have it, refreshing in the background if it's stale.
+async function showWeek(monday, {force=false}={}){
+  state.monday = monday;
+  const seq = ++showSeq, key = ymd(monday), cached = weekCache.get(key);
+  if (cached) { applyWeek(monday, cached); render(); }
+  else { const r = document.getElementById('range'); if (r) r.textContent = rangeText(monday); }
+  if (cached && !force && Date.now()-cached.at < FRESH_MS) { setLoading(false); prefetchAround(monday); return; }
+  setLoading(!cached);
+  try {
+    const entry = await fetchWeek(monday);
+    if (seq !== showSeq) return;           // user already moved to another week
+    applyWeek(monday, entry); render();
+    setLoading(false);
+    prefetchAround(monday);
+  } catch(e) {
+    if (seq !== showSeq) return;
+    setLoading(false);
+    if (!cached){ state.days = []; state.courts = []; render(); }
+    const status = document.getElementById('status');
+    status.className='status err';
+    status.textContent = e.status===401 ? 'The login token was refused. Clear it in Settings or paste a fresh one.' : 'Could not load the schedule ('+e.message+'). Check your connection and press ↻.';
+  }
+}
+function prefetchAround(monday){
+  for (const d of [7,-7,14]) { const m = addDays(monday,d), c = weekCache.get(ymd(m)); if (!c || Date.now()-c.at > FRESH_MS) fetchWeek(m).catch(()=>{}); }
+}
+// Used after a booking: refetch the visible week.
+async function loadWeek(){ weekCache.delete(ymd(state.monday)); await showWeek(state.monday, {force:true}); }
+
+function normalize(s, court, date){
+  const booked = !!s.id;
+  const start = booked ? s.start_time : s.time;
+  const end = booked ? s.end_time : s.time + (court.reservation_duration/60)*100;
+  const comp = s.competition?.object || {};
+  const teamIds = [...new Set((s.players||[]).map(p=>p.team_id).filter(Boolean))];
+  return {
+    raw:s, court, date, booked, start, end,
+    price: s.price, leagueId: comp.league_id || null, tournamentId: comp.tournament_id || null,
+    kind: !booked ? 'free' : (comp.league_id || comp.tournament_id) ? 'league' : 'booking',
+    teamIds, players: s.players||[], recurring: !!s.recurring, openSeats: s.open_seats||0,
+    waiting: (s.waiting_list||[]).length, byClub: s.type==='in_behalf', gameId: s.game_id, id: s.id
+  };
+}
+
+/* ---------- naming ---------- */
+function leagueName(id){ return cfg.nick[id] || state.leagues.get(id)?.name || ('League #'+id); }
+function leagueColor(id){
+  const ids = [...state.leagues.keys()].sort((a,b)=>a-b);
+  return `var(${LEAGUE_COLORS[Math.max(0,ids.indexOf(id)) % LEAGUE_COLORS.length]})`;
+}
+function teamName(id){ return state.teams.get(id)?.display_name || null; }
+function teamPlayers(id){ return (state.teams.get(id)?.players||[]).map(p=>p.display_name).join(', '); }
+function namedPlayers(s){ return s.players.map(p=>p.display_name).filter(Boolean); }
+// A booking is yours when you or your team is on it (player ids are only visible with a login token).
+function isMine(s){
+  const m = state.me; if (!m || !s.booked) return false;
+  const teamId = m.team?.id;
+  return s.players.some(p => (p.id && p.id===m.id) || (teamId && p.team_id===teamId));
+}
+function slotClass(s){ return s.kind + (isMine(s)?' mine':''); }
+function slotTitle(s){
+  if (s.kind==='free') return s.price!=null ? `Free · €${s.price}` : 'Free';
+  if (s.kind==='league'){
+    const names = s.teamIds.map(teamName);
+    if (s.teamIds.length===2 && names.every(Boolean)) return names.join(' – ');
+    if (names.some(Boolean)) return names.filter(Boolean).join(' – ');
+    return 'League match';
+  }
+  if (isMine(s)) return 'Your booking';
+  const np = namedPlayers(s);
+  if (np.length) return np.join(', ');
+  return s.byClub ? 'Club booking' : 'Booked';
+}
+function filterKey(s){ return s.kind==='league' ? 'L'+(s.leagueId||'t'+s.tournamentId) : s.kind; }
+function scoreLine(r){ return (r.sets||[]).filter(x=>x[0]||x[1]).map(x=>x[0]+'-'+x[1]).join(' '); }
+
+/* ---------- render ---------- */
+function render(){
+  document.getElementById('range').textContent = rangeText(state.monday);
+  renderSummary(); renderFilters(); renderBoard(); renderAgenda();
+}
+
+function visible(s){
+  if (s.kind==='free' && slotEnd(s) < new Date()) return false;
+  return !cfg.hidden[filterKey(s)];
+}
+
+function bookingPayload(s){
+  // Same shape the official app sends for a booking in your own name; times are the slot objects as /v2/court returns them.
+  const me = state.me?.team ? state.me.team : {};
+  return { date: ymd(s.date), times:[s.raw], players:[me, {}], repeat:0, group:{}, every_other_week:false, court_id: s.court.id,
+           name:'', monthly_prepayment:false, version:'20250422', cart:[] };
+}
+
+function myName(){ const m = state.me; return m ? (m.display_name || [m.first_name, m.last_name].filter(Boolean).join(' ')) : ''; }
+
+function bookingSection(s){
+  if (s.kind!=='free' || slotDate(s) < new Date()) return '';
+  if (!cfg.token) return `<div class="confirm"><b>Want this court?</b><p class="hint">Log in with your Sporty.plus account to book it from here.</p><button class="btn primary" type="button" onclick="openLogin()" style="align-self:flex-start">Log in to book</button></div>`;
+  return `<div class="confirm" id="bookBox">
+    <div><div class="hint">Book for yourself</div><b>${esc(myName() || 'In your name')}</b></div>
+    <div class="price" id="bookPrice">${s.price!=null?'€'+s.price:''}</div>
+    <p class="hint">Paid at the club. Cancelling follows the club's Sporty.plus rules.</p>
+    <button class="btn primary" id="bookGo" style="align-self:flex-start">Book ${esc(hm(s.start))} on ${esc(s.court.name)}</button>
+    <p class="msg" id="bookMsg" aria-live="polite"></p></div>`;
+}
+
+function wireBooking(s){
+  const go = document.getElementById('bookGo'); if (!go) return;
+  const msg = document.getElementById('bookMsg');
+  api('/v2/reservation/price', bookingPayload(s)).then(p => {
+    const n = typeof p==='number' ? p : Object.values(p||{}).filter(v=>typeof v==='number').reduce((a,b)=>a+b, NaN);
+    if (Number.isFinite(n)) document.getElementById('bookPrice').textContent = '€'+n;
+  }).catch(()=>{});
+  let armed = false;
+  go.onclick = async () => {
+    if (!armed){ armed = true; go.textContent = 'Tap again to confirm'; msg.className='msg'; msg.textContent = `${s.court.name}, ${s.date.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})} at ${hm(s.start)}.`; return; }
+    go.disabled = true; go.textContent = 'Booking…';
+    try {
+      await api('/v2/reservation', bookingPayload(s));
+      msg.className = 'msg ok'; msg.textContent = 'Booked. Updating the schedule…'; go.hidden = true;
+      await loadWeek(); render();
+      setTimeout(closeDrawer, 1200);
+    } catch(e) {
+      msg.className = 'msg err';
+      msg.textContent = e.status===401 ? 'Your login token was refused. Paste a fresh one in Settings.' : 'Sporty.plus refused the booking: ' + (e.apiMessage || e.message);
+      go.disabled = false; go.textContent = 'Try again'; armed = true;
+    }
+  };
+}
+function allSlots(){ return state.days.flatMap(d=>d.slots); }
+
+function renderSummary(){
+  const all = allSlots(); const league = all.filter(s=>s.kind==='league');
+  const played = league.filter(s=>state.resultsByGame.has(s.gameId)).length;
+  const booked = all.filter(s=>s.booked).length;
+  const now = new Date();
+  const freeLeft = all.filter(s=>s.kind==='free' && slotDate(s) > now).length;
+  const el = document.getElementById('summary');
+  const mine = all.filter(isMine).length;
+  el.innerHTML = state.days.length ? [
+    ...(state.me ? [[mine,'your bookings','hi']] : []),
+    [booked,'courts booked'],[league.length,'league matches'],[played,'results in'],[freeLeft,'free slots left']
+  ].map(([n,l,c])=>`<div class="stat ${c||''}"><b>${n}</b><span>${l}</span></div>`).join('') : '';
+}
+
+function renderFilters(){
+  const counts = {}; for (const s of allSlots()) counts[filterKey(s)] = (counts[filterKey(s)]||0)+1;
+  const chips = [];
+  for (const id of [...state.leagues.keys()].sort((a,b)=>a-b)) {
+    const k = 'L'+id; if (!counts[k]) continue;
+    chips.push(`<button class="chip" data-k="${k}" aria-pressed="${!cfg.hidden[k]}" style="--c:${leagueColor(id)}"><i></i>${esc(leagueName(id))} <span class="n">${counts[k]}</span></button>`);
+  }
+  for (const k of Object.keys(counts).filter(k=>k.startsWith('Lt'))) chips.push(`<button class="chip" data-k="${k}" aria-pressed="${!cfg.hidden[k]}"><i></i>Tournament <span class="n">${counts[k]}</span></button>`);
+  if (counts.booking) chips.push(`<button class="chip" data-k="booking" aria-pressed="${!cfg.hidden.booking}" style="--c:color-mix(in srgb,var(--court) 35%,var(--line))"><i></i>Bookings <span class="n">${counts.booking}</span></button>`);
+  if (counts.free) chips.push(`<button class="chip free" data-k="free" aria-pressed="${!cfg.hidden.free}"><i></i>Free slots <span class="n">${counts.free}</span></button>`);
+  const el = document.getElementById('filters'); el.innerHTML = chips.join('');
+  el.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{ const k=b.dataset.k; cfg.hidden[k]=!cfg.hidden[k]; store.set('hidden',cfg.hidden); render(); });
+}
+
+function slotDate(s){ const d = new Date(s.date); const h = Math.floor(s.start/100); d.setHours(h, Math.round((s.start%100)*0.6)); return d; }
+function slotEnd(s){ const d = new Date(s.date); d.setHours(Math.floor(s.end/100), Math.round((s.end%100)*0.6)); return d; }
+
+function slotInner(s, compact){
+  if (s.kind==='free') return `<span class="t">${hm(s.start)}</span><span class="open">Free</span><span class="l">${s.price!=null?'€'+s.price:''}</span>`;
+  const r = state.resultsByGame.get(s.gameId);
+  const tags = [s.recurring?'<span class="tag" title="Recurring booking">weekly</span>':'', s.openSeats?`<span class="tag" title="Open seats">+${s.openSeats}</span>`:''].join(' ');
+  const sub = s.kind==='league' ? leagueName(s.leagueId) : s.kind==='booking' ? (s.players.length? s.players.length+' player'+(s.players.length>1?'s':''):'') : '';
+  return `<span class="t">${hm(s.start)}–${hm(s.end)}</span>
+    <span class="${compact?'l':'x'}">${esc(slotTitle(s))}</span>
+    ${sub||tags.trim()?`<span class="l sub">${esc(sub)} ${tags}</span>`:''}
+    ${r?`<span class="sc">${esc(scoreLine(r))}</span>`:''}`;
+}
+
+function renderBoard(){
+  const board = document.getElementById('board');
+  if (!state.days.length){ board.innerHTML=''; return; }
+  const all = allSlots();
+  const min = Math.floor(Math.min(...all.map(s=>hrs(s.start)), 8));
+  const max = Math.ceil(Math.max(...all.map(s=>hrs(s.end)), 22));
+  const H = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hour'));
+  const height = (max-min)*H;
+  const now = new Date();
+  let html = `<div class="corner"></div>`;
+  state.days.forEach((d,i)=>{
+    const t = sameDay(d.date, now);
+    html += `<div class="dayhead${t?' today':''}"><div class="d">${DAYS[i]} <small>${d.date.getDate()}.${d.date.getMonth()+1}.</small></div>
+      <div class="lanes-h">${state.courts.map(c=>`<span title="${esc(c.name)}">${esc(c.name)}</span>`).join('')}</div></div>`;
+  });
+  html += `<div class="axis" style="height:${height}px">${[...Array(max-min+1)].map((_,i)=>i&&i<max-min?`<span style="top:${i*H}px">${min+i}:00</span>`:'').join('')}</div>`;
+  state.days.forEach((d)=>{
+    const t = sameDay(d.date, now);
+    html += `<div class="daycol${t?' today':''}" style="height:${height}px">`;
+    for (const c of state.courts){
+      html += `<div class="lane">`;
+      for (const s of d.slots.filter(s=>s.court.id===c.id && visible(s))){
+        const top = (hrs(s.start)-min)*H, h = (hrs(s.end)-hrs(s.start))*H - 3;
+        const style = `top:${top+1}px;height:${h}px;${s.kind==='league'?'--c:'+leagueColor(s.leagueId):''}`;
+        const past = slotEnd(s) < now ? ' past':'';
+        html += `<button class="slot ${slotClass(s)}${past}" style="${style}" data-id="${slotKey(s)}">${slotInner(s,true)}</button>`;
+      }
+      html += `</div>`;
+    }
+    if (t){ const nh = now.getHours()+now.getMinutes()/60; if (nh>=min && nh<=max) html += `<div class="now" style="top:${(nh-min)*H}px"></div>`; }
+    html += `</div>`;
+  });
+  board.innerHTML = html;
+  board.querySelectorAll('.slot').forEach(b=>b.onclick=()=>openSlot(b.dataset.id));
+}
+
+function renderAgenda(){
+  const el = document.getElementById('agenda'); const now = new Date();
+  el.innerHTML = state.days.map((d,i)=>{
+    const list = d.slots.filter(visible).sort((a,b)=>a.start-b.start || a.court.name.localeCompare(b.court.name));
+    return `<div><h3 class="${sameDay(d.date,now)?'today':''}">${DAYS[i]} <small>${d.date.toLocaleDateString('en-GB',{day:'numeric',month:'long'})}</small></h3>
+      ${list.length?`<ul>${list.map(s=>`<li><button class="slot ${slotClass(s)}${slotEnd(s)<now?' past':''}" style="${s.kind==='league'?'--c:'+leagueColor(s.leagueId):''}" data-id="${slotKey(s)}">
+        <span class="t">${hm(s.start)}</span><span class="body"><span class="l">${esc(slotTitle(s))}</span><span class="court">${esc(s.court.name)}${s.kind==='league'?' · '+esc(leagueName(s.leagueId)):''}${s.recurring?' · weekly':''}</span></span>
+        ${state.resultsByGame.get(s.gameId)?`<span class="sc">${esc(scoreLine(state.resultsByGame.get(s.gameId)))}</span>`:''}</button></li>`).join('')}</ul>`:'<p class="empty">Nothing to show for this day.</p>'}</div>`;
+  }).join('');
+  el.querySelectorAll('.slot').forEach(b=>b.onclick=()=>openSlot(b.dataset.id));
+}
+
+function slotKey(s){ return ymd(s.date)+'|'+s.court.id+'|'+s.start; }
+
+/* ---------- drawer ---------- */
+const drawer = document.getElementById('drawer'), panel = document.getElementById('panel');
+drawer.onclick = e => { if (e.target===drawer) closeDrawer(); };
+document.addEventListener('keydown', e => { if (e.key==='Escape' && !drawer.hidden) closeDrawer(); });
+function closeDrawer(){ drawer.hidden = true; }
+function openDrawer(html){ panel.innerHTML = `<button class="btn close" id="closeD">Close</button>`+html; drawer.hidden=false; document.getElementById('closeD').onclick=closeDrawer; document.getElementById('closeD').focus(); }
+
+function openSlot(key){
+  const s = allSlots().find(x=>slotKey(x)===key); if (!s) return;
+  const r = state.resultsByGame.get(s.gameId);
+  const when = s.date.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})+' · '+hm(s.start)+'–'+hm(s.end);
+  const bookUrl = `https://${cfg.sub}.sporty.plus/app/courts`;
+  let body = '';
+  if (s.kind==='league' || (s.kind==='booking' && s.teamIds.length===2)) {
+    const sides = s.teamIds.map(id=>{
+      const won = r && r.winner_team_id===id;
+      return `<div class="side"><b>${esc(teamName(id)||'Team #'+id)}${won?' — won':''}</b><small>${esc(teamPlayers(id)||'Player names not public')}</small></div>`;
+    });
+    body += `<div class="vs">${sides.join('<div class="sep">VS</div>')}</div>`;
+  }
+  const rows = [];
+  rows.push(['Court', esc(s.court.name)]);
+  if (s.kind==='league') rows.push(['League', `${esc(leagueName(s.leagueId))} <button class="btn" id="renameL" style="padding:1px 8px;font-size:.75rem">Rename</button>`]);
+  if (s.kind==='free') rows.push(['Price', s.price!=null?'€'+s.price:'—']);
+  if (s.booked) {
+    rows.push(['Type', s.kind==='league'?'League match':s.byClub?'Booked by the club':'Player booking']);
+    const np = namedPlayers(s); rows.push(['Players', np.length? esc(np.join(', ')) : s.players.length+' (names hidden)']);
+    if (s.recurring) rows.push(['Repeats','Every week']);
+    if (s.openSeats) rows.push(['Open seats', s.openSeats]);
+    if (s.waiting) rows.push(['Waiting list', s.waiting+' waiting']);
+    rows.push(['Paid', s.raw.is_paid?'Yes':'No']);
+    if (s.raw.created_at) rows.push(['Booked on', new Date(s.raw.created_at).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})]);
+  }
+  if (r) rows.push(['Result', `<span style="font-family:var(--f-mono)">${esc(scoreLine(r))}</span>`]);
+  body += `<dl class="kv">${rows.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
+  body += bookingSection(s);
+  body += `<p class="hint"><a href="${bookUrl}" target="_blank" rel="noopener">Open in Sporty.plus</a></p>`;
+  openDrawer(`<div><div class="when">${esc(when)}</div><h2>${esc(slotTitle(s))}</h2></div>`+body);
+  wireBooking(s);
+  const rn = document.getElementById('renameL');
+  if (rn) rn.onclick = () => {
+    const dd = rn.parentElement;
+    dd.innerHTML = `<div class="field"><input id="nickIn" value="${esc(cfg.nick[s.leagueId]||state.leagues.get(s.leagueId)?.name||'')}" placeholder="e.g. Winter doubles"><button class="btn primary" id="nickSave" style="align-self:flex-start">Save name</button></div>`;
+    const inp = document.getElementById('nickIn'); inp.focus();
+    const save = () => { const v = inp.value.trim(); if (v) cfg.nick[s.leagueId]=v; else delete cfg.nick[s.leagueId]; store.set('nick',cfg.nick); render(); openSlot(key); };
+    document.getElementById('nickSave').onclick = save; inp.onkeydown = e=>{ if(e.key==='Enter') save(); };
+  };
+}
+
+/* ---------- Log in with your Sporty+ account ----------
+   Same flow as the official app: the password goes straight from this browser to Sporty+
+   (api.sporty.plus) and is never stored. Only the returned session token is kept, in this browser. */
+const AUTH = 'https://api.sporty.plus/api/v3';
+async function authPost(path, body, token){
+  const h = { 'Accept':'application/json', 'Content-Type':'application/json' };
+  if (token) h.Authorization = token;
+  const r = await fetch(AUTH+path, { method:'POST', headers:h, body: JSON.stringify(body||{}) });
+  let j = {}; try { j = await r.json(); } catch(_){}
+  if (!r.ok) {
+    const e = new Error(j.errors?.[0]?.detail || j.message || j.error || ('Sporty.plus answered '+r.status));
+    e.status = r.status; e.data = j; throw e;
+  }
+  return j;
+}
+function loginErrorText(e){
+  if (e.status===429) return 'Too many attempts. Wait a minute and try again.';
+  if (e.status===422) return e.message.includes('credentials') ? 'That email and password don’t match a Sporty.plus account.' : e.message;
+  return e.message || 'Could not reach Sporty.plus. Check your connection and try again.';
+}
+async function useToken(raw){
+  cfg.token = raw.startsWith('Bearer') ? raw : 'Bearer '+raw;
+  store.set('token', cfg.token);
+  state.teams.clear(); state.resultsByGame.clear(); state.leagues.clear(); weekCache.clear();
+  await loadMe(); updateAccountBtn(); boot();
+}
+function updateAccountBtn(){
+  const b = document.getElementById('accountBtn');
+  b.textContent = state.me ? (myName().split(' ')[0] || 'Account') : (cfg.token ? 'Account' : 'Log in');
+  b.classList.toggle('solid', !cfg.token);
+}
+
+function openLogin(){
+  if (cfg.token) return openAccount();
+  openDrawer(`<h2>Log in with Sporty.plus</h2>
+    <p class="hint">Use the same email and password as the ${esc(state.club?.name || 'club')} app. Your password goes straight to Sporty.plus and isn't saved here.</p>
+    <form id="loginForm" class="wrap" style="padding:0;gap:12px" novalidate>
+      <div class="field"><label for="lEmail">Email</label><input id="lEmail" type="email" autocomplete="username" placeholder="ana.horvat@gmail.com" required></div>
+      <div class="field"><label for="lPass">Password</label><input id="lPass" type="password" autocomplete="current-password" required></div>
+      <div class="field" id="lCodeRow" hidden><label for="lCode">Code from your authenticator app</label><input id="lCode" inputmode="numeric" autocomplete="one-time-code" placeholder="123456"></div>
+      <button class="btn primary" id="lGo" type="submit" style="align-self:flex-start">Log in</button>
+      <p class="msg" id="lMsg" aria-live="polite"></p>
+    </form>`);
+  const f = document.getElementById('loginForm'), msg = document.getElementById('lMsg'), go = document.getElementById('lGo');
+  let challenge = null;
+  document.getElementById('lEmail').focus();
+  f.onsubmit = async (ev) => {
+    ev.preventDefault();
+    const email = document.getElementById('lEmail').value.trim(), pass = document.getElementById('lPass').value;
+    const code = document.getElementById('lCode').value.trim();
+    msg.className = 'msg err';
+    if (!challenge && (!email || !pass)) { msg.textContent = 'Enter your email and password.'; return; }
+    if (challenge && !code) { msg.textContent = 'Enter the code from your authenticator app.'; return; }
+    go.disabled = true; go.textContent = 'Logging in…'; msg.textContent = '';
+    try {
+      const r = challenge
+        ? await authPost('/login/two-factor-challenge', { challenge, code, recovery_code: null })
+        : await authPost('/login', { client:'native', email, password: pass });
+      if (!r.token) throw new Error('Sporty.plus did not return a session. Try again.');
+      msg.className = 'msg ok'; msg.textContent = 'Logged in. Loading your view…';
+      await useToken(r.token);
+      setTimeout(closeDrawer, 600);
+    } catch(e) {
+      if (!challenge && e.data && e.data.error==='two_factor_required' && e.data.challenge) {
+        challenge = e.data.challenge;
+        document.getElementById('lCodeRow').hidden = false; document.getElementById('lCode').focus();
+        msg.className = 'msg'; msg.textContent = 'Your account uses two-step login. Enter the code to finish.';
+      } else msg.textContent = challenge && e.status===422 ? 'That code isn’t right. Try again.' : loginErrorText(e);
+      go.disabled = false; go.textContent = challenge ? 'Confirm code' : 'Log in';
+    }
+  };
+}
+
+function openAccount(){
+  openDrawer(`<h2>${esc(myName() || 'Your account')}</h2>
+    <p class="hint">Logged in with Sporty.plus. You see player names and private leagues, and you can book courts from here.</p>
+    <button class="btn" id="logoutBtn" style="align-self:flex-start">Log out</button>`);
+  document.getElementById('logoutBtn').onclick = async () => {
+    const t = cfg.token;
+    cfg.token = ''; store.set('token',''); state.me = null;
+    authPost('/logout', {}, t).catch(()=>{});   // end the session on Sporty+ too; logging out here works either way
+    state.teams.clear(); state.resultsByGame.clear(); state.leagues.clear(); weekCache.clear();
+    closeDrawer(); updateAccountBtn(); boot();
+  };
+}
+
+function openSettings(){
+  openDrawer(`<h2>Settings</h2>
+    <div class="field"><label for="sClub">Club ID</label><input id="sClub" inputmode="numeric" value="${esc(cfg.club)}"></div>
+    <div class="field"><label for="sSub">Club web address (the part before .sporty.plus)</label><input id="sSub" value="${esc(cfg.sub)}"></div>
+    <details><summary class="hint" style="cursor:pointer">Developer options</summary>
+      <div class="field" style="margin-top:10px"><label for="sTok">Session token</label><input id="sTok" type="password" value="${esc(cfg.token)}" placeholder="Bearer …" autocomplete="off"></div>
+      <p class="hint" style="margin-top:6px">Only needed if you'd rather paste a token than log in. It stays in this browser. Treat it like a password.</p>
+    </details>
+    <button class="btn primary" id="sSave" style="align-self:flex-start">Save and reload</button>`);
+  document.getElementById('sSave').onclick = () => {
+    cfg.club = parseInt(document.getElementById('sClub').value,10) || 139;
+    cfg.sub = document.getElementById('sSub').value.trim() || 'modesto';
+    cfg.token = document.getElementById('sTok').value.trim().replace(/^"|"$/g,'');
+    store.set('club',cfg.club); store.set('sub',cfg.sub); store.set('token',cfg.token);
+    closeDrawer(); state.teams.clear(); state.resultsByGame.clear(); state.leagues.clear(); weekCache.clear(); boot();
+  };
+}
+
+/* ---------- results tab ---------- */
+function renderResults(){
+  const el = document.getElementById('resultsView');
+  if (!state.results.length){ el.innerHTML = '<p class="empty">No results loaded yet.</p>'; return; }
+  const groups = new Map();
+  for (const r of state.results){ const d = r.date.slice(0,10); if(!groups.has(d)) groups.set(d,[]); groups.get(d).push(r); }
+  el.innerHTML = [...groups].map(([d,list])=>`<div><h3>${new Date(d+'T12:00').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</h3>
+    ${list.map(r=>{
+      const sets = (r.sets||[]).filter(x=>x[0]||x[1]);
+      const [a,b] = r.players||[];
+      const team = (t,i)=>`<div class="team${r.winner_side===i?' w':''}"><b>${esc(t?.display_name||'—')}</b><small>${esc((t?.players||[]).map(p=>p.display_name).join(', '))}</small></div>`;
+      const g = r.game || {};
+      return `<div class="res"><div style="display:flex;flex-direction:column;gap:6px;min-width:0">${team(a,0)}${team(b,1)}</div>
+        <div class="sets">${sets.map(x=>`<span><em style="${x[0]>x[1]?'':'font-weight:400;opacity:.6'}">${x[0]}</em><em style="${x[1]>x[0]?'':'font-weight:400;opacity:.6'}">${x[1]}</em></span>`).join('')}</div>
+        <div class="meta">${r.date.slice(11,16)}${g.round?' · Round '+g.round:''}${r.official?' · official':''}${r.verified?' · verified':''}</div></div>`;
+    }).join('')}</div>`).join('');
+}
+
+/* ---------- wiring ---------- */
+const tabWeek = document.getElementById('tabWeek'), tabRes = document.getElementById('tabResults');
+function showTab(which){
+  tabWeek.setAttribute('aria-selected', which==='week'); tabRes.setAttribute('aria-selected', which==='results');
+  document.getElementById('weekView').hidden = which!=='week';
+  document.getElementById('resultsView').hidden = which!=='results';
+  if (which==='results') renderResults();
+  store.set('tab', which);
+}
+tabWeek.onclick = ()=>showTab('week'); tabRes.onclick = ()=>showTab('results');
+document.getElementById('prev').onclick = ()=>showWeek(addDays(state.monday,-7));
+document.getElementById('next').onclick = ()=>showWeek(addDays(state.monday,7));
+document.getElementById('today').onclick = ()=>showWeek(mondayOf(new Date()));
+document.getElementById('refresh').onclick = ()=>{ weekCache.clear(); boot(); };
+document.getElementById('settingsBtn').onclick = openSettings;
+document.getElementById('accountBtn').onclick = openLogin;
+
+/* ---------- theme: Auto follows the device, or pick Light / Dark ---------- */
+const THEMES = ['auto','light','dark'], THEME_LABEL = { auto:'Auto', light:'Light', dark:'Dark' };
+function applyTheme(t){
+  if (t==='auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = t;
+  const b = document.getElementById('themeBtn'); b.textContent = THEME_LABEL[t]; b.setAttribute('aria-label', 'Theme: '+THEME_LABEL[t]);
+}
+let theme = store.get('theme','auto'); if (!THEMES.includes(theme)) theme = 'auto';
+applyTheme(theme);
+document.getElementById('themeBtn').onclick = () => { theme = THEMES[(THEMES.indexOf(theme)+1)%3]; store.set('theme',theme); applyTheme(theme); };
+document.addEventListener('keydown', e => {
+  if (!drawer.hidden || e.target.closest('input,textarea')) return;
+  if (e.key==='ArrowLeft') document.getElementById('prev').click();
+  if (e.key==='ArrowRight') document.getElementById('next').click();
+});
+
+async function boot(){
+  // Paint straight away from what this browser saw last time, then refresh everything in parallel.
+  loadCachedResults();
+  const saved = store.get('week.'+cfg.club+'.'+(cfg.token?'auth':'anon'), null);
+  if (saved && saved.key === ymd(mondayOf(new Date())) && !weekCache.has(saved.key)) weekCache.set(saved.key, { at: 0, days: saved.days });
+  showTab(store.get('tab','week'));
+  loadClub();
+  updateAccountBtn();
+  loadMe().then(() => { updateAccountBtn(); if (state.me) render(); });
+  await showWeek(state.monday);
+  // The results endpoint is heavy and slows the server down for everything else, so it goes last.
+  loadResults().then(() => { render(); if (!document.getElementById('resultsView').hidden) renderResults(); });
+}
+boot();
+setInterval(()=>{ if (!document.hidden && drawer.hidden) renderBoard(); }, 60000); // keep the "now" line moving
+</script>
+</body>
+</html>
