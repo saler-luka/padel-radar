@@ -192,6 +192,15 @@ button{cursor:pointer}
 .hint{color:var(--muted);font-size:.8rem;margin:0}
 
 /* Booking */
+/* Result entry */
+.score{display:grid;grid-template-columns:minmax(0,1fr) repeat(3,44px);gap:6px 6px;align-items:center}
+.score .hd{font-size:.72rem;color:var(--muted);text-align:center}
+.score .tm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.score .tm small{display:block;font-weight:400;color:var(--muted);font-size:.72rem;overflow:hidden;text-overflow:ellipsis}
+.score input{width:44px;text-align:center;font:500 1.05rem var(--f-mono);border:1px solid var(--line);background:var(--surface);border-radius:var(--r-tile);padding:6px 0}
+.score input:focus-visible{outline:2px solid var(--court);outline-offset:0}
+.recap{font-weight:500}
+.recap .sets{font-family:var(--f-mono)}
 .confirm{display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);border-radius:var(--r-panel);padding:14px;background:var(--court-soft)}
 .confirm .price{font:600 1.5rem var(--f-display);font-variant-numeric:tabular-nums;color:var(--court)}
 .msg{font-size:.85rem;margin:0}
@@ -536,6 +545,98 @@ function bookingSection(s){
     <p class="msg" id="bookMsg" aria-live="polite"></p></div>`;
 }
 
+/* ---------- Enter a result for your own past match ----------
+   Same request the official app sends from a booking: POST /v2/result with the booking's game id,
+   both teams, and five [a,b] sets (unplayed sets stay 0-0). Scores follow the order of the players array. */
+function canEnterResult(s){
+  return !!(cfg.token && state.me && s.booked && s.gameId && isMine(s) && slotEnd(s) < new Date()
+    && !state.resultsByGame.has(s.gameId) && s.teamIds.length === 2);
+}
+function teamLabel(id){ return teamName(id) || (state.me?.team?.id === id ? 'Your team' : 'Team #'+id); }
+function resultSection(s){
+  if (!cfg.token || !state.me || !s.booked || !isMine(s) || slotEnd(s) >= new Date() || state.resultsByGame.has(s.gameId)) return '';
+  if (!canEnterResult(s)) return `<p class="hint">To enter a result here, both teams need to be on the booking. You can still enter it in Sporty.plus.</p>`;
+  const row = (id, i) => `<span class="tm">${esc(teamLabel(id))}${teamPlayers(id)?`<small>${esc(teamPlayers(id))}</small>`:''}</span>` +
+    [0,1,2].map(k => `<input id="sc${i}${k}" inputmode="numeric" maxlength="1" aria-label="${esc(teamLabel(id))}, set ${k+1}" autocomplete="off">`).join('');
+  return `<div class="confirm" id="resBox">
+    <div><div class="hint">Your match</div><b>Enter the result</b></div>
+    <div class="score"><span></span><span class="hd">Set 1</span><span class="hd">Set 2</span><span class="hd">Set 3</span>
+      ${row(s.teamIds[0],0)}${row(s.teamIds[1],1)}</div>
+    <p class="hint">Leave set 3 empty if you won in two sets.</p>
+    <button class="btn primary" id="resGo" type="button" style="align-self:flex-start">Review result</button>
+    <p class="msg" id="resMsg" aria-live="polite"></p></div>`;
+}
+// Returns { sets:[[a,b]x5], error } after checking it looks like a real padel score.
+function readScore(){
+  const v = (i,k) => document.getElementById('sc'+i+k).value.trim();
+  const sets = [], won = [0,0];
+  for (let k = 0; k < 3; k++) {
+    const a = v(0,k), b = v(1,k);
+    if (a === '' && b === '') { if (k < 2) return { error: 'Enter at least two sets.' }; continue; }
+    if (a === '' || b === '') return { error: `Fill in both scores for set ${k+1}.` };
+    const x = +a, y = +b;
+    if (!Number.isInteger(x) || !Number.isInteger(y) || x > 7 || y > 7) return { error: `Set ${k+1} needs scores from 0 to 7.` };
+    const hi = Math.max(x,y), lo = Math.min(x,y);
+    if (!((hi === 6 && lo <= 4) || (hi === 7 && (lo === 5 || lo === 6)))) return { error: `Set ${k+1} (${x}-${y}) isn't a finished set. Sets end 6-0 to 6-4, 7-5 or 7-6.` };
+    if (k === 2 && won[0] !== won[1]) return { error: 'The match was already decided in two sets, so leave set 3 empty.' };
+    won[x > y ? 0 : 1]++; sets.push([x,y]);
+  }
+  if (won[0] === won[1]) return { error: 'One team needs to win two sets.' };
+  while (sets.length < 5) sets.push([0,0]);
+  return { sets, winner: won[0] > won[1] ? 0 : 1 };
+}
+function wireResult(s){
+  const go = document.getElementById('resGo'); if (!go) return;
+  const msg = document.getElementById('resMsg');
+  const inputs = [...document.querySelectorAll('#resBox input')];
+  let armed = null;
+  const disarm = () => { if (armed) { armed = null; go.textContent = 'Review result'; msg.className = 'msg'; msg.textContent = ''; } };
+  inputs.forEach((el, n) => {
+    el.addEventListener('input', () => { el.value = el.value.replace(/[^0-9]/g,''); disarm(); if (el.value && inputs[n+1]) inputs[n+1].focus(); });
+  });
+  inputs[0].focus();
+  go.onclick = async () => {
+    if (!armed) {
+      const r = readScore();
+      if (r.error) { msg.className = 'msg err'; msg.textContent = r.error; return; }
+      armed = r;
+      const line = r.sets.filter(x => x[0]||x[1]).map(x => x[0]+'-'+x[1]).join(' ');
+      msg.className = 'msg';
+      msg.innerHTML = `<span class="recap">${esc(teamLabel(s.teamIds[r.winner]))} won <span class="sets">${line}</span></span><br>This is saved to Sporty.plus as an official result and counts towards rankings and league tables.`;
+      go.textContent = 'Submit result';
+      return;
+    }
+    go.disabled = true; go.textContent = 'Submitting…';
+    const payload = {
+      created_at: new Date().toISOString(), verified: null, points: 0, surface: {},
+      game_id: s.gameId,
+      players: s.teamIds.map(id => ({ id, type: 'team' })),
+      sets: armed.sets, tie_break: armed.sets.map(() => [0,0])
+    };
+    try {
+      const res = await api('/v2/result', payload);
+      const saved = res && (res.data || res);
+      if (saved && saved.id) {
+        const t = trimResult({ ...saved,
+          game_id: saved.game_id || s.gameId,
+          date: saved.date || ymd(new Date()) + ' ' + new Date().toTimeString().slice(0,8),
+          sets: saved.sets || payload.sets,
+          winner_side: saved.winner_side ?? armed.winner,
+          players: saved.players || s.teamIds.map(id => state.teams.get(id) || { id, display_name: teamLabel(id) }) });
+        setResults([t, ...state.results]); store.set('results.'+cfg.club, state.results);
+      }
+      msg.className = 'msg ok'; msg.textContent = 'Result saved. The other team may need to confirm it in Sporty.plus.';
+      go.hidden = true; inputs.forEach(el => el.disabled = true);
+      render();
+      loadResults().then(() => { render(); if (!document.getElementById('resultsView').hidden) renderResults(); });
+    } catch(e) {
+      msg.className = 'msg err';
+      msg.textContent = e.status===401 ? 'Your login has expired. Log in again and retry.' : 'Sporty.plus didn’t accept the result: ' + (e.apiMessage || e.message);
+      go.disabled = false; go.textContent = 'Submit result';
+    }
+  };
+}
+
 function wireBooking(s){
   const go = document.getElementById('bookGo'); if (!go) return;
   const msg = document.getElementById('bookMsg');
@@ -669,7 +770,7 @@ function openSlot(key){
   if (s.kind==='league' || (s.kind==='booking' && s.teamIds.length===2)) {
     const sides = s.teamIds.map(id=>{
       const won = r && r.winner_team_id===id;
-      return `<div class="side"><b>${esc(teamName(id)||'Team #'+id)}${won?' — won':''}</b><small>${esc(teamPlayers(id)||'Player names not public')}</small></div>`;
+      return `<div class="side"><b>${esc(teamLabel(id))}${won?' — won':''}</b><small>${esc(teamPlayers(id)||'Player names not public')}</small></div>`;
     });
     body += `<div class="vs">${sides.join('<div class="sep">VS</div>')}</div>`;
   }
@@ -691,6 +792,7 @@ function openSlot(key){
   if (r) rows.push(['Result', `<span style="font-family:var(--f-mono)">${esc(scoreLine(r))}</span>`]);
   body += `<dl class="kv">${rows.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
   body += bookingSection(s);
+  body += resultSection(s);
   body += `<p class="hint"><a href="${bookUrl}" target="_blank" rel="noopener">Open in Sporty.plus</a></p>`;
   const cam = COURT_CAMERAS[s.court.id];
   if (cam)
@@ -698,6 +800,7 @@ function openSlot(key){
       <p class="hint">${esc(s.court.name)} has a camera. Start a live stream or recording of your match.</p>`;
   openDrawer(`<div><div class="when">${esc(when)}</div><h2>${esc(slotTitle(s))}</h2></div>`+body);
   wireBooking(s);
+  wireResult(s);
   const rn = document.getElementById('renameL');
   if (rn) rn.onclick = () => {
     const dd = rn.parentElement;
