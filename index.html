@@ -268,6 +268,17 @@ button{cursor:pointer}
 .pstats div{background:var(--bg);border:1px solid var(--line);border-radius:var(--r-tile);padding:8px 10px;display:flex;flex-direction:column}
 .pstats b{font:600 1.35rem/1.1 var(--f-display);font-variant-numeric:tabular-nums}
 .pstats span{color:var(--muted);font-size:.72rem}
+.masters{border:1px solid color-mix(in srgb,var(--ball) 60%,var(--line));background:color-mix(in srgb,var(--ball) 10%,var(--surface));border-radius:var(--r-panel);padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.masters h3{color:var(--fg)!important;margin:0!important}
+.masters .mrow{display:flex;gap:20px}
+.masters .mrow div{display:flex;align-items:baseline;gap:6px}
+.masters .mrow b{font:600 1.6rem/1 var(--f-display);font-variant-numeric:tabular-nums}
+.masters .mrow span{color:var(--muted);font-size:.8rem}
+.mrounds{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.mrounds li{display:flex;gap:8px;align-items:baseline;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.78rem}
+.mrounds li span{color:var(--muted)}
+.mrounds li b{font:500 .82rem var(--f-mono)}
+.mrounds li.none b{color:var(--muted)}
 .psec h3{font:500 .95rem var(--f-display);margin:0 0 6px;color:var(--muted)}
 .form{display:flex;gap:5px}
 .form i{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:600 .72rem var(--f-body);font-style:normal;color:#fff}
@@ -420,7 +431,7 @@ const I18N = {
     pf_matches:'Mečevi', pf_wins:'Pobjede', pf_losses:'Porazi', pf_winRate:'Uspješnost', pf_sets:'Setovi', pf_form:'Forma (zadnjih 5)',
     pf_partners:'Najčešći partneri', pf_recent:'Zadnji mečevi', pf_upcoming:'Tvoji nadolazeći termini', pf_noUpcoming:'Nemaš nadolazećih termina u učitanim tjednima.',
     pf_noResults:'Još nema upisanih rezultata.', pf_basedOn:'Prema zadnjih {n} rezultata.', pf_with:'s {who}', pf_vs:'protiv {who}',
-    pf_win:'Pobjeda', pf_loss:'Poraz', pf_matchesN_one:'{n} meč', pf_matchesN_few:'{n} meča', pf_matchesN_many:'{n} mečeva', pf_openSporty:'Profil u Sporty.plus', pair:'Par', openTeam:'Otvori profil para: {name}', tp_opponents:'Najčešći protivnici', tp_openSporty:'Par u Sporty.plus', pf_loadingResults:'Učitavam rezultate…',
+    pf_win:'Pobjeda', pf_loss:'Poraz', pf_matchesN_one:'{n} meč', pf_matchesN_few:'{n} meča', pf_matchesN_many:'{n} mečeva', pf_openSporty:'Profil u Sporty.plus', ms_points_one:'bod', ms_points_few:'boda', ms_points_many:'bodova', ms_rank:'{r}.', ms_of:'mjesto od {n}', ms_round:'{n}. kolo', ms_open:'Cijela tablica Mastersa', pair:'Par', openTeam:'Otvori profil para: {name}', tp_opponents:'Najčešći protivnici', tp_openSporty:'Par u Sporty.plus', pf_loadingResults:'Učitavam rezultate…',
     ed_title:'Igrači na rezervaciji', ed_hint:'Dodaj ili ukloni igrače pa spremi sve odjednom.', ed_remove:'Ukloni', ed_undo:'Vrati', ed_you:'ti',
     ed_search:'Traži člana kluba', ed_searchPh:'Upiši ime ili prezime', ed_searching:'Tražim…', ed_noHits:'Nema članova s tim imenom.', ed_add:'Dodaj', ed_added:'Dodano',
     ed_full:'Rezervacija može imati najviše {max} igrača.', ed_count:'{n} od {max} igrača', ed_save:'Spremi promjene', ed_confirm:'Dodirni ponovno za potvrdu',
@@ -494,7 +505,7 @@ const I18N = {
     pf_matches:'Matches', pf_wins:'Wins', pf_losses:'Losses', pf_winRate:'Win rate', pf_sets:'Sets', pf_form:'Form (last 5)',
     pf_partners:'Most frequent partners', pf_recent:'Recent matches', pf_upcoming:'Your upcoming slots', pf_noUpcoming:'No upcoming slots in the weeks loaded so far.',
     pf_noResults:'No results entered yet.', pf_basedOn:'Based on the last {n} results.', pf_with:'with {who}', pf_vs:'vs {who}',
-    pf_win:'Win', pf_loss:'Loss', pf_matchesN_one:'{n} match', pf_matchesN_few:'{n} matches', pf_matchesN_many:'{n} matches', pf_openSporty:'Profile in Sporty.plus', pair:'Pair', openTeam:'Open pair profile: {name}', tp_opponents:'Most frequent opponents', tp_openSporty:'Pair in Sporty.plus', pf_loadingResults:'Loading results…',
+    pf_win:'Win', pf_loss:'Loss', pf_matchesN_one:'{n} match', pf_matchesN_few:'{n} matches', pf_matchesN_many:'{n} matches', pf_openSporty:'Profile in Sporty.plus', ms_points_one:'point', ms_points_few:'points', ms_points_many:'points', ms_rank:'#{r}', ms_of:'of {n}', ms_round:'Round {n}', ms_open:'Full Masters table', pair:'Pair', openTeam:'Open pair profile: {name}', tp_opponents:'Most frequent opponents', tp_openSporty:'Pair in Sporty.plus', pf_loadingResults:'Loading results…',
     ed_title:'Players on this booking', ed_hint:'Add or remove players, then save everything at once.', ed_remove:'Remove', ed_undo:'Undo', ed_you:'you',
     ed_search:'Find a club member', ed_searchPh:'Type a first or last name', ed_searching:'Searching…', ed_noHits:'No members with that name.', ed_add:'Add', ed_added:'Added',
     ed_full:'A booking can have at most {max} players.', ed_count:'{n} of {max} players', ed_save:'Save changes', ed_confirm:'Tap again to confirm',
@@ -1574,6 +1585,36 @@ function renderTeamProfile(id, team, data){
 }
 document.addEventListener('click', e => { const b = e.target.closest('[data-team]'); if (b) { e.preventDefault(); openTeamProfile(b.dataset.team); } });
 
+/* ---------- Modesto Masters points ----------
+   The club's Masters table lives at t00bz.github.io/modesto-masters. Its standings.json is the single source of truth
+   (their own ETL turns league cycles into points), so we read it as-is instead of recalculating. Player keys are
+   Sporty+ player ids. Total = sum of rounds; ties keep the file's player order, exactly like their table. */
+const MASTERS_URL = 'https://t00bz.github.io/modesto-masters/data/standings.json';
+const MASTERS_PAGE = 'https://t00bz.github.io/modesto-masters/';
+let mastersPromise = null;
+state.masters = null;
+function loadMasters(){
+  if (!mastersPromise) mastersPromise = fetch(MASTERS_URL).then(r => r.ok ? r.json() : null).then(d => {
+    if (!d || !Array.isArray(d.players) || !Array.isArray(d.rounds) || !d.rounds.length || typeof d.players[0] !== 'object') return null;
+    const totals = d.players.map((p, order) => {
+      const id = String(p.id), scores = d.rounds.map(r => Object.prototype.hasOwnProperty.call(r.scores || {}, id) ? r.scores[id] : null);
+      return { id, name: p.name, order, scores, total: scores.reduce((a, s) => a + (s || 0), 0) };
+    }).sort((a, b) => b.total - a.total || a.order - b.order);
+    const byId = new Map(totals.map((p, i) => [p.id, { ...p, rank: i + 1 }]));
+    return (state.masters = { title: [d.brandSeason, d.competition].filter(Boolean).join(' · '), dates: d.rounds.map(r => r.date), count: totals.length, byId });
+  }).catch(() => { mastersPromise = null; return null; });
+  return mastersPromise;
+}
+function mastersSection(id){
+  const m = state.masters, me = m && m.byId.get(String(id));
+  if (!me) return '';
+  const day = iso => new Date(iso + 'T12:00').toLocaleDateString(LOC(), { day:'numeric', month:'short' });
+  return `<div class="psec masters"><h3>${esc(m.title || 'Masters')}</h3>
+    <div class="mrow"><div><b>${me.total}</b><span>${tn('ms_points', me.total)}</span></div><div><b>${t('ms_rank', { r: me.rank })}</b><span>${t('ms_of', { n: m.count })}</span></div></div>
+    <ul class="mrounds">${me.scores.map((s, i) => `<li${s === null ? ' class="none"' : ''}><span>${t('ms_round', { n: i + 1 })} · ${esc(day(m.dates[i]))}</span><b>${s === null ? '—' : s}</b></li>`).join('')}</ul>
+    <p class="hint"><a href="${MASTERS_PAGE}" target="_blank" rel="noopener">${t('ms_open')}</a></p></div>`;
+}
+
 async function openProfile(id){
   id = Number(id);
   navPush('player', id);
@@ -1586,14 +1627,15 @@ async function openProfile(id){
   openDrawer(`<h2>${self ? t('myProfile') : t('profile')}</h2><p class="hint">${t('profileLoading')}</p>`);
   panel.dataset.key = '';
   const resultsP = loadPlayerResults(id);   // slow endpoint: start it now, render it when it lands
-  let pl;
+  const mastersP = loadMasters();
+  let pl, data = null;
   try { pl = (await loadPlayer(id)).player; } catch(e) {
     if (openProfile.current !== token || drawer.hidden) return;
     openDrawer(`<h2>${t('profile')}</h2><p class="msg err">${e.status===401 ? t('tokenRefusedShort') : t('profileFail')}</p>`); return;
   }
   if (openProfile.current !== token || drawer.hidden) return;
   renderProfile(id, pl, null, self);
-  let data = null;
+  mastersP.then(m => { if (m && openProfile.current === token && !drawer.hidden) renderProfile(id, pl, data, self); });
   try { data = await resultsP; } catch(e) { data = { results: [], total: 0, failed: true }; }
   if (openProfile.current !== token || drawer.hidden) return;
   renderProfile(id, pl, data, self);
@@ -1610,6 +1652,7 @@ function renderProfile(id, pl, data, self){
   const where = [pl.city?.name, pl.country ? ((pl.country.emoji ? pl.country.emoji+' ' : '') + pl.country.name) : null].filter(Boolean).join(' · ');
   const av = pl.image ? `<img class="av" src="${esc(pl.image)}" alt="">` : `<span class="av ph" aria-hidden="true">${esc(initials(name))}</span>`;
   let body = `${self ? `<div class="hint">${t('myProfile')}</div>` : ''}<div class="prof">${av}<h2>${esc(name)}</h2><div class="where">${esc(where)}</div></div>`;
+  body += mastersSection(id);
   if (!data) body += `<p class="hint">${t('pf_loadingResults')}</p>`;
   else if (data.failed) body += `<p class="msg err">${t('profileFail')}</p>`;
   else if (mine.length) {
