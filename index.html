@@ -13,7 +13,7 @@
 :root{
   --bg:#eef5f8; --surface:#ffffff; --fg:#13222c; --muted:#5d6f7b; --line:#d3e3eb;
   --band:#0085b2; --on-band:#ffffff; --band-soft:#cfeaf5;
-  --court:#0085b2; --court-soft:#e3f2f8; --free:#4a6f0a; --free-bg:#eef7dc; --free-line:#a3c642; --free-bg-lite:#f7fbee; --free-line-lite:#d2e6a0; --ball:#c9d82b; --now:#e0452b; --win:#13222c;
+  --court:#0085b2; --court-soft:#e3f2f8; --free:#4a6f0a; --free-bg:#eef7dc; --free-line:#a3c642; --peak:#7a5600; --peak-bg:#fdf4cf; --peak-line:#e0bb32; --ball:#c9d82b; --now:#e0452b; --win:#13222c;
   --l1:#d4762a; --l2:#7c4bc0; --l3:#1f9d6b; --l4:#c23d6b; --l5:#8a7a12; --l6:#0085b2;
   --f-display:"Outfit",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -24,13 +24,13 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0a1419; --surface:#12222b; --fg:#e4eef2; --muted:#8ea4af; --line:#223843;
   --band:#0b5f80; --on-band:#ffffff; --band-soft:#a9d9ec;
-  --court:#3bb4de; --court-soft:#15313d; --free:#d6e24a; --free-bg:#1d2b12; --free-line:#6f8f24; --free-bg-lite:#152010; --free-line-lite:#465c1f; --ball:#d6e24a; --now:#ff6a4f; --win:#ffffff;
+  --court:#3bb4de; --court-soft:#15313d; --free:#d6e24a; --free-bg:#1d2b12; --free-line:#6f8f24; --peak:#f2d35c; --peak-bg:#2a2410; --peak-line:#8c7421; --ball:#d6e24a; --now:#ff6a4f; --win:#ffffff;
   --l1:#f0954a; --l2:#a77ee8; --l3:#3cc48e; --l4:#ec6a96; --l5:#cdb93a; --l6:#3bb4de;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0a1419; --surface:#12222b; --fg:#e4eef2; --muted:#8ea4af; --line:#223843;
   --band:#0b5f80; --on-band:#ffffff; --band-soft:#a9d9ec;
-  --court:#3bb4de; --court-soft:#15313d; --free:#d6e24a; --free-bg:#1d2b12; --free-line:#6f8f24; --free-bg-lite:#152010; --free-line-lite:#465c1f; --ball:#d6e24a; --now:#ff6a4f; --win:#ffffff;
+  --court:#3bb4de; --court-soft:#15313d; --free:#d6e24a; --free-bg:#1d2b12; --free-line:#6f8f24; --peak:#f2d35c; --peak-bg:#2a2410; --peak-line:#8c7421; --ball:#d6e24a; --now:#ff6a4f; --win:#ffffff;
   --l1:#f0954a; --l2:#a77ee8; --l3:#3cc48e; --l4:#ec6a96; --l5:#cdb93a; --l6:#3bb4de;
   color-scheme:dark}
 *{box-sizing:border-box}
@@ -75,7 +75,7 @@ button{cursor:pointer}
 .chip[aria-pressed="false"]{opacity:.45}
 .chip[aria-pressed="false"] i{background:transparent;outline:1.5px solid var(--c,var(--court))}
 .chip .n{color:var(--muted);font-variant-numeric:tabular-nums}
-.chip.free i{background:var(--free-bg);border:1.5px solid var(--free-line)}
+.chip.free i{background:linear-gradient(90deg,var(--free-bg) 50%,var(--peak-bg) 50%);border:1.5px solid var(--free-line);border-right-color:var(--peak-line);border-bottom-color:var(--peak-line)}
 
 .status{color:var(--muted);font-size:.85rem}
 .status.err{color:var(--now)}
@@ -119,8 +119,8 @@ button{cursor:pointer}
 .slot.mine{background:var(--court);border-color:var(--court);color:#fff}
 .slot.mine .t,.slot.mine .sub,.slot.mine .sc{color:color-mix(in srgb,#fff 82%,transparent)}
 .slot:hover{border-color:var(--c,var(--court))}
-/* Off-peak (cheaper) free slots get a lighter green; the week's top price keeps the full green */
-.slot.free.cheap{background:var(--free-bg-lite);border-color:var(--free-line-lite)}
+/* Free slots at the week's top price (peak hours) turn padel-ball yellow; cheaper ones stay green */
+.slot.free.peak{--free:var(--peak);--free-bg:var(--peak-bg);--free-line:var(--peak-line)}
 .slot.free:hover{background:color-mix(in srgb,var(--free-line) 30%,var(--free-bg));border-color:var(--free)}
 .slot.past{opacity:.55}
 .tag{display:inline-block;font:500 .62rem var(--f-body);padding:0 5px;border-radius:999px;background:var(--court-soft);color:var(--court);vertical-align:1px}
@@ -499,8 +499,8 @@ function isMine(s){
   const teamId = m.team?.id;
   return s.players.some(p => (p.id && p.id===m.id) || (teamId && p.team_id===teamId));
 }
-function peakPrice(){ return Math.max(0, ...allSlots().filter(x=>x.kind==='free' && x.price!=null).map(x=>x.price)); }
-function slotClass(s){ return s.kind + (isMine(s)?' mine':'') + (s.kind==='free' && s.price!=null && s.price < state.peak ? ' cheap' : ''); }
+function freePrices(){ return allSlots().filter(x=>x.kind==='free' && x.price!=null).map(x=>x.price); }
+function slotClass(s){ return s.kind + (isMine(s)?' mine':'') + (s.kind==='free' && s.price!=null && s.price === state.peak && state.low < state.peak ? ' peak' : ''); }
 function slotTitle(s){
   if (s.kind==='free') return s.price!=null ? `Free · €${s.price}` : 'Free';
   if (s.kind==='league'){
@@ -520,7 +520,7 @@ function scoreLine(r){ return (r.sets||[]).filter(x=>x[0]||x[1]).map(x=>x[0]+'-'
 /* ---------- render ---------- */
 function render(){
   document.getElementById('range').textContent = rangeText(state.monday);
-  state.peak = peakPrice();
+  const fp = freePrices(); state.peak = fp.length ? Math.max(...fp) : 0; state.low = fp.length ? Math.min(...fp) : 0;
   renderSummary(); renderFilters(); renderBoard(); renderAgenda();
 }
 
