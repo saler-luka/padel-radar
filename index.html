@@ -63,6 +63,22 @@ button{cursor:pointer}
 .tabs button{border:1px solid transparent;background:none;padding:6px 16px;font:500 .95rem var(--f-display);color:var(--muted);border-radius:999px}
 .tabs button[aria-selected="true"]{color:var(--court);background:var(--surface);border-color:var(--line)}
 
+/* Court switch bar: All courts / one court. Pinned under the header on phones. */
+.courtbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px}
+.seg{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px}
+.seg button{border:0;background:none;border-radius:999px;padding:6px 16px;color:var(--muted);font:500 .92rem var(--f-display);white-space:nowrap}
+.seg button:hover{color:var(--fg)}
+.seg button[aria-pressed="true"]{background:var(--court);color:#fff}
+.courtnote{color:var(--muted);font-size:.82rem;display:inline-flex;align-items:center;gap:8px}
+.courtnote .cam{display:inline-flex;align-items:center;gap:5px}
+.courtnote .cam i{width:7px;height:7px;border-radius:50%;background:var(--now)}
+.board.one{grid-template-columns:52px repeat(7,minmax(124px,1fr));min-width:920px}
+@media (max-width:760px){
+  .courtbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);margin-inline:-16px;padding:8px 16px;border-bottom:1px solid var(--line)}
+  .seg{display:flex;width:100%}
+  .seg button{flex:1;padding:8px 4px}
+  .courtnote{display:none}
+}
 .summary{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:baseline}
 .stat{display:flex;align-items:baseline;gap:6px}
 .stat b{font:600 1.6rem/1 var(--f-display);font-variant-numeric:tabular-nums}
@@ -236,6 +252,7 @@ button{cursor:pointer}
   </div>
 
   <section id="weekView" class="wrap" style="gap:12px">
+    <div class="courtbar" id="courtBar"></div>
     <div class="summary" id="summary"></div>
     <div class="filters" id="filters"></div>
     <div class="status" id="status">Loading…</div>
@@ -263,7 +280,8 @@ const cfg = {
   sub: store.get('sub', 'modesto'),
   token: store.get('token', ''),
   nick: store.get('nick', {}),          // league id -> nickname
-  hidden: store.get('hidden', {free:false}) // filter keys -> hidden?
+  hidden: store.get('hidden', {free:false}), // filter keys -> hidden?
+  court: store.get('court', 'all')          // 'all' or a Sporty+ court id
 };
 
 const state = { monday: mondayOf(new Date()), days: [], courts: [], teams: new Map(), results: [], resultsByGame: new Map(), leagues: new Map(), club: null, me: null };
@@ -517,14 +535,36 @@ function slotTitle(s){
 function filterKey(s){ return s.kind==='league' ? 'L'+(s.leagueId||'t'+s.tournamentId) : s.kind; }
 function scoreLine(r){ return (r.sets||[]).filter(x=>x[0]||x[1]).map(x=>x[0]+'-'+x[1]).join(' '); }
 
+/* ---------- court switch ---------- */
+function shownCourts(){
+  const one = state.courts.filter(c => String(c.id) === String(cfg.court));
+  return cfg.court === 'all' || !one.length ? state.courts : one;
+}
+function inCourt(s){ const c = shownCourts(); return c.length === state.courts.length || c.some(x => x.id === s.court.id); }
+function shortCourt(name){ const n = name.replace(/^padel\s+/i, ''); return n.charAt(0).toUpperCase() + n.slice(1); }
+function renderCourtBar(){
+  const el = document.getElementById('courtBar');
+  if (state.courts.length < 2) { el.innerHTML = ''; return; }
+  const sel = shownCourts().length === 1 ? String(shownCourts()[0].id) : 'all';
+  const now = new Date();
+  const freeToday = id => allSlots().filter(s => s.kind==='free' && sameDay(s.date, now) && slotEnd(s) >= now && (id==='all' || s.court.id===id)).length;
+  const opts = [['all','All courts'], ...state.courts.map(c => [String(c.id), shortCourt(c.name)])];
+  const one = sel !== 'all' ? state.courts.find(c => String(c.id) === sel) : null;
+  const n = freeToday(one ? one.id : 'all');
+  el.innerHTML = `<div class="seg" role="group" aria-label="Show courts">${opts.map(([v,l]) => `<button type="button" data-court="${v}" aria-pressed="${v===sel}">${esc(l)}</button>`).join('')}</div>
+    <span class="courtnote">${one ? esc(one.name)+' · ' : ''}${n} free ${n===1?'slot':'slots'} left today${one && COURT_CAMERAS[one.id] ? ' · <span class="cam"><i aria-hidden="true"></i>Matchi TV camera</span>' : ''}</span>`;
+  el.querySelectorAll('[data-court]').forEach(b => b.onclick = () => { cfg.court = b.dataset.court; store.set('court', cfg.court); render(); });
+}
+
 /* ---------- render ---------- */
 function render(){
   document.getElementById('range').textContent = rangeText(state.monday);
   const fp = freePrices(); state.peak = fp.length ? Math.max(...fp) : 0; state.low = fp.length ? Math.min(...fp) : 0;
-  renderSummary(); renderFilters(); renderBoard(); renderAgenda();
+  renderCourtBar(); renderSummary(); renderFilters(); renderBoard(); renderAgenda();
 }
 
 function visible(s){
+  if (!inCourt(s)) return false;
   if (s.kind==='free' && slotEnd(s) < new Date()) return false;
   return !cfg.hidden[filterKey(s)];
 }
@@ -667,7 +707,7 @@ function wireBooking(s){
 function allSlots(){ return state.days.flatMap(d=>d.slots); }
 
 function renderSummary(){
-  const all = allSlots(); const league = all.filter(s=>s.kind==='league');
+  const all = allSlots().filter(inCourt); const league = all.filter(s=>s.kind==='league');
   const played = league.filter(s=>state.resultsByGame.has(s.gameId)).length;
   const booked = all.filter(s=>s.booked).length;
   const now = new Date();
@@ -681,7 +721,7 @@ function renderSummary(){
 }
 
 function renderFilters(){
-  const counts = {}; for (const s of allSlots()) counts[filterKey(s)] = (counts[filterKey(s)]||0)+1;
+  const counts = {}; for (const s of allSlots().filter(inCourt)) counts[filterKey(s)] = (counts[filterKey(s)]||0)+1;
   const chips = [];
   for (const id of [...state.leagues.keys()].sort((a,b)=>a-b)) {
     const k = 'L'+id; if (!counts[k]) continue;
@@ -712,6 +752,8 @@ function renderBoard(){
   const board = document.getElementById('board');
   if (!state.days.length){ board.innerHTML=''; return; }
   const all = allSlots();
+  const courts = shownCourts(), single = courts.length === 1 && state.courts.length > 1;
+  board.classList.toggle('one', single);
   const min = Math.floor(Math.min(...all.map(s=>hrs(s.start)), 8));
   const max = Math.ceil(Math.max(...all.map(s=>hrs(s.end)), 22));
   const H = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hour'));
@@ -721,19 +763,19 @@ function renderBoard(){
   state.days.forEach((d,i)=>{
     const t = sameDay(d.date, now);
     html += `<div class="dayhead${t?' today':''}"><div class="d">${DAYS[i]} <small>${d.date.getDate()}.${d.date.getMonth()+1}.</small></div>
-      <div class="lanes-h">${state.courts.map(c=>`<span title="${esc(c.name)}">${esc(c.name)}</span>`).join('')}</div></div>`;
+      <div class="lanes-h">${courts.map(c=>`<span title="${esc(c.name)}">${esc(c.name)}</span>`).join('')}</div></div>`;
   });
   html += `<div class="axis" style="height:${height}px">${[...Array(max-min+1)].map((_,i)=>i&&i<max-min?`<span style="top:${i*H}px">${min+i}:00</span>`:'').join('')}</div>`;
   state.days.forEach((d)=>{
     const t = sameDay(d.date, now);
     html += `<div class="daycol${t?' today':''}" style="height:${height}px">`;
-    for (const c of state.courts){
+    for (const c of courts){
       html += `<div class="lane">`;
       for (const s of d.slots.filter(s=>s.court.id===c.id && visible(s))){
         const top = (hrs(s.start)-min)*H, h = (hrs(s.end)-hrs(s.start))*H - 3;
         const style = `top:${top+1}px;height:${h}px;${s.kind==='league'?'--c:'+leagueColor(s.leagueId):''}`;
         const past = slotEnd(s) < now ? ' past':'';
-        html += `<button class="slot ${slotClass(s)}${past}" style="${style}" data-id="${slotKey(s)}">${slotInner(s,true)}</button>`;
+        html += `<button class="slot ${slotClass(s)}${past}" style="${style}" data-id="${slotKey(s)}">${slotInner(s,!single)}</button>`;
       }
       html += `</div>`;
     }
@@ -746,11 +788,13 @@ function renderBoard(){
 
 function renderAgenda(){
   const el = document.getElementById('agenda'); const now = new Date();
+  const single = shownCourts().length === 1 && state.courts.length > 1;
+  const meta = s => [single ? null : esc(s.court.name), s.kind==='league' ? esc(leagueName(s.leagueId)) : null, s.recurring ? 'weekly' : null].filter(Boolean).join(' · ');
   el.innerHTML = state.days.map((d,i)=>{
     const list = d.slots.filter(visible).sort((a,b)=>a.start-b.start || a.court.name.localeCompare(b.court.name));
     return `<div><h3 class="${sameDay(d.date,now)?'today':''}">${DAYS[i]} <small>${d.date.toLocaleDateString('en-GB',{day:'numeric',month:'long'})}</small></h3>
       ${list.length?`<ul>${list.map(s=>`<li><button class="slot ${slotClass(s)}${slotEnd(s)<now?' past':''}" style="${s.kind==='league'?'--c:'+leagueColor(s.leagueId):''}" data-id="${slotKey(s)}">
-        <span class="t">${hm(s.start)}</span><span class="body"><span class="l">${esc(slotTitle(s))}</span><span class="court">${esc(s.court.name)}${s.kind==='league'?' · '+esc(leagueName(s.leagueId)):''}${s.recurring?' · weekly':''}</span></span>${wxBadge(s)}
+        <span class="t">${hm(s.start)}</span><span class="body"><span class="l">${esc(slotTitle(s))}</span>${meta(s)?`<span class="court">${meta(s)}</span>`:''}</span>${wxBadge(s)}
         ${state.resultsByGame.get(s.gameId)?`<span class="sc">${esc(scoreLine(state.resultsByGame.get(s.gameId)))}</span>`:''}</button></li>`).join('')}</ul>`:'<p class="empty">Nothing to show for this day.</p>'}</div>`;
   }).join('');
   el.querySelectorAll('.slot').forEach(b=>b.onclick=()=>openSlot(b.dataset.id));
