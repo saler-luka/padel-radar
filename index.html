@@ -267,6 +267,16 @@ button{cursor:pointer}
 .score input:focus-visible{outline:2px solid var(--court);outline-offset:0}
 .recap{font-weight:500}
 .recap .sets{font-family:var(--f-mono)}
+/* Booking players editor */
+.ed ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.ed li{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-tile);padding:6px 6px 6px 10px;min-width:0}
+.ed li .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ed li .nm small{color:var(--muted);margin-left:6px}
+.ed li.out .nm{text-decoration:line-through;color:var(--muted)}
+.ed li.new{border-color:var(--court)}
+.ed li .btn{padding:3px 10px;font-size:.78rem;flex:none}
+.ed .hits{max-height:220px;overflow:auto}
+.ed .count{font-size:.78rem;color:var(--muted);font-variant-numeric:tabular-nums}
 .confirm{display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);border-radius:var(--r-panel);padding:14px;background:var(--court-soft)}
 .confirm .price{font:600 1.5rem var(--f-display);font-variant-numeric:tabular-nums;color:var(--court)}
 .msg{font-size:.85rem;margin:0}
@@ -388,6 +398,11 @@ const I18N = {
     pf_partners:'Najčešći partneri', pf_recent:'Zadnji mečevi', pf_upcoming:'Tvoji nadolazeći termini', pf_noUpcoming:'Nemaš nadolazećih termina u učitanim tjednima.',
     pf_noResults:'Još nema upisanih rezultata.', pf_basedOn:'Prema zadnjih {n} rezultata.', pf_with:'s {who}', pf_vs:'protiv {who}',
     pf_win:'Pobjeda', pf_loss:'Poraz', pf_matchesN_one:'{n} meč', pf_matchesN_few:'{n} meča', pf_matchesN_many:'{n} mečeva', pf_openSporty:'Profil u Sporty.plus', pf_loadingResults:'Učitavam rezultate…',
+    ed_title:'Igrači na rezervaciji', ed_hint:'Dodaj ili ukloni igrače pa spremi sve odjednom.', ed_remove:'Ukloni', ed_undo:'Vrati', ed_you:'ti',
+    ed_search:'Traži člana kluba', ed_searchPh:'Upiši ime ili prezime', ed_searching:'Tražim…', ed_noHits:'Nema članova s tim imenom.', ed_add:'Dodaj', ed_added:'Dodano',
+    ed_full:'Rezervacija može imati najviše {max} igrača.', ed_count:'{n} od {max} igrača', ed_save:'Spremi promjene', ed_confirm:'Dodirni ponovno za potvrdu',
+    ed_summary:'Dodaješ: {add}. Uklanjaš: {remove}.', ed_none:'nikoga', ed_saving:'Spremam…', ed_saved:'Spremljeno. Osvježavam raspored…',
+    ed_refused:'Sporty.plus nije prihvatio promjenu: {msg}', ed_nothing:'Nema promjena za spremanje.', ed_pending:'Novi igrač', ed_willRemove:'bit će uklonjen',
     noResults:'Rezultati još nisu učitani.', roundN:'{n}. kolo', official:'službeno', verified:'potvrđeno'
   },
   en: {
@@ -456,6 +471,11 @@ const I18N = {
     pf_partners:'Most frequent partners', pf_recent:'Recent matches', pf_upcoming:'Your upcoming slots', pf_noUpcoming:'No upcoming slots in the weeks loaded so far.',
     pf_noResults:'No results entered yet.', pf_basedOn:'Based on the last {n} results.', pf_with:'with {who}', pf_vs:'vs {who}',
     pf_win:'Win', pf_loss:'Loss', pf_matchesN_one:'{n} match', pf_matchesN_few:'{n} matches', pf_matchesN_many:'{n} matches', pf_openSporty:'Profile in Sporty.plus', pf_loadingResults:'Loading results…',
+    ed_title:'Players on this booking', ed_hint:'Add or remove players, then save everything at once.', ed_remove:'Remove', ed_undo:'Undo', ed_you:'you',
+    ed_search:'Find a club member', ed_searchPh:'Type a first or last name', ed_searching:'Searching…', ed_noHits:'No members with that name.', ed_add:'Add', ed_added:'Added',
+    ed_full:'A booking can have at most {max} players.', ed_count:'{n} of {max} players', ed_save:'Save changes', ed_confirm:'Tap again to confirm',
+    ed_summary:'Adding: {add}. Removing: {remove}.', ed_none:'nobody', ed_saving:'Saving…', ed_saved:'Saved. Updating the schedule…',
+    ed_refused:'Sporty.plus refused the change: {msg}', ed_nothing:'Nothing to save yet.', ed_pending:'New player', ed_willRemove:'will be removed',
     noResults:'No results loaded yet.', roundN:'Round {n}', official:'official', verified:'verified'
   }
 };
@@ -513,11 +533,11 @@ function esc(s){ return String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'
 function rangeText(m){ const f = d => d.toLocaleDateString(LOC(),{day:'numeric',month:'short'}); return f(m)+' – '+f(addDays(m,6)); }
 function sameDay(a,b){ return ymd(a)===ymd(b); }
 
-async function api(path, body){
+async function api(path, body, method){
   const h = { 'Accept':'application/json', 'x-club': String(cfg.club) };
   if (cfg.token) h.Authorization = cfg.token.startsWith('Bearer') ? cfg.token : 'Bearer '+cfg.token;
   const opt = { headers:h };
-  if (body !== undefined) { opt.method = 'POST'; h['Content-Type'] = 'application/json'; opt.body = JSON.stringify(body); }
+  if (body !== undefined) { opt.method = method || 'POST'; h['Content-Type'] = 'application/json'; opt.body = JSON.stringify(body); }
   const r = await fetch(API+path, opt);
   if (!r.ok) {
     let msg = ''; try { const j = await r.json(); msg = j.error || j.message || ''; } catch(_){}
@@ -850,12 +870,12 @@ function bookingSection(s){
    Same request the official app sends from a booking: POST /v2/result with the booking's game id,
    both teams, and five [a,b] sets (unplayed sets stay 0-0). Scores follow the order of the players array. */
 function canEnterResult(s){
-  return !!(cfg.token && state.me && s.booked && s.gameId && isMine(s) && slotEnd(s) < new Date()
+  return !!(cfg.token && state.me && s.kind === 'league' && s.booked && s.gameId && isMine(s) && slotEnd(s) < new Date()
     && !state.resultsByGame.has(s.gameId) && s.teamIds.length === 2);
 }
 function teamLabel(id){ return teamName(id) || (state.me?.team?.id === id ? t('yourTeam') : t('teamN', { id })); }
 function resultSection(s){
-  if (!cfg.token || !state.me || !s.booked || !isMine(s) || slotEnd(s) >= new Date() || state.resultsByGame.has(s.gameId)) return '';
+  if (!cfg.token || !state.me || s.kind !== 'league' || !s.booked || !isMine(s) || slotEnd(s) >= new Date() || state.resultsByGame.has(s.gameId)) return '';
   if (!canEnterResult(s)) return `<p class="hint">${t('resultNeedTeams')}</p>`;
   const row = (id, i) => `<span class="tm">${esc(teamLabel(id))}${teamPlayers(id)?`<small>${esc(teamPlayers(id))}</small>`:''}</span>` +
     [0,1,2].map(k => `<input id="sc${i}${k}" inputmode="numeric" maxlength="1" aria-label="${esc(t('setAria', { team: teamLabel(id), n: k+1 }))}" autocomplete="off">`).join('');
@@ -934,6 +954,94 @@ function wireResult(s){
       msg.className = 'msg err';
       msg.textContent = e.status===401 ? t('loginExpired') : t('resultRefused', { msg: e.apiMessage || e.message });
       go.disabled = false; go.textContent = t('submitResult');
+    }
+  };
+}
+
+/* ---------- Add / remove players on your own (friendly) booking ----------
+   Sporty+ saves a booking's whole player list at once (PUT /v2/reservation/{id}), the way the official app does when
+   you invite or remove someone. We collect every change first and send them in a single save. */
+const MAX_PLAYERS = 4;
+function canEditPlayers(s){ return !!(cfg.token && state.me && s.booked && s.kind === 'booking' && s.id && isMine(s) && slotEnd(s) >= new Date()); }
+function isMePlayer(p){ const m = state.me; return !!m && ((p.id && p.id === m.id) || (m.team?.id && p.team_id === m.team.id)); }
+function playersEditor(s){
+  if (!canEditPlayers(s)) return '';
+  return `<div class="confirm ed" id="edBox">
+    <div><b>${t('ed_title')}</b><p class="hint">${t('ed_hint')}</p></div>
+    <ul id="edList"></ul>
+    <div class="count" id="edCount"></div>
+    <div class="field"><label for="edQ">${t('ed_search')}</label><input id="edQ" autocomplete="off" placeholder="${esc(t('ed_searchPh'))}"></div>
+    <ul class="hits" id="edHits" aria-live="polite"></ul>
+    <button class="btn primary" id="edGo" type="button" style="align-self:flex-start">${t('ed_save')}</button>
+    <p class="msg" id="edMsg" aria-live="polite"></p></div>`;
+}
+function wirePlayersEditor(s){
+  const box = document.getElementById('edBox'); if (!box) return;
+  const list = document.getElementById('edList'), hits = document.getElementById('edHits'), q = document.getElementById('edQ');
+  const go = document.getElementById('edGo'), msg = document.getElementById('edMsg'), count = document.getElementById('edCount');
+  const removing = new Set();           // index into s.players
+  const adding = [];                    // team objects from the member search
+  let armed = false, timer = null, seq = 0;
+  const current = () => s.players.length - removing.size + adding.length;
+  const name = p => p.display_name || t('ed_pending');
+  const disarm = () => { armed = false; go.textContent = t('ed_save'); if (!msg.classList.contains('err')) msg.textContent = ''; };
+  function draw(){
+    list.innerHTML = s.players.map((p, i) => {
+      const me = isMePlayer(p), out = removing.has(i);
+      return `<li class="${out ? 'out' : ''}"><span class="nm">${esc(name(p))}${me ? ` <small>(${t('ed_you')})</small>` : ''}${out ? ` <small>${t('ed_willRemove')}</small>` : ''}</span>
+        ${me ? '' : `<button class="btn" type="button" data-rm="${i}">${out ? t('ed_undo') : t('ed_remove')}</button>`}</li>`;
+    }).join('') + adding.map((p, i) => `<li class="new"><span class="nm">${esc(p.display_name)} <small>+</small></span><button class="btn" type="button" data-un="${i}">${t('ed_undo')}</button></li>`).join('');
+    count.textContent = t('ed_count', { n: current(), max: MAX_PLAYERS });
+    list.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { const i = +b.dataset.rm; removing.has(i) ? removing.delete(i) : removing.add(i); disarm(); draw(); });
+    list.querySelectorAll('[data-un]').forEach(b => b.onclick = () => { adding.splice(+b.dataset.un, 1); disarm(); draw(); search(); });
+  }
+  const onBooking = id => s.players.some(p => p.team_id === id) || adding.some(a => a.id === id);
+  async function search(){
+    const term = q.value.trim(), my = ++seq;
+    if (term.length < 2) { hits.innerHTML = ''; return; }
+    hits.innerHTML = `<li><span class="nm hint">${t('ed_searching')}</span></li>`;
+    try {
+      const r = await api(`/v2/team?filter[display_name]=${encodeURIComponent(term)}&filter[club]=${cfg.club}&filter[number_of_players]=1&page=1`);
+      if (my !== seq) return;
+      const found = (r.data || []).slice(0, 12);
+      if (!found.length) { hits.innerHTML = `<li><span class="nm hint">${t('ed_noHits')}</span></li>`; return; }
+      // Only the name is shown: the search also returns emails and ratings, which we never display.
+      hits.innerHTML = found.map((m, i) => `<li><span class="nm">${esc(m.display_name)}</span>${onBooking(m.id)
+        ? `<span class="hint">${t('ed_added')}</span>` : `<button class="btn" type="button" data-add="${i}">${t('ed_add')}</button>`}</li>`).join('');
+      hits.querySelectorAll('[data-add]').forEach(b => b.onclick = () => {
+        if (current() >= MAX_PLAYERS) { msg.className = 'msg err'; msg.textContent = t('ed_full', { max: MAX_PLAYERS }); return; }
+        msg.className = 'msg'; msg.textContent = '';
+        adding.push(found[+b.dataset.add]); disarm(); draw(); search();
+      });
+    } catch(e) { if (my === seq) hits.innerHTML = `<li><span class="nm msg err">${esc(e.apiMessage || e.message)}</span></li>`; }
+  }
+  q.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(search, 300); });
+  draw();
+  go.onclick = async () => {
+    if (!removing.size && !adding.length) { msg.className = 'msg'; msg.textContent = t('ed_nothing'); return; }
+    if (!armed) {
+      armed = true; go.textContent = t('ed_confirm'); msg.className = 'msg';
+      const out = [...removing].map(i => name(s.players[i])).join(', ') || t('ed_none');
+      msg.textContent = t('ed_summary', { add: adding.map(a => a.display_name).join(', ') || t('ed_none'), remove: out });
+      return;
+    }
+    go.disabled = true; go.textContent = t('ed_saving');
+    try {
+      // Fresh copy of the booking, so we never overwrite a change made elsewhere in the meantime.
+      const fresh = await api(`/v2/reservation/${s.id}`);
+      const res = fresh && fresh.data && fresh.data.id ? fresh.data : fresh;
+      const drop = new Set([...removing].flatMap(i => [s.players[i].team_id, s.players[i].id]).filter(Boolean));
+      res.players = (res.players || []).filter(rp => !drop.has(rp.id) && !drop.has(rp.team_id)).concat(adding);
+      if (res.players.length > MAX_PLAYERS) throw new Error(t('ed_full', { max: MAX_PLAYERS }));
+      await api(`/v2/reservation/${s.id}`, res, 'PUT');
+      msg.className = 'msg ok'; msg.textContent = t('ed_saved'); go.hidden = true;
+      const key = slotKey(s);
+      await loadWeek(); render();
+      if (!drawer.hidden && allSlots().some(x => slotKey(x) === key)) openSlot(key);
+    } catch(e) {
+      msg.className = 'msg err';
+      msg.textContent = e.status === 401 ? t('tokenRefusedShort') : t('ed_refused', { msg: e.apiMessage || e.message });
+      go.disabled = false; go.textContent = t('ed_save'); armed = false;
     }
   };
 }
@@ -1171,6 +1279,7 @@ function openSlot(key){
   body += `<dl class="kv">${rows.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
   body += rainPlan(s);
   body += bookingSection(s);
+  body += playersEditor(s);
   body += resultSection(s);
   body += actionsSection(s);
   body += `<p class="hint"><a href="${bookUrl}" target="_blank" rel="noopener">${t('openInSporty')}</a></p>`;
@@ -1181,6 +1290,7 @@ function openSlot(key){
   openDrawer(`<div><div class="when">${esc(when)}</div><h2>${esc(slotTitle(s))}</h2></div>`+body);
   wireBooking(s);
   wireResult(s);
+  wirePlayersEditor(s);
   wireActions(s);
   panel.querySelectorAll('[data-alt]').forEach(b => b.onclick = () => openSlot(b.dataset.alt));
   panel.dataset.key = key;
