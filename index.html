@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="hr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Padel Radar</title>
-<meta name="description" content="Every padel court, league match and free slot for the week, with weather and booking. Built on Sporty.plus.">
+<meta name="description" content="Svi padel tereni, ligaške utakmice i slobodni termini za cijeli tjedan, s prognozom i rezervacijama. Na temelju Sporty.plus.">
 <meta name="theme-color" content="#0085b2">
 <meta name="apple-mobile-web-app-title" content="Padel Radar">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -150,7 +150,7 @@ button{cursor:pointer}
 .slot.past{opacity:.55}
 /* Rain plan: outdoor slots where rain is likely */
 .slot.wet{box-shadow:inset 3px 0 0 var(--rain)}
-.slot.free.wet .open::after{content:" · rain";color:var(--rain)}
+.slot.free .open .rw{color:var(--rain)}
 .tag.rain{background:var(--rain-soft);color:var(--rain)}
 .rainplan{display:flex;flex-direction:column;gap:8px;border:1px solid color-mix(in srgb,var(--rain) 45%,var(--line));border-radius:var(--r-panel);padding:12px 14px;background:var(--rain-soft)}
 .rainplan b{color:var(--rain);font-weight:600}
@@ -256,37 +256,38 @@ button{cursor:pointer}
     <div class="brand">
       <img class="logo" src="icon.svg" alt="" width="44" height="44">
       <h1 id="clubName">Padel Radar</h1>
-      <p id="clubSub">Padel Radar · live from Sporty.plus</p>
+      <p id="clubSub">Padel Radar · uživo sa Sporty.plus</p>
     </div>
     <div class="nav">
-      <button class="pill" id="prev" aria-label="Previous week">←</button>
-      <button class="pill solid" id="today">This week</button>
+      <button class="pill" id="prev" data-i18n-aria="prevWeek" aria-label="Prethodni tjedan">←</button>
+      <button class="pill solid" id="today" data-i18n="thisWeek">Ovaj tjedan</button>
       <span class="range" id="range"></span>
-      <button class="pill" id="next" aria-label="Next week">→</button>
-      <button class="pill" id="refresh" title="Reload data" aria-label="Reload data">↻</button>
-      <button class="pill" id="themeBtn" title="Switch between automatic, light and dark">Auto</button>
-      <button class="pill" id="settingsBtn">Settings</button>
-      <button class="pill solid" id="accountBtn">Log in</button>
+      <button class="pill" id="next" data-i18n-aria="nextWeek" aria-label="Sljedeći tjedan">→</button>
+      <button class="pill" id="refresh" data-i18n-title="reload" data-i18n-aria="reload" title="Osvježi podatke" aria-label="Osvježi podatke">↻</button>
+      <button class="pill" id="themeBtn" data-i18n-title="themeTitle" title="Promijeni temu">Auto</button>
+      <button class="pill" id="langBtn" lang="en">EN</button>
+      <button class="pill" id="settingsBtn" data-i18n="settings">Postavke</button>
+      <button class="pill solid" id="accountBtn">Prijava</button>
     </div>
   </div>
 </header>
 <div class="wrap">
   <div class="tabs" role="tablist">
-    <button role="tab" id="tabWeek" aria-selected="true">Schedule</button>
-    <button role="tab" id="tabResults" aria-selected="false">Results</button>
+    <button role="tab" id="tabWeek" aria-selected="true" data-i18n="schedule">Raspored</button>
+    <button role="tab" id="tabResults" aria-selected="false" data-i18n="results">Rezultati</button>
   </div>
 
   <section id="weekView" class="wrap" style="gap:12px">
     <div class="courtbar" id="courtBar"></div>
     <div class="summary" id="summary"></div>
     <div class="filters" id="filters"></div>
-    <div class="status" id="status">Loading…</div>
+    <div class="status" id="status" data-i18n="loading">Učitavanje…</div>
     <div class="board-scroll"><div class="board" id="board"></div></div>
     <div class="agenda" id="agenda"></div>
   </section>
 
   <section id="resultsView" class="results" hidden></section>
-  <p class="hint credit">Weather forecast from <a href="https://www.yr.no/" target="_blank" rel="noopener">Yr</a>, delivered by the Norwegian Meteorological Institute (MET Norway).</p>
+  <p class="hint credit" id="credit">Vremenska prognoza: <a href="https://www.yr.no/" target="_blank" rel="noopener">Yr</a>, Norveški meteorološki institut (MET Norway).</p>
 </div>
 
 <div class="drawer" id="drawer" hidden><div class="panel" id="panel" role="dialog" aria-modal="true"></div></div>
@@ -294,7 +295,159 @@ button{cursor:pointer}
 <script>
 const API = 'https://api.tenis.plus';
 const LEAGUE_COLORS = ['--l1','--l2','--l3','--l4','--l5','--l6'];
-const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+/* ---------- languages: Croatian (default) and English ---------- */
+const I18N = {
+  hr: {
+    locale:'hr-HR', switchTo:'EN', switchAria:'Prebaci na engleski',
+    prevWeek:'Prethodni tjedan', nextWeek:'Sljedeći tjedan', thisWeek:'Ovaj tjedan', reload:'Osvježi podatke',
+    themeTitle:'Promijeni temu: automatska, svijetla ili tamna', themeAria:'Tema: {x}', theme_auto:'Auto', theme_light:'Svijetla', theme_dark:'Tamna',
+    settings:'Postavke', login:'Prijava', account:'Račun', liveFrom:'uživo sa Sporty.plus',
+    schedule:'Raspored', results:'Rezultati', loading:'Učitavanje…', loadingWeek:'Učitavanje tjedna…',
+    credit:'Vremenska prognoza: {yr}, Norveški meteorološki institut (MET Norway).',
+    tokenRefused:'Prijava je odbijena. Prijavi se ponovno ili obriši token u Postavkama.',
+    loadFail:'Raspored se nije mogao učitati ({msg}). Provjeri vezu i pritisni ↻.',
+    wx_clearsky:'Vedro', wx_fair:'Pretežno vedro', wx_partlycloudy:'Djelomično oblačno', wx_cloudy:'Oblačno', wx_fog:'Magla',
+    wx_lightrain:'Slaba kiša', wx_rain:'Kiša', wx_heavyrain:'Jaka kiša', wx_lightrainshowers:'Slabi pljuskovi', wx_rainshowers:'Pljuskovi',
+    wx_heavyrainshowers:'Jaki pljuskovi', wx_lightsleet:'Slaba susnježica', wx_sleet:'Susnježica', wx_lightsnow:'Slab snijeg', wx_snow:'Snijeg',
+    wx_heavysnow:'Jak snijeg', wx_rainandthunder:'Kiša i grmljavina', wx_rainshowersandthunder:'Pljuskovi i grmljavina', wx_other:'Promjenjivo',
+    rainMm:'{mm} mm kiše', inHours:' u {h} h', noRain:'Bez kiše', wind:'vjetar {w} m/s', sixHour:'6-satna prognoza',
+    rainDuring:'<b>Moguća kiša</b> u ovom terminu: {what}{six}.', rainAmount:'oko {mm} mm tijekom {min} minuta', rainSym:'prognoza: {desc}',
+    rainSix:' (6-satna prognoza, manje precizna)', altSame:'Teren {court} je slobodan u isto vrijeme.',
+    altNear:'Teren {court} je zauzet u {t}. Najbliži slobodan termin u dvorani je u {t2}.', playIndoors:'Igraj u dvorani u {t}{price}',
+    noIndoor:'Taj dan više nema slobodnih termina u dvorani.', cancelOutdoor:'Ako prebaciš, otkaži ovu vanjsku rezervaciju u Sporty.plus da teren ne ostane prazan.',
+    leagueN:'Liga #{id}', free:'Slobodno', freePrice:'Slobodno · €{p}', leagueMatch:'Ligaška utakmica', yourBooking:'Tvoja rezervacija',
+    clubBooking:'Rezervacija kluba', booked:'Zauzeto', yourTeam:'Tvoj tim', teamN:'Tim #{id}',
+    allCourts:'Svi tereni', showCourts:'Prikaži terene', freeToday_one:'{n} slobodan termin danas', freeToday_few:'{n} slobodna termina danas',
+    freeToday_many:'{n} slobodnih termina danas', camera:'Matchi TV kamera',
+    wantCourt:'Želiš ovaj teren?', loginToBookHint:'Prijavi se Sporty.plus računom i rezerviraj ga ovdje.', loginToBook:'Prijavi se za rezervaciju',
+    bookForYourself:'Rezerviraj za sebe', inYourName:'Na tvoje ime', paidAtClub:'Plaća se u klubu. Otkazivanje prema pravilima kluba u Sporty.plus.',
+    bookBtn:'Rezerviraj {t} · {court}', tapConfirm:'Dodirni ponovno za potvrdu', bookLine:'{court}, {date} u {t}.', booking:'Rezerviram…',
+    bookedOk:'Rezervirano. Osvježavam raspored…', tokenRefusedShort:'Prijava je odbijena. Prijavi se ponovno.', bookRefused:'Sporty.plus je odbio rezervaciju: {msg}', tryAgain:'Pokušaj ponovno',
+    resultNeedTeams:'Za unos rezultata ovdje oba tima moraju biti na rezervaciji. Rezultat i dalje možeš unijeti u Sporty.plus.',
+    yourMatch:'Tvoja utakmica', enterResult:'Unesi rezultat', setN:'{n}. set', setAria:'{team}, {n}. set',
+    leaveSet3:'Ostavi 3. set prazan ako je meč završio u dva seta.', reviewResult:'Provjeri rezultat',
+    errTwoSets:'Unesi barem dva seta.', errBoth:'Upiši oba rezultata za {n}. set.', errRange:'{n}. set mora imati rezultat od 0 do 7.',
+    errUnfinished:'{n}. set ({x}-{y}) nije završen set. Set završava od 6-0 do 6-4, 7-5 ili 7-6.',
+    errDecided:'Meč je već odlučen u dva seta, ostavi 3. set prazan.', errWinner:'Jedan tim mora osvojiti dva seta.',
+    wonLine:'Pobjeda: {team} {sets}', officialNote:'Sprema se u Sporty.plus kao službeni rezultat i ulazi u poredak i ligaške tablice.',
+    submitResult:'Pošalji rezultat', submitting:'Šaljem…', resultSaved:'Rezultat je spremljen. Drugi tim ga možda treba potvrditi u Sporty.plus.',
+    loginExpired:'Prijava je istekla. Prijavi se ponovno i pokušaj opet.', resultRefused:'Sporty.plus nije prihvatio rezultat: {msg}',
+    st_yourBookings:'tvoje rezervacije', st_courtsBooked:'zauzetih termina', st_leagueMatches:'ligaških utakmica', st_resultsIn:'upisanih rezultata', st_freeLeft:'slobodnih termina',
+    tournament:'Turnir', bookings:'Rezervacije', freeSlots:'Slobodni termini',
+    tagRain:'kiša', tagRainTitle:'Moguća kiša', tagWeekly:'tjedno', tagWeeklyTitle:'Ponavljajuća rezervacija', tagSeatsTitle:'Slobodna mjesta',
+    players_one:'{n} igrač', players_few:'{n} igrača', players_many:'{n} igrača', weekly:'tjedno', nothingToday:'Za ovaj dan nema ništa za prikaz.',
+    close:'Zatvori', wonMark:' — pobjeda', namesHidden:'Imena igrača nisu javna',
+    r_court:'Teren', r_weather:'Vrijeme', r_league:'Liga', rename:'Preimenuj', r_price:'Cijena', r_type:'Vrsta', r_players:'Igrači',
+    r_repeats:'Ponavlja se', everyWeek:'Svaki tjedan', r_openSeats:'Slobodna mjesta', r_waiting:'Lista čekanja', waitingN:'{n} čeka',
+    r_paid:'Plaćeno', yes:'Da', no:'Ne', r_bookedOn:'Rezervirano', r_result:'Rezultat',
+    type_league:'Ligaška utakmica', type_club:'Rezervirao klub', type_player:'Rezervacija igrača', namesHiddenN:'{n} (imena skrivena)',
+    openInSporty:'Otvori u Sporty.plus', stream:'Prenosi na Matchi TV', camHint:'{court} ima kameru. Pokreni prijenos uživo ili snimku svoje utakmice.',
+    nickPlaceholder:'npr. Zimska liga parova', saveName:'Spremi naziv',
+    share:'Podijeli', addCal:'Dodaj u kalendar', copyText:'Kopiraj tekst i poveznicu', icsBtn:'Apple ili Outlook (.ics)',
+    copied:'Kopirano. Zalijepi u grupni chat.', icsDone:'Datoteka kalendara je preuzeta. Otvori je da dodaš utakmicu.',
+    freeCourt:'Slobodan teren', rainLikelyShort:'moguća kiša', spots_one:'{n} slobodno mjesto', spots_few:'{n} slobodna mjesta', spots_many:'{n} slobodnih mjesta',
+    loginTitle:'Prijava putem Sporty.plus', loginHint:'Koristi isti e-mail i lozinku kao u Sporty.plus aplikaciji ({club}). Lozinka ide izravno na Sporty.plus i ne sprema se ovdje.',
+    theClub:'tvoj klub', email:'E-mail', password:'Lozinka', codeLabel:'Kôd iz aplikacije za autentifikaciju',
+    errEmailPass:'Upiši e-mail i lozinku.', errCode:'Upiši kôd iz aplikacije za autentifikaciju.', loggingIn:'Prijavljujem…',
+    noSession:'Sporty.plus nije vratio sesiju. Pokušaj ponovno.', loggedIn:'Prijavljen si. Učitavam…',
+    twoStep:'Tvoj račun koristi prijavu u dva koraka. Upiši kôd za nastavak.', badCode:'Kôd nije točan. Pokušaj ponovno.', confirmCode:'Potvrdi kôd',
+    tooMany:'Previše pokušaja. Pričekaj minutu i pokušaj ponovno.', badCreds:'E-mail i lozinka ne odgovaraju nijednom Sporty.plus računu.',
+    noReach:'Sporty.plus nije dostupan. Provjeri vezu i pokušaj ponovno.', sportyAnswered:'Sporty.plus je odgovorio {s}',
+    yourAccount:'Tvoj račun', accountHint:'Prijavljen si putem Sporty.plus. Vidiš imena igrača i privatne lige te možeš rezervirati terene.', logout:'Odjava',
+    clubId:'ID kluba', clubAddr:'Web adresa kluba (dio prije .sporty.plus)', devOptions:'Opcije za developere', sessionToken:'Token sesije',
+    tokenHint:'Potrebno samo ako radije zalijepiš token umjesto prijave. Ostaje u ovom pregledniku. Čuvaj ga kao lozinku.', saveReload:'Spremi i osvježi',
+    noResults:'Rezultati još nisu učitani.', roundN:'{n}. kolo', official:'službeno', verified:'potvrđeno'
+  },
+  en: {
+    locale:'en-GB', switchTo:'HR', switchAria:'Switch to Croatian',
+    prevWeek:'Previous week', nextWeek:'Next week', thisWeek:'This week', reload:'Reload data',
+    themeTitle:'Switch between automatic, light and dark', themeAria:'Theme: {x}', theme_auto:'Auto', theme_light:'Light', theme_dark:'Dark',
+    settings:'Settings', login:'Log in', account:'Account', liveFrom:'live from Sporty.plus',
+    schedule:'Schedule', results:'Results', loading:'Loading…', loadingWeek:'Loading week…',
+    credit:'Weather forecast from {yr}, delivered by the Norwegian Meteorological Institute (MET Norway).',
+    tokenRefused:'The login token was refused. Log in again or clear it in Settings.',
+    loadFail:'Could not load the schedule ({msg}). Check your connection and press ↻.',
+    wx_clearsky:'Clear sky', wx_fair:'Fair', wx_partlycloudy:'Partly cloudy', wx_cloudy:'Cloudy', wx_fog:'Fog',
+    wx_lightrain:'Light rain', wx_rain:'Rain', wx_heavyrain:'Heavy rain', wx_lightrainshowers:'Light rain showers', wx_rainshowers:'Rain showers',
+    wx_heavyrainshowers:'Heavy rain showers', wx_lightsleet:'Light sleet', wx_sleet:'Sleet', wx_lightsnow:'Light snow', wx_snow:'Snow',
+    wx_heavysnow:'Heavy snow', wx_rainandthunder:'Rain and thunder', wx_rainshowersandthunder:'Rain showers and thunder', wx_other:'Changeable',
+    rainMm:'{mm} mm rain', inHours:' in {h} h', noRain:'No rain expected', wind:'wind {w} m/s', sixHour:'6-hour forecast',
+    rainDuring:'<b>Rain likely</b> during this slot: {what}{six}.', rainAmount:'about {mm} mm over the {min} minutes', rainSym:'{desc} in the forecast',
+    rainSix:' (6-hour forecast, so less precise)', altSame:'{court} is free at the same time.',
+    altNear:'{court} is taken at {t}. The nearest free indoor slot is at {t2}.', playIndoors:'Play indoors at {t}{price}',
+    noIndoor:'No indoor court is free later that day.', cancelOutdoor:"If you switch, cancel this outdoor booking in Sporty.plus so the court isn't left empty.",
+    leagueN:'League #{id}', free:'Free', freePrice:'Free · €{p}', leagueMatch:'League match', yourBooking:'Your booking',
+    clubBooking:'Club booking', booked:'Booked', yourTeam:'Your team', teamN:'Team #{id}',
+    allCourts:'All courts', showCourts:'Show courts', freeToday_one:'{n} free slot left today', freeToday_few:'{n} free slots left today',
+    freeToday_many:'{n} free slots left today', camera:'Matchi TV camera',
+    wantCourt:'Want this court?', loginToBookHint:'Log in with your Sporty.plus account to book it from here.', loginToBook:'Log in to book',
+    bookForYourself:'Book for yourself', inYourName:'In your name', paidAtClub:"Paid at the club. Cancelling follows the club's Sporty.plus rules.",
+    bookBtn:'Book {t} on {court}', tapConfirm:'Tap again to confirm', bookLine:'{court}, {date} at {t}.', booking:'Booking…',
+    bookedOk:'Booked. Updating the schedule…', tokenRefusedShort:'Your login was refused. Log in again.', bookRefused:'Sporty.plus refused the booking: {msg}', tryAgain:'Try again',
+    resultNeedTeams:'To enter a result here, both teams need to be on the booking. You can still enter it in Sporty.plus.',
+    yourMatch:'Your match', enterResult:'Enter the result', setN:'Set {n}', setAria:'{team}, set {n}',
+    leaveSet3:'Leave set 3 empty if you won in two sets.', reviewResult:'Review result',
+    errTwoSets:'Enter at least two sets.', errBoth:'Fill in both scores for set {n}.', errRange:'Set {n} needs scores from 0 to 7.',
+    errUnfinished:"Set {n} ({x}-{y}) isn't a finished set. Sets end 6-0 to 6-4, 7-5 or 7-6.",
+    errDecided:'The match was already decided in two sets, so leave set 3 empty.', errWinner:'One team needs to win two sets.',
+    wonLine:'{team} won {sets}', officialNote:'This is saved to Sporty.plus as an official result and counts towards rankings and league tables.',
+    submitResult:'Submit result', submitting:'Submitting…', resultSaved:'Result saved. The other team may need to confirm it in Sporty.plus.',
+    loginExpired:'Your login has expired. Log in again and retry.', resultRefused:'Sporty.plus didn’t accept the result: {msg}',
+    st_yourBookings:'your bookings', st_courtsBooked:'courts booked', st_leagueMatches:'league matches', st_resultsIn:'results in', st_freeLeft:'free slots left',
+    tournament:'Tournament', bookings:'Bookings', freeSlots:'Free slots',
+    tagRain:'rain', tagRainTitle:'Rain likely', tagWeekly:'weekly', tagWeeklyTitle:'Recurring booking', tagSeatsTitle:'Open seats',
+    players_one:'{n} player', players_few:'{n} players', players_many:'{n} players', weekly:'weekly', nothingToday:'Nothing to show for this day.',
+    close:'Close', wonMark:' — won', namesHidden:'Player names not public',
+    r_court:'Court', r_weather:'Weather', r_league:'League', rename:'Rename', r_price:'Price', r_type:'Type', r_players:'Players',
+    r_repeats:'Repeats', everyWeek:'Every week', r_openSeats:'Open seats', r_waiting:'Waiting list', waitingN:'{n} waiting',
+    r_paid:'Paid', yes:'Yes', no:'No', r_bookedOn:'Booked on', r_result:'Result',
+    type_league:'League match', type_club:'Booked by the club', type_player:'Player booking', namesHiddenN:'{n} (names hidden)',
+    openInSporty:'Open in Sporty.plus', stream:'Stream on Matchi TV', camHint:'{court} has a camera. Start a live stream or recording of your match.',
+    nickPlaceholder:'e.g. Winter doubles', saveName:'Save name',
+    share:'Share', addCal:'Add to calendar', copyText:'Copy text and link', icsBtn:'Apple or Outlook (.ics)',
+    copied:'Copied. Paste it into your group chat.', icsDone:'Calendar file downloaded. Open it to add the match.',
+    freeCourt:'Free court', rainLikelyShort:'rain likely', spots_one:'{n} spot left', spots_few:'{n} spots left', spots_many:'{n} spots left',
+    loginTitle:'Log in with Sporty.plus', loginHint:"Use the same email and password as in the Sporty.plus app ({club}). Your password goes straight to Sporty.plus and isn't saved here.",
+    theClub:'your club', email:'Email', password:'Password', codeLabel:'Code from your authenticator app',
+    errEmailPass:'Enter your email and password.', errCode:'Enter the code from your authenticator app.', loggingIn:'Logging in…',
+    noSession:'Sporty.plus did not return a session. Try again.', loggedIn:'Logged in. Loading your view…',
+    twoStep:'Your account uses two-step login. Enter the code to finish.', badCode:'That code isn’t right. Try again.', confirmCode:'Confirm code',
+    tooMany:'Too many attempts. Wait a minute and try again.', badCreds:'That email and password don’t match a Sporty.plus account.',
+    noReach:'Could not reach Sporty.plus. Check your connection and try again.', sportyAnswered:'Sporty.plus answered {s}',
+    yourAccount:'Your account', accountHint:'Logged in with Sporty.plus. You see player names and private leagues, and you can book courts from here.', logout:'Log out',
+    clubId:'Club ID', clubAddr:'Club web address (the part before .sporty.plus)', devOptions:'Developer options', sessionToken:'Session token',
+    tokenHint:"Only needed if you'd rather paste a token than log in. It stays in this browser. Treat it like a password.", saveReload:'Save and reload',
+    noResults:'No results loaded yet.', roundN:'Round {n}', official:'official', verified:'verified'
+  }
+};
+let lang = (() => { try { const v = JSON.parse(localStorage.getItem('pw.lang')); return v === 'en' ? 'en' : 'hr'; } catch(e) { return 'hr'; } })();
+function t(key, vars){
+  let s = (I18N[lang] && I18N[lang][key]) ?? I18N.en[key] ?? key;
+  if (vars) for (const k in vars) s = s.split('{'+k+'}').join(vars[k]);
+  return s;
+}
+// Croatian plurals: 1, 21, 31 → one; 2-4, 22-24 → few; everything else → many (English: one / many).
+function tn(key, count, vars){
+  const n10 = count % 10, n100 = count % 100;
+  const form = lang === 'hr'
+    ? (n10 === 1 && n100 !== 11 ? 'one' : (n10 >= 2 && n10 <= 4 && (n100 < 12 || n100 > 14)) ? 'few' : 'many')
+    : (count === 1 ? 'one' : 'many');
+  return t(key + '_' + form, { n: count, ...(vars||{}) });
+}
+const LOC = () => t('locale');
+const cap = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+function dayShort(d){ return cap(d.toLocaleDateString(LOC(), { weekday:'short' }).replace('.', '')); }
+function dateLong(d){ return d.toLocaleDateString(LOC(), { weekday:'long', day:'numeric', month:'long' }); }
+// Static markup: data-i18n (text), data-i18n-aria (aria-label), data-i18n-title (title).
+function applyStaticText(){
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => el.textContent = t(el.dataset.i18n));
+  document.querySelectorAll('[data-i18n-aria]').forEach(el => el.setAttribute('aria-label', t(el.dataset.i18nAria)));
+  document.querySelectorAll('[data-i18n-title]').forEach(el => el.title = t(el.dataset.i18nTitle));
+  document.getElementById('credit').innerHTML = t('credit', { yr: '<a href="https://www.yr.no/" target="_blank" rel="noopener">Yr</a>' });
+  const lb = document.getElementById('langBtn'); lb.textContent = t('switchTo'); lb.setAttribute('aria-label', t('switchAria'));
+}
 
 const store = {
   get(k, d){ try{ const v = localStorage.getItem('pw.'+k); return v==null?d:JSON.parse(v);}catch(e){return d;} },
@@ -319,7 +472,7 @@ function ymd(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0
 function hrs(t){ return t/100; }
 function hm(t){ const h = Math.floor(t/100), m = Math.round((t%100)*0.6); return h+':'+String(m).padStart(2,'0'); }
 function esc(s){ return String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function rangeText(m){ const f = d => d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}); return f(m)+' – '+f(addDays(m,6)); }
+function rangeText(m){ const f = d => d.toLocaleDateString(LOC(),{day:'numeric',month:'short'}); return f(m)+' – '+f(addDays(m,6)); }
 function sameDay(a,b){ return ymd(a)===ymd(b); }
 
 async function api(path, body){
@@ -351,11 +504,7 @@ const OUTDOOR_COURTS = new Set([798]);
 const COURT_CAMERAS = { 798: 'https://www.matchi.tv/create-stream/start?id=9i2bjHsKpf3&v2' };
 
 const WX_ICONS = 'https://cdn.jsdelivr.net/gh/metno/weathericons@89e3173756248b4696b9b10677b66c4ef435db53/weather/svg/';
-const WX_TEXT = { clearsky:'Clear sky', fair:'Fair', partlycloudy:'Partly cloudy', cloudy:'Cloudy', fog:'Fog',
-  lightrain:'Light rain', rain:'Rain', heavyrain:'Heavy rain', lightrainshowers:'Light rain showers', rainshowers:'Rain showers',
-  heavyrainshowers:'Heavy rain showers', lightsleet:'Light sleet', sleet:'Sleet', lightsnow:'Light snow', snow:'Snow',
-  heavysnow:'Heavy snow', rainandthunder:'Rain and thunder', rainshowersandthunder:'Rain showers and thunder' };
-function wxText(code){ const k = code.replace(/_(day|night|polartwilight)$/,''); return WX_TEXT[k] || k.replace(/and/g,' and ').replace(/^./, c=>c.toUpperCase()); }
+function wxText(code){ const k = code.replace(/_(day|night|polartwilight)$/,''); const v = t('wx_'+k); return v !== 'wx_'+k ? v : t('wx_other'); }
 function setWeather(raw){
   state.wx = (raw||[]).map(x => ({ t:x.t, temp:x.temp, wind:x.wind, sym:x.sym, rain:x.rain, span:x.span }));
 }
@@ -416,18 +565,18 @@ function indoorAlternative(s){
 function rainPlan(s){
   const r = rainFor(s); if (!r || !r.wet) return '';
   const alt = indoorAlternative(s);
-  const what = r.mm ? `about ${r.mm} mm over the ${Math.round((slotEnd(s)-slotDate(s))/60000)} minutes` : esc(wxText(r.sym)).toLowerCase() + ' in the forecast';
-  let body = `<div><b>Rain likely</b> during this slot: ${what}${r.six ? ' (6-hour forecast, so less precise)' : ''}.</div>`;
-  if (alt) body += `<div>${alt.same ? `${esc(alt.slot.court.name)} is free at the same time.` : `${esc(alt.slot.court.name)} is taken at ${hm(s.start)}. The nearest free indoor slot is at ${hm(alt.slot.start)}.`}</div>
-    <button class="btn primary" type="button" data-alt="${esc(slotKey(alt.slot))}">Play indoors at ${hm(alt.slot.start)}${alt.slot.price!=null?' · €'+alt.slot.price:''}</button>`;
-  else body += `<div>No indoor court is free later that day.</div>`;
-  if (isMine(s) && s.booked) body += `<p class="hint">If you switch, cancel this outdoor booking in Sporty.plus so the court isn't left empty.</p>`;
+  const what = r.mm ? t('rainAmount', { mm: r.mm.toLocaleString(LOC()), min: Math.round((slotEnd(s)-slotDate(s))/60000) }) : t('rainSym', { desc: esc(wxText(r.sym)).toLowerCase() });
+  let body = `<div>${t('rainDuring', { what, six: r.six ? t('rainSix') : '' })}</div>`;
+  if (alt) body += `<div>${alt.same ? t('altSame', { court: esc(alt.slot.court.name) }) : t('altNear', { court: esc(alt.slot.court.name), t: hm(s.start), t2: hm(alt.slot.start) })}</div>
+    <button class="btn primary" type="button" data-alt="${esc(slotKey(alt.slot))}">${t('playIndoors', { t: hm(alt.slot.start), price: alt.slot.price!=null ? ' · €'+alt.slot.price : '' })}</button>`;
+  else body += `<div>${t('noIndoor')}</div>`;
+  if (isMine(s) && s.booked) body += `<p class="hint">${t('cancelOutdoor')}</p>`;
   return `<div class="rainplan">${body}</div>`;
 }
 
 function wxBadge(s){
   const w = weatherFor(s); if (!w) return '';
-  const rain = w.rain ? `, ${w.rain} mm rain${w.span>1?' in '+w.span+' h':''}` : '';
+  const rain = w.rain ? ', ' + t('rainMm', { mm: w.rain.toLocaleString(LOC()) }) + (w.span>1 ? t('inHours', { h: w.span }) : '') : '';
   return `<span class="wx" title="${esc(wxText(w.sym))}, ${Math.round(w.temp)} °C${rain}"><img src="${WX_ICONS}${w.sym}.svg" alt="${esc(wxText(w.sym))}" loading="lazy">${Math.round(w.temp)}°</span>`;
 }
 
@@ -435,7 +584,7 @@ async function loadClub(){
   try { state.club = await api('/v2/club/this'); } catch(e){ state.club = null; }
   const n = state.club?.name || 'Padel Radar';
   document.getElementById('clubName').textContent = n;
-  document.getElementById('clubSub').textContent = state.club ? ['Padel Radar', state.club.city].filter(Boolean).join(' · ') : 'Padel Radar · live from Sporty.plus';
+  document.getElementById('clubSub').textContent = state.club ? ['Padel Radar', state.club.city].filter(Boolean).join(' · ') : 'Padel Radar · ' + t('liveFrom');
   document.title = n + ' · Padel Radar';
 }
 
@@ -515,7 +664,7 @@ function applyWeek(monday, entry){
 
 function setLoading(on){
   document.getElementById('status').className = 'status';
-  document.getElementById('status').textContent = on ? 'Loading week…' : '';
+  document.getElementById('status').textContent = on ? t('loadingWeek') : '';
   document.querySelector('.board-scroll').classList.toggle('loading', on);
   document.getElementById('agenda').classList.toggle('loading', on);
 }
@@ -540,7 +689,7 @@ async function showWeek(monday, {force=false}={}){
     if (!cached){ state.days = []; state.courts = []; render(); }
     const status = document.getElementById('status');
     status.className='status err';
-    status.textContent = e.status===401 ? 'The login token was refused. Clear it in Settings or paste a fresh one.' : 'Could not load the schedule ('+e.message+'). Check your connection and press ↻.';
+    status.textContent = e.status===401 ? t('tokenRefused') : t('loadFail', { msg: e.message });
   }
 }
 function prefetchAround(monday){
@@ -565,7 +714,7 @@ function normalize(s, court, date){
 }
 
 /* ---------- naming ---------- */
-function leagueName(id){ return cfg.nick[id] || state.leagues.get(id)?.name || ('League #'+id); }
+function leagueName(id){ return cfg.nick[id] || state.leagues.get(id)?.name || t('leagueN', { id }); }
 function leagueColor(id){
   const ids = [...state.leagues.keys()].sort((a,b)=>a-b);
   return `var(${LEAGUE_COLORS[Math.max(0,ids.indexOf(id)) % LEAGUE_COLORS.length]})`;
@@ -582,17 +731,17 @@ function isMine(s){
 function freePrices(){ return allSlots().filter(x=>x.kind==='free' && x.price!=null).map(x=>x.price); }
 function slotClass(s){ return s.kind + (isMine(s)?' mine':'') + (rainFor(s)?.wet ? ' wet' : '') + (s.kind==='free' && s.price!=null && s.price === state.peak && state.low < state.peak ? ' peak' : ''); }
 function slotTitle(s){
-  if (s.kind==='free') return s.price!=null ? `Free · €${s.price}` : 'Free';
+  if (s.kind==='free') return s.price!=null ? t('freePrice', { p: s.price }) : t('free');
   if (s.kind==='league'){
     const names = s.teamIds.map(teamName);
     if (s.teamIds.length===2 && names.every(Boolean)) return names.join(' – ');
     if (names.some(Boolean)) return names.filter(Boolean).join(' – ');
-    return 'League match';
+    return t('leagueMatch');
   }
-  if (isMine(s)) return 'Your booking';
+  if (isMine(s)) return t('yourBooking');
   const np = namedPlayers(s);
   if (np.length) return np.join(', ');
-  return s.byClub ? 'Club booking' : 'Booked';
+  return s.byClub ? t('clubBooking') : t('booked');
 }
 function filterKey(s){ return s.kind==='league' ? 'L'+(s.leagueId||'t'+s.tournamentId) : s.kind; }
 function scoreLine(r){ return (r.sets||[]).filter(x=>x[0]||x[1]).map(x=>x[0]+'-'+x[1]).join(' '); }
@@ -610,11 +759,11 @@ function renderCourtBar(){
   const sel = shownCourts().length === 1 ? String(shownCourts()[0].id) : 'all';
   const now = new Date();
   const freeToday = id => allSlots().filter(s => s.kind==='free' && sameDay(s.date, now) && slotEnd(s) >= now && (id==='all' || s.court.id===id)).length;
-  const opts = [['all','All courts'], ...state.courts.map(c => [String(c.id), shortCourt(c.name)])];
+  const opts = [['all',t('allCourts')], ...state.courts.map(c => [String(c.id), shortCourt(c.name)])];
   const one = sel !== 'all' ? state.courts.find(c => String(c.id) === sel) : null;
   const n = freeToday(one ? one.id : 'all');
-  el.innerHTML = `<div class="seg" role="group" aria-label="Show courts">${opts.map(([v,l]) => `<button type="button" data-court="${v}" aria-pressed="${v===sel}">${esc(l)}</button>`).join('')}</div>
-    <span class="courtnote">${one ? esc(one.name)+' · ' : ''}${n} free ${n===1?'slot':'slots'} left today${one && COURT_CAMERAS[one.id] ? ' · <span class="cam"><i aria-hidden="true"></i>Matchi TV camera</span>' : ''}</span>`;
+  el.innerHTML = `<div class="seg" role="group" aria-label="${t('showCourts')}">${opts.map(([v,l]) => `<button type="button" data-court="${v}" aria-pressed="${v===sel}">${esc(l)}</button>`).join('')}</div>
+    <span class="courtnote">${one ? esc(one.name)+' · ' : ''}${tn('freeToday', n)}${one && COURT_CAMERAS[one.id] ? ' · <span class="cam"><i aria-hidden="true"></i>'+t('camera')+'</span>' : ''}</span>`;
   el.querySelectorAll('[data-court]').forEach(b => b.onclick = () => { cfg.court = b.dataset.court; store.set('court', cfg.court); render(); });
 }
 
@@ -642,12 +791,12 @@ function myName(){ const m = state.me; return m ? (m.display_name || [m.first_na
 
 function bookingSection(s){
   if (s.kind!=='free' || slotDate(s) < new Date()) return '';
-  if (!cfg.token) return `<div class="confirm"><b>Want this court?</b><p class="hint">Log in with your Sporty.plus account to book it from here.</p><button class="btn primary" type="button" onclick="openLogin()" style="align-self:flex-start">Log in to book</button></div>`;
+  if (!cfg.token) return `<div class="confirm"><b>${t('wantCourt')}</b><p class="hint">${t('loginToBookHint')}</p><button class="btn primary" type="button" onclick="openLogin()" style="align-self:flex-start">${t('loginToBook')}</button></div>`;
   return `<div class="confirm" id="bookBox">
-    <div><div class="hint">Book for yourself</div><b>${esc(myName() || 'In your name')}</b></div>
+    <div><div class="hint">${t('bookForYourself')}</div><b>${esc(myName() || t('inYourName'))}</b></div>
     <div class="price" id="bookPrice">${s.price!=null?'€'+s.price:''}</div>
-    <p class="hint">Paid at the club. Cancelling follows the club's Sporty.plus rules.</p>
-    <button class="btn primary" id="bookGo" style="align-self:flex-start">Book ${esc(hm(s.start))} on ${esc(s.court.name)}</button>
+    <p class="hint">${t('paidAtClub')}</p>
+    <button class="btn primary" id="bookGo" style="align-self:flex-start">${t('bookBtn', { t: esc(hm(s.start)), court: esc(s.court.name) })}</button>
     <p class="msg" id="bookMsg" aria-live="polite"></p></div>`;
 }
 
@@ -658,18 +807,18 @@ function canEnterResult(s){
   return !!(cfg.token && state.me && s.booked && s.gameId && isMine(s) && slotEnd(s) < new Date()
     && !state.resultsByGame.has(s.gameId) && s.teamIds.length === 2);
 }
-function teamLabel(id){ return teamName(id) || (state.me?.team?.id === id ? 'Your team' : 'Team #'+id); }
+function teamLabel(id){ return teamName(id) || (state.me?.team?.id === id ? t('yourTeam') : t('teamN', { id })); }
 function resultSection(s){
   if (!cfg.token || !state.me || !s.booked || !isMine(s) || slotEnd(s) >= new Date() || state.resultsByGame.has(s.gameId)) return '';
-  if (!canEnterResult(s)) return `<p class="hint">To enter a result here, both teams need to be on the booking. You can still enter it in Sporty.plus.</p>`;
+  if (!canEnterResult(s)) return `<p class="hint">${t('resultNeedTeams')}</p>`;
   const row = (id, i) => `<span class="tm">${esc(teamLabel(id))}${teamPlayers(id)?`<small>${esc(teamPlayers(id))}</small>`:''}</span>` +
-    [0,1,2].map(k => `<input id="sc${i}${k}" inputmode="numeric" maxlength="1" aria-label="${esc(teamLabel(id))}, set ${k+1}" autocomplete="off">`).join('');
+    [0,1,2].map(k => `<input id="sc${i}${k}" inputmode="numeric" maxlength="1" aria-label="${esc(t('setAria', { team: teamLabel(id), n: k+1 }))}" autocomplete="off">`).join('');
   return `<div class="confirm" id="resBox">
-    <div><div class="hint">Your match</div><b>Enter the result</b></div>
-    <div class="score"><span></span><span class="hd">Set 1</span><span class="hd">Set 2</span><span class="hd">Set 3</span>
+    <div><div class="hint">${t('yourMatch')}</div><b>${t('enterResult')}</b></div>
+    <div class="score"><span></span>${[1,2,3].map(k => `<span class="hd">${t('setN', { n: k })}</span>`).join('')}
       ${row(s.teamIds[0],0)}${row(s.teamIds[1],1)}</div>
-    <p class="hint">Leave set 3 empty if you won in two sets.</p>
-    <button class="btn primary" id="resGo" type="button" style="align-self:flex-start">Review result</button>
+    <p class="hint">${t('leaveSet3')}</p>
+    <button class="btn primary" id="resGo" type="button" style="align-self:flex-start">${t('reviewResult')}</button>
     <p class="msg" id="resMsg" aria-live="polite"></p></div>`;
 }
 // Returns { sets:[[a,b]x5], error } after checking it looks like a real padel score.
@@ -678,16 +827,16 @@ function readScore(){
   const sets = [], won = [0,0];
   for (let k = 0; k < 3; k++) {
     const a = v(0,k), b = v(1,k);
-    if (a === '' && b === '') { if (k < 2) return { error: 'Enter at least two sets.' }; continue; }
-    if (a === '' || b === '') return { error: `Fill in both scores for set ${k+1}.` };
+    if (a === '' && b === '') { if (k < 2) return { error: t('errTwoSets') }; continue; }
+    if (a === '' || b === '') return { error: t('errBoth', { n: k+1 }) };
     const x = +a, y = +b;
-    if (!Number.isInteger(x) || !Number.isInteger(y) || x > 7 || y > 7) return { error: `Set ${k+1} needs scores from 0 to 7.` };
+    if (!Number.isInteger(x) || !Number.isInteger(y) || x > 7 || y > 7) return { error: t('errRange', { n: k+1 }) };
     const hi = Math.max(x,y), lo = Math.min(x,y);
-    if (!((hi === 6 && lo <= 4) || (hi === 7 && (lo === 5 || lo === 6)))) return { error: `Set ${k+1} (${x}-${y}) isn't a finished set. Sets end 6-0 to 6-4, 7-5 or 7-6.` };
-    if (k === 2 && won[0] !== won[1]) return { error: 'The match was already decided in two sets, so leave set 3 empty.' };
+    if (!((hi === 6 && lo <= 4) || (hi === 7 && (lo === 5 || lo === 6)))) return { error: t('errUnfinished', { n: k+1, x, y }) };
+    if (k === 2 && won[0] !== won[1]) return { error: t('errDecided') };
     won[x > y ? 0 : 1]++; sets.push([x,y]);
   }
-  if (won[0] === won[1]) return { error: 'One team needs to win two sets.' };
+  if (won[0] === won[1]) return { error: t('errWinner') };
   while (sets.length < 5) sets.push([0,0]);
   return { sets, winner: won[0] > won[1] ? 0 : 1 };
 }
@@ -696,7 +845,7 @@ function wireResult(s){
   const msg = document.getElementById('resMsg');
   const inputs = [...document.querySelectorAll('#resBox input')];
   let armed = null;
-  const disarm = () => { if (armed) { armed = null; go.textContent = 'Review result'; msg.className = 'msg'; msg.textContent = ''; } };
+  const disarm = () => { if (armed) { armed = null; go.textContent = t('reviewResult'); msg.className = 'msg'; msg.textContent = ''; } };
   inputs.forEach((el, n) => {
     el.addEventListener('input', () => { el.value = el.value.replace(/[^0-9]/g,''); disarm(); if (el.value && inputs[n+1]) inputs[n+1].focus(); });
   });
@@ -708,11 +857,11 @@ function wireResult(s){
       armed = r;
       const line = r.sets.filter(x => x[0]||x[1]).map(x => x[0]+'-'+x[1]).join(' ');
       msg.className = 'msg';
-      msg.innerHTML = `<span class="recap">${esc(teamLabel(s.teamIds[r.winner]))} won <span class="sets">${line}</span></span><br>This is saved to Sporty.plus as an official result and counts towards rankings and league tables.`;
-      go.textContent = 'Submit result';
+      msg.innerHTML = `<span class="recap">${t('wonLine', { team: esc(teamLabel(s.teamIds[r.winner])), sets: `<span class="sets">${line}</span>` })}</span><br>${t('officialNote')}`;
+      go.textContent = t('submitResult');
       return;
     }
-    go.disabled = true; go.textContent = 'Submitting…';
+    go.disabled = true; go.textContent = t('submitting');
     const payload = {
       created_at: new Date().toISOString(), verified: null, points: 0, surface: {},
       game_id: s.gameId,
@@ -731,14 +880,14 @@ function wireResult(s){
           players: saved.players || s.teamIds.map(id => state.teams.get(id) || { id, display_name: teamLabel(id) }) });
         setResults([t, ...state.results]); store.set('results.'+cfg.club, state.results);
       }
-      msg.className = 'msg ok'; msg.textContent = 'Result saved. The other team may need to confirm it in Sporty.plus.';
+      msg.className = 'msg ok'; msg.textContent = t('resultSaved');
       go.hidden = true; inputs.forEach(el => el.disabled = true);
       render();
       loadResults().then(() => { render(); if (!document.getElementById('resultsView').hidden) renderResults(); });
     } catch(e) {
       msg.className = 'msg err';
-      msg.textContent = e.status===401 ? 'Your login has expired. Log in again and retry.' : 'Sporty.plus didn’t accept the result: ' + (e.apiMessage || e.message);
-      go.disabled = false; go.textContent = 'Submit result';
+      msg.textContent = e.status===401 ? t('loginExpired') : t('resultRefused', { msg: e.apiMessage || e.message });
+      go.disabled = false; go.textContent = t('submitResult');
     }
   };
 }
@@ -752,17 +901,17 @@ function wireBooking(s){
   }).catch(()=>{});
   let armed = false;
   go.onclick = async () => {
-    if (!armed){ armed = true; go.textContent = 'Tap again to confirm'; msg.className='msg'; msg.textContent = `${s.court.name}, ${s.date.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})} at ${hm(s.start)}.`; return; }
-    go.disabled = true; go.textContent = 'Booking…';
+    if (!armed){ armed = true; go.textContent = t('tapConfirm'); msg.className='msg'; msg.textContent = t('bookLine', { court: s.court.name, date: dateLong(s.date), t: hm(s.start) }); return; }
+    go.disabled = true; go.textContent = t('booking');
     try {
       await api('/v2/reservation', bookingPayload(s));
-      msg.className = 'msg ok'; msg.textContent = 'Booked. Updating the schedule…'; go.hidden = true;
+      msg.className = 'msg ok'; msg.textContent = t('bookedOk'); go.hidden = true;
       await loadWeek(); render();
       setTimeout(closeDrawer, 1200);
     } catch(e) {
       msg.className = 'msg err';
-      msg.textContent = e.status===401 ? 'Your login token was refused. Paste a fresh one in Settings.' : 'Sporty.plus refused the booking: ' + (e.apiMessage || e.message);
-      go.disabled = false; go.textContent = 'Try again'; armed = true;
+      msg.textContent = e.status===401 ? t('tokenRefusedShort') : t('bookRefused', { msg: e.apiMessage || e.message });
+      go.disabled = false; go.textContent = t('tryAgain'); armed = true;
     }
   };
 }
@@ -777,8 +926,8 @@ function renderSummary(){
   const el = document.getElementById('summary');
   const mine = all.filter(isMine).length;
   el.innerHTML = state.days.length ? [
-    ...(state.me ? [[mine,'your bookings','hi']] : []),
-    [booked,'courts booked'],[league.length,'league matches'],[played,'results in'],[freeLeft,'free slots left']
+    ...(state.me ? [[mine,t('st_yourBookings'),'hi']] : []),
+    [booked,t('st_courtsBooked')],[league.length,t('st_leagueMatches')],[played,t('st_resultsIn')],[freeLeft,t('st_freeLeft')]
   ].map(([n,l,c])=>`<div class="stat ${c||''}"><b>${n}</b><span>${l}</span></div>`).join('') : '';
 }
 
@@ -789,9 +938,9 @@ function renderFilters(){
     const k = 'L'+id; if (!counts[k]) continue;
     chips.push(`<button class="chip" data-k="${k}" aria-pressed="${!cfg.hidden[k]}" style="--c:${leagueColor(id)}"><i></i>${esc(leagueName(id))} <span class="n">${counts[k]}</span></button>`);
   }
-  for (const k of Object.keys(counts).filter(k=>k.startsWith('Lt'))) chips.push(`<button class="chip" data-k="${k}" aria-pressed="${!cfg.hidden[k]}"><i></i>Tournament <span class="n">${counts[k]}</span></button>`);
-  if (counts.booking) chips.push(`<button class="chip" data-k="booking" aria-pressed="${!cfg.hidden.booking}" style="--c:color-mix(in srgb,var(--court) 35%,var(--line))"><i></i>Bookings <span class="n">${counts.booking}</span></button>`);
-  if (counts.free) chips.push(`<button class="chip free" data-k="free" aria-pressed="${!cfg.hidden.free}"><i></i>Free slots <span class="n">${counts.free}</span></button>`);
+  for (const k of Object.keys(counts).filter(k=>k.startsWith('Lt'))) chips.push(`<button class="chip" data-k="${k}" aria-pressed="${!cfg.hidden[k]}"><i></i>${t('tournament')} <span class="n">${counts[k]}</span></button>`);
+  if (counts.booking) chips.push(`<button class="chip" data-k="booking" aria-pressed="${!cfg.hidden.booking}" style="--c:color-mix(in srgb,var(--court) 35%,var(--line))"><i></i>${t('bookings')} <span class="n">${counts.booking}</span></button>`);
+  if (counts.free) chips.push(`<button class="chip free" data-k="free" aria-pressed="${!cfg.hidden.free}"><i></i>${t('freeSlots')} <span class="n">${counts.free}</span></button>`);
   const el = document.getElementById('filters'); el.innerHTML = chips.join('');
   el.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{ const k=b.dataset.k; cfg.hidden[k]=!cfg.hidden[k]; store.set('hidden',cfg.hidden); render(); });
 }
@@ -800,10 +949,10 @@ function slotDate(s){ const d = new Date(s.date); const h = Math.floor(s.start/1
 function slotEnd(s){ const d = new Date(s.date); d.setHours(Math.floor(s.end/100), Math.round((s.end%100)*0.6)); return d; }
 
 function slotInner(s, compact){
-  if (s.kind==='free') return `<span class="top"><span class="t">${hm(s.start)}</span>${wxBadge(s)}</span><span class="open">Free</span><span class="l">${s.price!=null?'€'+s.price:''}</span>`;
+  if (s.kind==='free') return `<span class="top"><span class="t">${hm(s.start)}</span>${wxBadge(s)}</span><span class="open">${t('free')}${rainFor(s)?.wet ? ` · <span class="rw">${t('tagRain')}</span>` : ''}</span><span class="l">${s.price!=null?'€'+s.price:''}</span>`;
   const r = state.resultsByGame.get(s.gameId);
-  const tags = [rainFor(s)?.wet?'<span class="tag rain" title="Rain likely">rain</span>':'', s.recurring?'<span class="tag" title="Recurring booking">weekly</span>':'', s.openSeats?`<span class="tag" title="Open seats">+${s.openSeats}</span>`:''].join(' ');
-  const sub = s.kind==='league' ? leagueName(s.leagueId) : s.kind==='booking' ? (s.players.length? s.players.length+' player'+(s.players.length>1?'s':''):'') : '';
+  const tags = [rainFor(s)?.wet?`<span class="tag rain" title="${t('tagRainTitle')}">${t('tagRain')}</span>`:'', s.recurring?`<span class="tag" title="${t('tagWeeklyTitle')}">${t('tagWeekly')}</span>`:'', s.openSeats?`<span class="tag" title="${t('tagSeatsTitle')}">+${s.openSeats}</span>`:''].join(' ');
+  const sub = s.kind==='league' ? leagueName(s.leagueId) : s.kind==='booking' ? (s.players.length ? tn('players', s.players.length) : '') : '';
   return `<span class="top"><span class="t">${compact ? hm(s.start) : hm(s.start)+'–'+hm(s.end)}</span>${wxBadge(s)}</span>
     <span class="${compact?'l':'x'}">${esc(slotTitle(s))}</span>
     ${sub||tags.trim()?`<span class="l sub">${esc(sub)} ${tags}</span>`:''}
@@ -824,7 +973,7 @@ function renderBoard(){
   let html = `<div class="corner"></div>`;
   state.days.forEach((d,i)=>{
     const t = sameDay(d.date, now);
-    html += `<div class="dayhead${t?' today':''}"><div class="d">${DAYS[i]} <small>${d.date.getDate()}.${d.date.getMonth()+1}.</small></div>
+    html += `<div class="dayhead${t?' today':''}"><div class="d">${dayShort(d.date)} <small>${d.date.getDate()}.${d.date.getMonth()+1}.</small></div>
       <div class="lanes-h">${courts.map(c=>`<span title="${esc(c.name)}">${esc(c.name)}</span>`).join('')}</div></div>`;
   });
   html += `<div class="axis" style="height:${height}px">${[...Array(max-min+1)].map((_,i)=>i&&i<max-min?`<span style="top:${i*H}px">${min+i}:00</span>`:'').join('')}</div>`;
@@ -851,13 +1000,13 @@ function renderBoard(){
 function renderAgenda(){
   const el = document.getElementById('agenda'); const now = new Date();
   const single = shownCourts().length === 1 && state.courts.length > 1;
-  const meta = s => [single ? null : esc(s.court.name), s.kind==='league' ? esc(leagueName(s.leagueId)) : null, s.recurring ? 'weekly' : null].filter(Boolean).join(' · ');
+  const meta = s => [single ? null : esc(s.court.name), s.kind==='league' ? esc(leagueName(s.leagueId)) : null, s.recurring ? t('weekly') : null].filter(Boolean).join(' · ');
   el.innerHTML = state.days.map((d,i)=>{
     const list = d.slots.filter(visible).sort((a,b)=>a.start-b.start || a.court.name.localeCompare(b.court.name));
-    return `<div><h3 class="${sameDay(d.date,now)?'today':''}">${DAYS[i]} <small>${d.date.toLocaleDateString('en-GB',{day:'numeric',month:'long'})}</small></h3>
+    return `<div><h3 class="${sameDay(d.date,now)?'today':''}">${dayShort(d.date)} <small>${d.date.toLocaleDateString(LOC(),{day:'numeric',month:'long'})}</small></h3>
       ${list.length?`<ul>${list.map(s=>`<li><button class="slot ${slotClass(s)}${slotEnd(s)<now?' past':''}" style="${s.kind==='league'?'--c:'+leagueColor(s.leagueId):''}" data-id="${slotKey(s)}">
         <span class="t">${hm(s.start)}</span><span class="body"><span class="l">${esc(slotTitle(s))}</span>${meta(s)?`<span class="court">${meta(s)}</span>`:''}</span>${wxBadge(s)}
-        ${state.resultsByGame.get(s.gameId)?`<span class="sc">${esc(scoreLine(state.resultsByGame.get(s.gameId)))}</span>`:''}</button></li>`).join('')}</ul>`:'<p class="empty">Nothing to show for this day.</p>'}</div>`;
+        ${state.resultsByGame.get(s.gameId)?`<span class="sc">${esc(scoreLine(state.resultsByGame.get(s.gameId)))}</span>`:''}</button></li>`).join('')}</ul>`:`<p class="empty">${t('nothingToday')}</p>`}</div>`;
   }).join('');
   el.querySelectorAll('.slot').forEach(b=>b.onclick=()=>openSlot(b.dataset.id));
 }
@@ -869,18 +1018,18 @@ const drawer = document.getElementById('drawer'), panel = document.getElementByI
 drawer.onclick = e => { if (e.target===drawer) closeDrawer(); };
 document.addEventListener('keydown', e => { if (e.key==='Escape' && !drawer.hidden) closeDrawer(); });
 function closeDrawer(){ drawer.hidden = true; if (location.hash.startsWith('#s=')) { try { history.replaceState(null, '', location.pathname + location.search); } catch(e){} } }
-function openDrawer(html){ panel.innerHTML = `<button class="btn close" id="closeD">Close</button>`+html; drawer.hidden=false; document.getElementById('closeD').onclick=closeDrawer; document.getElementById('closeD').focus(); }
+function openDrawer(html){ panel.innerHTML = `<button class="btn close" id="closeD">${t('close')}</button>`+html; drawer.hidden=false; document.getElementById('closeD').onclick=closeDrawer; document.getElementById('closeD').focus(); }
 
 /* ---------- share + calendar ---------- */
 function slotLink(s){ return location.origin + location.pathname + '#s=' + encodeURIComponent(slotKey(s)); }
 function clubPlace(){ return [state.club?.name, state.club?.city].filter(Boolean).join(', '); }
 function shareText(s){
-  const day = s.date.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+  const day = s.date.toLocaleDateString(LOC(),{weekday:'short',day:'numeric',month:'short'});
   const w = weatherFor(s), rr = rainFor(s);
-  const what = s.kind==='free' ? `Free court${s.price!=null?' · €'+s.price:''}` : slotTitle(s);
+  const what = s.kind==='free' ? t('freeCourt')+(s.price!=null?' · €'+s.price:'') : slotTitle(s);
   const bits = [`🎾 ${day} ${hm(s.start)}–${hm(s.end)}`, `${s.court.name}${state.club?.name ? ' ('+state.club.name+')' : ''}`, what];
-  if (w) bits.push(`${Math.round(w.temp)}°${rr?.wet ? ', rain likely' : ''}`);
-  if (s.openSeats) bits.push(`${s.openSeats} ${s.openSeats===1?'spot':'spots'} left`);
+  if (w) bits.push(`${Math.round(w.temp)}°${rr?.wet ? ', '+t('rainLikelyShort') : ''}`);
+  if (s.openSeats) bits.push(tn('spots', s.openSeats));
   return bits.join(' · ');
 }
 const icsEsc = t => String(t).replace(/\\/g,'\\\\').replace(/[,;]/g, m => '\\'+m).replace(/\n/g,'\\n');
@@ -909,16 +1058,16 @@ const ICON_CAL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 function actionsSection(s){
   if (slotEnd(s) < new Date()) return '';
   return `<div class="actions">
-      <button class="btn" type="button" id="shareBtn">${ICON_SHARE}Share</button>
-      <button class="btn" type="button" id="calBtn">${ICON_CAL}Add to calendar</button>
+      <button class="btn" type="button" id="shareBtn">${ICON_SHARE}${t('share')}</button>
+      <button class="btn" type="button" id="calBtn">${ICON_CAL}${t('addCal')}</button>
     </div>
     <div class="shareopts" id="shareOpts" hidden>
       <a class="btn" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(shareText(s)+' '+slotLink(s))}">WhatsApp</a>
-      <button class="btn" type="button" id="copyBtn">Copy text and link</button>
+      <button class="btn" type="button" id="copyBtn">${t('copyText')}</button>
     </div>
     <div class="shareopts" id="calOpts" hidden>
       <a class="btn" target="_blank" rel="noopener" href="${googleCalUrl(s)}">Google Calendar</a>
-      <button class="btn" type="button" id="icsBtn">Apple or Outlook (.ics)</button>
+      <button class="btn" type="button" id="icsBtn">${t('icsBtn')}</button>
     </div>
     <p class="msg" id="actMsg" aria-live="polite"></p>`;
 }
@@ -932,7 +1081,7 @@ function wireActions(s){
   };
   document.getElementById('calBtn').onclick = () => { const o = document.getElementById('calOpts'); o.hidden = !o.hidden; document.getElementById('shareOpts').hidden = true; };
   document.getElementById('copyBtn').onclick = async () => {
-    try { await navigator.clipboard.writeText(text + '\n' + url); msg.className = 'msg ok'; msg.textContent = 'Copied. Paste it into your group chat.'; }
+    try { await navigator.clipboard.writeText(text + '\n' + url); msg.className = 'msg ok'; msg.textContent = t('copied'); }
     catch(e) { msg.className = 'msg'; msg.textContent = text + ' ' + url; }
   };
   document.getElementById('icsBtn').onclick = () => {
@@ -940,49 +1089,49 @@ function wireActions(s){
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
     a.download = `padel-${ymd(s.date)}-${hm(s.start).replace(':','')}.ics`;
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-    msg.className = 'msg ok'; msg.textContent = 'Calendar file downloaded. Open it to add the match.';
+    msg.className = 'msg ok'; msg.textContent = t('icsDone');
   };
 }
 
 function openSlot(key){
   const s = allSlots().find(x=>slotKey(x)===key); if (!s) return;
   const r = state.resultsByGame.get(s.gameId);
-  const when = s.date.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})+' · '+hm(s.start)+'–'+hm(s.end);
+  const when = dateLong(s.date)+' · '+hm(s.start)+'–'+hm(s.end);
   const bookUrl = `https://${cfg.sub}.sporty.plus/app/courts`;
   let body = '';
   if (s.kind==='league' || (s.kind==='booking' && s.teamIds.length===2)) {
     const sides = s.teamIds.map(id=>{
       const won = r && r.winner_team_id===id;
-      return `<div class="side"><b>${esc(teamLabel(id))}${won?' — won':''}</b><small>${esc(teamPlayers(id)||'Player names not public')}</small></div>`;
+      return `<div class="side"><b>${esc(teamLabel(id))}${won?t('wonMark'):''}</b><small>${esc(teamPlayers(id)||t('namesHidden'))}</small></div>`;
     });
     body += `<div class="vs">${sides.join('<div class="sep">VS</div>')}</div>`;
   }
   const rows = [];
-  rows.push(['Court', esc(s.court.name)]);
+  rows.push([t('r_court'), esc(s.court.name)]);
   const w = weatherFor(s);
-  if (w) rows.push(['Weather', `<span class="wxrow"><img src="${WX_ICONS}${w.sym}.svg" alt="">${esc(wxText(w.sym))}, ${Math.round(w.temp)} °C</span><br><span class="hint">${w.rain ? w.rain+' mm rain'+(w.span>1?' in '+w.span+' h':'') : 'No rain expected'} · wind ${Math.round(w.wind)} m/s${w.span>1?' · 6-hour forecast':''}</span>`]);
-  if (s.kind==='league') rows.push(['League', `${esc(leagueName(s.leagueId))} <button class="btn" id="renameL" style="padding:1px 8px;font-size:.75rem">Rename</button>`]);
-  if (s.kind==='free') rows.push(['Price', s.price!=null?'€'+s.price:'—']);
+  if (w) rows.push([t('r_weather'), `<span class="wxrow"><img src="${WX_ICONS}${w.sym}.svg" alt="">${esc(wxText(w.sym))}, ${Math.round(w.temp)} °C</span><br><span class="hint">${w.rain ? t('rainMm', { mm: w.rain.toLocaleString(LOC()) })+(w.span>1?t('inHours', { h: w.span }):'') : t('noRain')} · ${t('wind', { w: Math.round(w.wind) })}${w.span>1?' · '+t('sixHour'):''}</span>`]);
+  if (s.kind==='league') rows.push([t('r_league'), `${esc(leagueName(s.leagueId))} <button class="btn" id="renameL" style="padding:1px 8px;font-size:.75rem">${t('rename')}</button>`]);
+  if (s.kind==='free') rows.push([t('r_price'), s.price!=null?'€'+s.price:'—']);
   if (s.booked) {
-    rows.push(['Type', s.kind==='league'?'League match':s.byClub?'Booked by the club':'Player booking']);
-    const np = namedPlayers(s); rows.push(['Players', np.length? esc(np.join(', ')) : s.players.length+' (names hidden)']);
-    if (s.recurring) rows.push(['Repeats','Every week']);
-    if (s.openSeats) rows.push(['Open seats', s.openSeats]);
-    if (s.waiting) rows.push(['Waiting list', s.waiting+' waiting']);
-    rows.push(['Paid', s.raw.is_paid?'Yes':'No']);
-    if (s.raw.created_at) rows.push(['Booked on', new Date(s.raw.created_at).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})]);
+    rows.push([t('r_type'), s.kind==='league'?t('type_league'):s.byClub?t('type_club'):t('type_player')]);
+    const np = namedPlayers(s); rows.push([t('r_players'), np.length? esc(np.join(', ')) : t('namesHiddenN', { n: s.players.length })]);
+    if (s.recurring) rows.push([t('r_repeats'), t('everyWeek')]);
+    if (s.openSeats) rows.push([t('r_openSeats'), s.openSeats]);
+    if (s.waiting) rows.push([t('r_waiting'), t('waitingN', { n: s.waiting })]);
+    rows.push([t('r_paid'), s.raw.is_paid?t('yes'):t('no')]);
+    if (s.raw.created_at) rows.push([t('r_bookedOn'), new Date(s.raw.created_at).toLocaleString(LOC(),{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})]);
   }
-  if (r) rows.push(['Result', `<span style="font-family:var(--f-mono)">${esc(scoreLine(r))}</span>`]);
+  if (r) rows.push([t('r_result'), `<span style="font-family:var(--f-mono)">${esc(scoreLine(r))}</span>`]);
   body += `<dl class="kv">${rows.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
   body += rainPlan(s);
   body += bookingSection(s);
   body += resultSection(s);
   body += actionsSection(s);
-  body += `<p class="hint"><a href="${bookUrl}" target="_blank" rel="noopener">Open in Sporty.plus</a></p>`;
+  body += `<p class="hint"><a href="${bookUrl}" target="_blank" rel="noopener">${t('openInSporty')}</a></p>`;
   const cam = COURT_CAMERAS[s.court.id];
   if (cam)
-    body +=`<a class="stream" href="${esc(cam)}" target="_blank" rel="noopener"><i aria-hidden="true"></i>Stream on Matchi TV</a>
-      <p class="hint">${esc(s.court.name)} has a camera. Start a live stream or recording of your match.</p>`;
+    body +=`<a class="stream" href="${esc(cam)}" target="_blank" rel="noopener"><i aria-hidden="true"></i>${t('stream')}</a>
+      <p class="hint">${t('camHint', { court: esc(s.court.name) })}</p>`;
   openDrawer(`<div><div class="when">${esc(when)}</div><h2>${esc(slotTitle(s))}</h2></div>`+body);
   wireBooking(s);
   wireResult(s);
@@ -993,7 +1142,7 @@ function openSlot(key){
   const rn = document.getElementById('renameL');
   if (rn) rn.onclick = () => {
     const dd = rn.parentElement;
-    dd.innerHTML = `<div class="field"><input id="nickIn" value="${esc(cfg.nick[s.leagueId]||state.leagues.get(s.leagueId)?.name||'')}" placeholder="e.g. Winter doubles"><button class="btn primary" id="nickSave" style="align-self:flex-start">Save name</button></div>`;
+    dd.innerHTML = `<div class="field"><input id="nickIn" value="${esc(cfg.nick[s.leagueId]||state.leagues.get(s.leagueId)?.name||'')}" placeholder="${t('nickPlaceholder')}"><button class="btn primary" id="nickSave" style="align-self:flex-start">${t('saveName')}</button></div>`;
     const inp = document.getElementById('nickIn'); inp.focus();
     const save = () => { const v = inp.value.trim(); if (v) cfg.nick[s.leagueId]=v; else delete cfg.nick[s.leagueId]; store.set('nick',cfg.nick); render(); openSlot(key); };
     document.getElementById('nickSave').onclick = save; inp.onkeydown = e=>{ if(e.key==='Enter') save(); };
@@ -1010,15 +1159,16 @@ async function authPost(path, body, token){
   const r = await fetch(AUTH+path, { method:'POST', headers:h, body: JSON.stringify(body||{}) });
   let j = {}; try { j = await r.json(); } catch(_){}
   if (!r.ok) {
-    const e = new Error(j.errors?.[0]?.detail || j.message || j.error || ('Sporty.plus answered '+r.status));
+    const e = new Error(j.errors?.[0]?.detail || j.message || j.error || t('sportyAnswered', { s: r.status }));
     e.status = r.status; e.data = j; throw e;
   }
   return j;
 }
 function loginErrorText(e){
-  if (e.status===429) return 'Too many attempts. Wait a minute and try again.';
-  if (e.status===422) return e.message.includes('credentials') ? 'That email and password don’t match a Sporty.plus account.' : e.message;
-  return e.message || 'Could not reach Sporty.plus. Check your connection and try again.';
+  if (e.status===429) return t('tooMany');
+  if (e.status===422) return e.message.includes('credentials') ? t('badCreds') : e.message;
+  if (!e.status) return t('noReach');
+  return e.message || t('noReach');
 }
 async function useToken(raw){
   cfg.token = raw.startsWith('Bearer') ? raw : 'Bearer '+raw;
@@ -1028,19 +1178,19 @@ async function useToken(raw){
 }
 function updateAccountBtn(){
   const b = document.getElementById('accountBtn');
-  b.textContent = state.me ? (myName().split(' ')[0] || 'Account') : (cfg.token ? 'Account' : 'Log in');
+  b.textContent = state.me ? (myName().split(' ')[0] || t('account')) : (cfg.token ? t('account') : t('login'));
   b.classList.toggle('solid', !cfg.token);
 }
 
 function openLogin(){
   if (cfg.token) return openAccount();
-  openDrawer(`<h2>Log in with Sporty.plus</h2>
-    <p class="hint">Use the same email and password as the ${esc(state.club?.name || 'club')} app. Your password goes straight to Sporty.plus and isn't saved here.</p>
+  openDrawer(`<h2>${t('loginTitle')}</h2>
+    <p class="hint">${t('loginHint', { club: esc(state.club?.name || t('theClub')) })}</p>
     <form id="loginForm" class="wrap" style="padding:0;gap:12px" novalidate>
-      <div class="field"><label for="lEmail">Email</label><input id="lEmail" type="email" autocomplete="username" placeholder="ana.horvat@gmail.com" required></div>
-      <div class="field"><label for="lPass">Password</label><input id="lPass" type="password" autocomplete="current-password" required></div>
-      <div class="field" id="lCodeRow" hidden><label for="lCode">Code from your authenticator app</label><input id="lCode" inputmode="numeric" autocomplete="one-time-code" placeholder="123456"></div>
-      <button class="btn primary" id="lGo" type="submit" style="align-self:flex-start">Log in</button>
+      <div class="field"><label for="lEmail">${t('email')}</label><input id="lEmail" type="email" autocomplete="username" placeholder="ana.horvat@gmail.com" required></div>
+      <div class="field"><label for="lPass">${t('password')}</label><input id="lPass" type="password" autocomplete="current-password" required></div>
+      <div class="field" id="lCodeRow" hidden><label for="lCode">${t('codeLabel')}</label><input id="lCode" inputmode="numeric" autocomplete="one-time-code" placeholder="123456"></div>
+      <button class="btn primary" id="lGo" type="submit" style="align-self:flex-start">${t('login')}</button>
       <p class="msg" id="lMsg" aria-live="polite"></p>
     </form>`);
   const f = document.getElementById('loginForm'), msg = document.getElementById('lMsg'), go = document.getElementById('lGo');
@@ -1051,32 +1201,32 @@ function openLogin(){
     const email = document.getElementById('lEmail').value.trim(), pass = document.getElementById('lPass').value;
     const code = document.getElementById('lCode').value.trim();
     msg.className = 'msg err';
-    if (!challenge && (!email || !pass)) { msg.textContent = 'Enter your email and password.'; return; }
-    if (challenge && !code) { msg.textContent = 'Enter the code from your authenticator app.'; return; }
-    go.disabled = true; go.textContent = 'Logging in…'; msg.textContent = '';
+    if (!challenge && (!email || !pass)) { msg.textContent = t('errEmailPass'); return; }
+    if (challenge && !code) { msg.textContent = t('errCode'); return; }
+    go.disabled = true; go.textContent = t('loggingIn'); msg.textContent = '';
     try {
       const r = challenge
         ? await authPost('/login/two-factor-challenge', { challenge, code, recovery_code: null })
         : await authPost('/login', { client:'native', email, password: pass });
-      if (!r.token) throw new Error('Sporty.plus did not return a session. Try again.');
-      msg.className = 'msg ok'; msg.textContent = 'Logged in. Loading your view…';
+      if (!r.token) throw new Error(t('noSession'));
+      msg.className = 'msg ok'; msg.textContent = t('loggedIn');
       await useToken(r.token);
       setTimeout(closeDrawer, 600);
     } catch(e) {
       if (!challenge && e.data && e.data.error==='two_factor_required' && e.data.challenge) {
         challenge = e.data.challenge;
         document.getElementById('lCodeRow').hidden = false; document.getElementById('lCode').focus();
-        msg.className = 'msg'; msg.textContent = 'Your account uses two-step login. Enter the code to finish.';
-      } else msg.textContent = challenge && e.status===422 ? 'That code isn’t right. Try again.' : loginErrorText(e);
-      go.disabled = false; go.textContent = challenge ? 'Confirm code' : 'Log in';
+        msg.className = 'msg'; msg.textContent = t('twoStep');
+      } else msg.textContent = challenge && e.status===422 ? t('badCode') : loginErrorText(e);
+      go.disabled = false; go.textContent = challenge ? t('confirmCode') : t('login');
     }
   };
 }
 
 function openAccount(){
-  openDrawer(`<h2>${esc(myName() || 'Your account')}</h2>
-    <p class="hint">Logged in with Sporty.plus. You see player names and private leagues, and you can book courts from here.</p>
-    <button class="btn" id="logoutBtn" style="align-self:flex-start">Log out</button>`);
+  openDrawer(`<h2>${esc(myName() || t('yourAccount'))}</h2>
+    <p class="hint">${t('accountHint')}</p>
+    <button class="btn" id="logoutBtn" style="align-self:flex-start">${t('logout')}</button>`);
   document.getElementById('logoutBtn').onclick = async () => {
     const t = cfg.token;
     cfg.token = ''; store.set('token',''); state.me = null;
@@ -1087,14 +1237,14 @@ function openAccount(){
 }
 
 function openSettings(){
-  openDrawer(`<h2>Settings</h2>
-    <div class="field"><label for="sClub">Club ID</label><input id="sClub" inputmode="numeric" value="${esc(cfg.club)}"></div>
-    <div class="field"><label for="sSub">Club web address (the part before .sporty.plus)</label><input id="sSub" value="${esc(cfg.sub)}"></div>
-    <details><summary class="hint" style="cursor:pointer">Developer options</summary>
-      <div class="field" style="margin-top:10px"><label for="sTok">Session token</label><input id="sTok" type="password" value="${esc(cfg.token)}" placeholder="Bearer …" autocomplete="off"></div>
-      <p class="hint" style="margin-top:6px">Only needed if you'd rather paste a token than log in. It stays in this browser. Treat it like a password.</p>
+  openDrawer(`<h2>${t('settings')}</h2>
+    <div class="field"><label for="sClub">${t('clubId')}</label><input id="sClub" inputmode="numeric" value="${esc(cfg.club)}"></div>
+    <div class="field"><label for="sSub">${t('clubAddr')}</label><input id="sSub" value="${esc(cfg.sub)}"></div>
+    <details><summary class="hint" style="cursor:pointer">${t('devOptions')}</summary>
+      <div class="field" style="margin-top:10px"><label for="sTok">${t('sessionToken')}</label><input id="sTok" type="password" value="${esc(cfg.token)}" placeholder="Bearer …" autocomplete="off"></div>
+      <p class="hint" style="margin-top:6px">${t('tokenHint')}</p>
     </details>
-    <button class="btn primary" id="sSave" style="align-self:flex-start">Save and reload</button>`);
+    <button class="btn primary" id="sSave" style="align-self:flex-start">${t('saveReload')}</button>`);
   document.getElementById('sSave').onclick = () => {
     cfg.club = parseInt(document.getElementById('sClub').value,10) || 139;
     cfg.sub = document.getElementById('sSub').value.trim() || 'modesto';
@@ -1107,10 +1257,10 @@ function openSettings(){
 /* ---------- results tab ---------- */
 function renderResults(){
   const el = document.getElementById('resultsView');
-  if (!state.results.length){ el.innerHTML = '<p class="empty">No results loaded yet.</p>'; return; }
+  if (!state.results.length){ el.innerHTML = `<p class="empty">${t('noResults')}</p>`; return; }
   const groups = new Map();
   for (const r of state.results){ const d = r.date.slice(0,10); if(!groups.has(d)) groups.set(d,[]); groups.get(d).push(r); }
-  el.innerHTML = [...groups].map(([d,list])=>`<div><h3>${new Date(d+'T12:00').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</h3>
+  el.innerHTML = [...groups].map(([d,list])=>`<div><h3>${dateLong(new Date(d+'T12:00'))}</h3>
     ${list.map(r=>{
       const sets = (r.sets||[]).filter(x=>x[0]||x[1]);
       const [a,b] = r.players||[];
@@ -1118,7 +1268,7 @@ function renderResults(){
       const g = r.game || {};
       return `<div class="res"><div style="display:flex;flex-direction:column;gap:6px;min-width:0">${team(a,0)}${team(b,1)}</div>
         <div class="sets">${sets.map(x=>`<span><em style="${x[0]>x[1]?'':'font-weight:400;opacity:.6'}">${x[0]}</em><em style="${x[1]>x[0]?'':'font-weight:400;opacity:.6'}">${x[1]}</em></span>`).join('')}</div>
-        <div class="meta">${r.date.slice(11,16)}${g.round?' · Round '+g.round:''}${r.official?' · official':''}${r.verified?' · verified':''}</div></div>`;
+        <div class="meta">${r.date.slice(11,16)}${g.round?' · '+t('roundN', { n: g.round }):''}${r.official?' · '+t('official'):''}${r.verified?' · '+t('verified'):''}</div></div>`;
     }).join('')}</div>`).join('');
 }
 
@@ -1140,14 +1290,25 @@ document.getElementById('settingsBtn').onclick = openSettings;
 document.getElementById('accountBtn').onclick = openLogin;
 
 /* ---------- theme: Auto follows the device, or pick Light / Dark ---------- */
-const THEMES = ['auto','light','dark'], THEME_LABEL = { auto:'Auto', light:'Light', dark:'Dark' };
-function applyTheme(t){
-  if (t==='auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = t;
-  const b = document.getElementById('themeBtn'); b.textContent = THEME_LABEL[t]; b.setAttribute('aria-label', 'Theme: '+THEME_LABEL[t]);
+const THEMES = ['auto','light','dark'];
+function applyTheme(th){
+  if (th==='auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = th;
+  const b = document.getElementById('themeBtn'), label = window.t('theme_'+th); b.textContent = label; b.setAttribute('aria-label', window.t('themeAria', { x: label }));
 }
 let theme = store.get('theme','auto'); if (!THEMES.includes(theme)) theme = 'auto';
 applyTheme(theme);
 document.getElementById('themeBtn').onclick = () => { theme = THEMES[(THEMES.indexOf(theme)+1)%3]; store.set('theme',theme); applyTheme(theme); };
+
+/* ---------- language switch: Croatian <-> English ---------- */
+function setLang(l){
+  lang = l === 'en' ? 'en' : 'hr'; store.set('lang', lang);
+  applyStaticText(); applyTheme(theme); updateAccountBtn();
+  const openKey = !drawer.hidden ? panel.dataset.key : null;
+  render(); if (!document.getElementById('resultsView').hidden) renderResults();
+  if (openKey && allSlots().some(x => slotKey(x) === openKey)) openSlot(openKey); else if (!drawer.hidden) closeDrawer();
+}
+document.getElementById('langBtn').onclick = () => setLang(lang === 'hr' ? 'en' : 'hr');
+applyStaticText();
 document.addEventListener('keydown', e => {
   if (!drawer.hidden || e.target.closest('input,textarea')) return;
   if (e.key==='ArrowLeft') document.getElementById('prev').click();
