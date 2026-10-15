@@ -135,6 +135,10 @@ button{cursor:pointer}
 .agenda .wx img{width:22px;height:22px}
 .wxrow{display:inline-flex;align-items:center;gap:6px}
 .wxrow img{width:28px;height:28px}
+.stream{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:8px 16px;background:var(--fg);color:var(--bg);text-decoration:none;font-weight:500}
+.stream:hover{background:color-mix(in srgb,var(--fg) 85%,var(--court))}
+.stream i{width:9px;height:9px;border-radius:50%;background:var(--now);box-shadow:0 0 0 3px color-mix(in srgb,var(--now) 30%,transparent)}
+.drawer a.stream{color:var(--bg)}
 .credit{text-align:center;padding-block:8px 0}
 .credit a{color:var(--court)}
 
@@ -287,6 +291,9 @@ async function loadMe(){
 /* ---------- data ---------- */
 /* ---------- weather: MET Norway / yr.no locationforecast ----------
    Hourly for ~2.5 days, then every 6 hours up to ~9 days. Cached for 30 minutes per club. */
+/* Courts with a Matchi TV camera (Sporty+ court id -> stream link). Only Padel otvoreni for now. */
+const COURT_CAMERAS = { 798: 'https://www.matchi.tv/create-stream/start?id=9i2bjHsKpf3&v2' };
+
 const WX_ICONS = 'https://cdn.jsdelivr.net/gh/metno/weathericons@89e3173756248b4696b9b10677b66c4ef435db53/weather/svg/';
 const WX_TEXT = { clearsky:'Clear sky', fair:'Fair', partlycloudy:'Partly cloudy', cloudy:'Cloudy', fog:'Fog',
   lightrain:'Light rain', rain:'Rain', heavyrain:'Heavy rain', lightrainshowers:'Light rain showers', rainshowers:'Rain showers',
@@ -685,6 +692,10 @@ function openSlot(key){
   body += `<dl class="kv">${rows.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
   body += bookingSection(s);
   body += `<p class="hint"><a href="${bookUrl}" target="_blank" rel="noopener">Open in Sporty.plus</a></p>`;
+  const cam = COURT_CAMERAS[s.court.id];
+  if (cam && slotEnd(s) >= new Date())
+    body += `<a class="stream" href="${esc(cam)}" target="_blank" rel="noopener"><i aria-hidden="true"></i>Stream on Matchi TV</a>
+      <p class="hint">${esc(s.court.name)} has a camera. Start a live stream or recording of your match.</p>`;
   openDrawer(`<div><div class="when">${esc(when)}</div><h2>${esc(slotTitle(s))}</h2></div>`+body);
   wireBooking(s);
   const rn = document.getElementById('renameL');
