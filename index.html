@@ -245,7 +245,8 @@ button{cursor:pointer}
 .vs .side small{color:var(--muted)}
 .vs .sep{font:500 .75rem var(--f-display);color:var(--muted);letter-spacing:.1em}
 .drawer a{color:var(--court)}
-.drawer .close{align-self:flex-end}
+.drawer .dhead{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.drawer .back{display:inline-flex;align-items:center;gap:6px}
 .field{display:flex;flex-direction:column;gap:4px}
 .field label{font-size:.8rem;color:var(--muted)}
 .field input{border:1px solid var(--line);background:var(--bg);border-radius:var(--r-tile);padding:8px 11px;width:100%}
@@ -393,7 +394,7 @@ const I18N = {
     tournament:'Turnir', bookings:'Rezervacije', freeSlots:'Slobodni termini',
     tagRain:'kiša', tagRainTitle:'Moguća kiša', tagWeekly:'tjedno', tagWeeklyTitle:'Ponavljajuća rezervacija', tagSeatsTitle:'Slobodna mjesta',
     players_one:'{n} igrač', players_few:'{n} igrača', players_many:'{n} igrača', weekly:'tjedno', nothingToday:'Za ovaj dan nema ništa za prikaz.',
-    close:'Zatvori', wonMark:' — pobjeda', namesHidden:'Imena igrača nisu javna',
+    close:'Zatvori', back:'Natrag', wonMark:' — pobjeda', namesHidden:'Imena igrača nisu javna',
     r_court:'Teren', r_weather:'Vrijeme', r_league:'Liga', rename:'Preimenuj', r_price:'Cijena', r_type:'Vrsta', r_players:'Igrači',
     r_repeats:'Ponavlja se', everyWeek:'Svaki tjedan', r_openSeats:'Slobodna mjesta', r_waiting:'Lista čekanja', waitingN:'{n} čeka',
     r_paid:'Plaćeno', yes:'Da', no:'Ne', r_bookedOn:'Rezervirano', r_result:'Rezultat',
@@ -467,7 +468,7 @@ const I18N = {
     tournament:'Tournament', bookings:'Bookings', freeSlots:'Free slots',
     tagRain:'rain', tagRainTitle:'Rain likely', tagWeekly:'weekly', tagWeeklyTitle:'Recurring booking', tagSeatsTitle:'Open seats',
     players_one:'{n} player', players_few:'{n} players', players_many:'{n} players', weekly:'weekly', nothingToday:'Nothing to show for this day.',
-    close:'Close', wonMark:' — won', namesHidden:'Player names not public',
+    close:'Close', back:'Back', wonMark:' — won', namesHidden:'Player names not public',
     r_court:'Court', r_weather:'Weather', r_league:'League', rename:'Rename', r_price:'Price', r_type:'Type', r_players:'Players',
     r_repeats:'Repeats', everyWeek:'Every week', r_openSeats:'Open seats', r_waiting:'Waiting list', waitingN:'{n} waiting',
     r_paid:'Paid', yes:'Yes', no:'No', r_bookedOn:'Booked on', r_result:'Result',
@@ -1222,8 +1223,35 @@ function slotKey(s){ return ymd(s.date)+'|'+s.court.id+'|'+s.start; }
 const drawer = document.getElementById('drawer'), panel = document.getElementById('panel');
 drawer.onclick = e => { if (e.target===drawer) closeDrawer(); };
 document.addEventListener('keydown', e => { if (e.key==='Escape' && !drawer.hidden) closeDrawer(); });
-function closeDrawer(){ drawer.hidden = true; if (location.hash.startsWith('#s=')) { try { history.replaceState(null, '', location.pathname + location.search); } catch(e){} } }
-function openDrawer(html){ panel.innerHTML = `<button class="btn close" id="closeD">${t('close')}</button>`+html; drawer.hidden=false; document.getElementById('closeD').onclick=closeDrawer; document.getElementById('closeD').focus(); }
+/* ---------- panel history: Back returns to the previous slot, player or pair ----------
+   Every slot / player / pair opened while the panel is already open is stacked. Re-renders of the same view
+   (loading → loaded, language switch) don't stack. Login and Settings start fresh. Closing the panel clears it. */
+let navStack = [];
+function navPush(type, id){
+  if (drawer.hidden) navStack = [];
+  const top = navStack[navStack.length - 1];
+  if (!top || top.type !== type || String(top.id) !== String(id)) navStack.push({ type, id });
+}
+function navReset(){ navStack = []; }
+async function navBack(){
+  navStack.pop();
+  const prev = navStack[navStack.length - 1];
+  if (!prev) return closeDrawer();
+  if (prev.type === 'slot') {
+    if (!allSlots().some(x => slotKey(x) === prev.id)) await showWeek(mondayOf(new Date(prev.id.slice(0,10) + 'T12:00')));
+    openSlot(prev.id);
+  } else if (prev.type === 'player') openProfile(prev.id);
+  else if (prev.type === 'team') openTeamProfile(prev.id);
+}
+function closeDrawer(){ drawer.hidden = true; navStack = []; if (location.hash.startsWith('#s=')) { try { history.replaceState(null, '', location.pathname + location.search); } catch(e){} } }
+function openDrawer(html){
+  const back = navStack.length > 1 ? `<button class="btn back" id="backD" type="button"><span aria-hidden="true">←</span> ${t('back')}</button>` : '<span></span>';
+  panel.innerHTML = `<div class="dhead">${back}<button class="btn close" id="closeD" type="button">${t('close')}</button></div>` + html;
+  drawer.hidden = false;
+  document.getElementById('closeD').onclick = closeDrawer;
+  const b = document.getElementById('backD'); if (b) b.onclick = navBack;
+  (b || document.getElementById('closeD')).focus();
+}
 
 /* ---------- share + calendar ---------- */
 function slotLink(s){ return location.origin + location.pathname + '#s=' + encodeURIComponent(slotKey(s)); }
@@ -1300,6 +1328,7 @@ function wireActions(s){
 
 function openSlot(key){
   const s = allSlots().find(x=>slotKey(x)===key); if (!s) return;
+  navPush('slot', key);
   const r = state.resultsByGame.get(s.gameId);
   const when = dateLong(s.date)+' · '+hm(s.start)+'–'+hm(s.end);
   const bookUrl = `https://${cfg.sub}.sporty.plus/app/courts`;
@@ -1390,6 +1419,7 @@ function updateAccountBtn(){
 }
 
 function openLogin(){
+  navReset();
   if (cfg.token) return openAccount();
   openDrawer(`<h2>${t('loginTitle')}</h2>
     <p class="hint">${t('loginHint', { club: esc(state.club?.name || t('theClub')) })}</p>
@@ -1489,6 +1519,7 @@ function teamResultFor(r, id){
 }
 async function openTeamProfile(id){
   id = Number(id);
+  navPush('team', id);
   if (!cfg.token) {
     openDrawer(`<h2>${t('pair')}</h2><p class="hint">${t('profileLogin')}</p><button class="btn primary" type="button" id="pfLogin" style="align-self:flex-start">${t('profileLoginBtn')}</button>`);
     document.getElementById('pfLogin').onclick = openLogin; return;
@@ -1545,6 +1576,7 @@ document.addEventListener('click', e => { const b = e.target.closest('[data-team
 
 async function openProfile(id){
   id = Number(id);
+  navPush('player', id);
   const self = state.me?.id === id;
   if (!cfg.token) {
     openDrawer(`<h2>${t('profile')}</h2><p class="hint">${t('profileLogin')}</p><button class="btn primary" type="button" id="pfLogin" style="align-self:flex-start">${t('profileLoginBtn')}</button>`);
@@ -1617,6 +1649,7 @@ function renderProfile(id, pl, data, self){
 document.addEventListener('click', e => { const b = e.target.closest('[data-player]'); if (b) { e.preventDefault(); openProfile(b.dataset.player); } });
 
 function openSettings(){
+  navReset();
   openDrawer(`<h2>${t('settings')}</h2>
     <div class="field"><label for="sClub">${t('clubId')}</label><input id="sClub" inputmode="numeric" value="${esc(cfg.club)}"></div>
     <div class="field"><label for="sSub">${t('clubAddr')}</label><input id="sSub" value="${esc(cfg.sub)}"></div>
