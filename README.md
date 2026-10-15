@@ -4,7 +4,7 @@
 
 A faster, friendlier front end for [Sporty.plus](https://sporty.plus) court booking. See a whole week of courts at once, with league matches, results and open slots, and book a court in two clicks.
 
-**Live:** https://saler-luka.github.io/padel-week/
+**Live:** https://saler-luka.github.io/padel-radar/
 
 ## What it does
 
