@@ -196,6 +196,12 @@ button{cursor:pointer}
 .agenda .slot.league .court{color:var(--c)}
 .agenda .slot .sc{margin:0}
 .empty{color:var(--muted);font-size:.85rem}
+/* Earlier slots bar (phone list, current week) */
+.earlier{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;border:0;border-radius:var(--r-tile);padding:10px 14px;background:var(--line);color:var(--fg);font:500 .9rem var(--f-body);text-align:left}
+.earlier:hover{background:color-mix(in srgb,var(--line) 70%,var(--muted))}
+.earlier .chev{display:inline-block;width:1.1em;color:var(--muted)}
+.earlier .n{font:500 .8rem var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.earlierlist{display:flex;flex-direction:column;gap:18px;opacity:.8}
 @media (max-width:760px){.board-scroll{display:none}.agenda{display:flex}.brand{display:grid;grid-template-columns:auto 1fr;column-gap:12px;align-items:center}
 .brand .logo{grid-row:span 2;width:44px;height:44px;border-radius:11px;box-shadow:0 0 0 2px color-mix(in srgb,#fff 70%,transparent)}
 .brand h1{font-size:1.4rem}.nav .range{min-width:0}}
@@ -403,6 +409,7 @@ const I18N = {
     ed_full:'Rezervacija može imati najviše {max} igrača.', ed_count:'{n} od {max} igrača', ed_save:'Spremi promjene', ed_confirm:'Dodirni ponovno za potvrdu',
     ed_summary:'Dodaješ: {add}. Uklanjaš: {remove}.', ed_none:'nikoga', ed_saving:'Spremam…', ed_saved:'Spremljeno. Osvježavam raspored…',
     ed_refused:'Sporty.plus nije prihvatio promjenu: {msg}', ed_nothing:'Nema promjena za spremanje.', ed_pending:'Novi igrač', ed_willRemove:'bit će uklonjen',
+    ag_earlier:'Raniji termini', ag_hideEarlier:'Sakrij ranije termine', ag_today:'danas', ag_earlierToday:'danas ranije',
     noResults:'Rezultati još nisu učitani.', roundN:'{n}. kolo', official:'službeno', verified:'potvrđeno'
   },
   en: {
@@ -476,6 +483,7 @@ const I18N = {
     ed_full:'A booking can have at most {max} players.', ed_count:'{n} of {max} players', ed_save:'Save changes', ed_confirm:'Tap again to confirm',
     ed_summary:'Adding: {add}. Removing: {remove}.', ed_none:'nobody', ed_saving:'Saving…', ed_saved:'Saved. Updating the schedule…',
     ed_refused:'Sporty.plus refused the change: {msg}', ed_nothing:'Nothing to save yet.', ed_pending:'New player', ed_willRemove:'will be removed',
+    ag_earlier:'Earlier slots', ag_hideEarlier:'Hide earlier slots', ag_today:'today', ag_earlierToday:'earlier today',
     noResults:'No results loaded yet.', roundN:'Round {n}', official:'official', verified:'verified'
   }
 };
@@ -1151,17 +1159,44 @@ function renderBoard(){
   board.querySelectorAll('.slot').forEach(b=>b.onclick=()=>openSlot(b.dataset.id));
 }
 
+// Phone list. In the current week it opens at today: earlier days and today's finished slots fold into one
+// gray "Earlier slots" bar at the top, which expands in place. Other weeks show in full.
 function renderAgenda(){
   const el = document.getElementById('agenda'); const now = new Date();
   const single = shownCourts().length === 1 && state.courts.length > 1;
   const meta = s => [single ? null : esc(courtLabel(s.court)), s.kind==='league' ? esc(leagueName(s.leagueId)) : null, s.recurring ? t('weekly') : null].filter(Boolean).join(' · ');
-  el.innerHTML = state.days.map((d,i)=>{
-    const list = d.slots.filter(visible).sort((a,b)=>a.start-b.start || courtLabel(a.court).localeCompare(courtLabel(b.court)));
-    return `<div><h3 class="${sameDay(d.date,now)?'today':''}">${dayShort(d.date)} <small>${d.date.toLocaleDateString(LOC(),{day:'numeric',month:'long'})}</small></h3>
-      ${list.length?`<ul>${list.map(s=>`<li><button class="slot ${slotClass(s)}${slotEnd(s)<now?' past':''}" style="${s.kind==='league'?'--c:'+leagueColor(s.leagueId):''}" data-id="${slotKey(s)}">
+  const row = s => `<li><button class="slot ${slotClass(s)}${slotEnd(s)<now?' past':''}" style="${s.kind==='league'?'--c:'+leagueColor(s.leagueId):''}" data-id="${slotKey(s)}">
         <span class="t">${hm(s.start)}</span><span class="body"><span class="l">${esc(slotTitle(s))}</span>${meta(s)?`<span class="court">${meta(s)}</span>`:''}</span>${wxBadge(s)}
-        ${state.resultsByGame.get(s.gameId)?`<span class="sc">${esc(scoreLine(state.resultsByGame.get(s.gameId)))}</span>`:''}</button></li>`).join('')}</ul>`:`<p class="empty">${t('nothingToday')}</p>`}</div>`;
-  }).join('');
+        ${state.resultsByGame.get(s.gameId)?`<span class="sc">${esc(scoreLine(state.resultsByGame.get(s.gameId)))}</span>`:''}</button></li>`;
+  const dayHead = d => { const today = sameDay(d.date, now);
+    return `<h3 class="${today?'today':''}">${dayShort(d.date)} <small>${d.date.toLocaleDateString(LOC(),{day:'numeric',month:'long'})}${today?' · '+t('ag_today'):''}</small></h3>`; };
+  const sorted = d => d.slots.filter(visible).sort((a,b)=>a.start-b.start || courtLabel(a.court).localeCompare(courtLabel(b.court)));
+  const thisWeek = ymd(state.monday) === ymd(mondayOf(now));
+  const isEarlier = s => slotEnd(s) < now;   // finished slots, earlier days included
+
+  if (!thisWeek) {
+    el.innerHTML = state.days.map(d => { const list = sorted(d);
+      return `<div>${dayHead(d)}${list.length?`<ul>${list.map(row).join('')}</ul>`:`<p class="empty">${t('nothingToday')}</p>`}</div>`; }).join('');
+  } else {
+    const earlier = state.days.map(d => ({ d, list: sorted(d).filter(isEarlier) })).filter(x => x.list.length);
+    const count = earlier.reduce((a,x) => a + x.list.length, 0);
+    let html = '';
+    if (count) {
+      const first = earlier[0].d.date, last = earlier[earlier.length-1].d.date;
+      const name = d => sameDay(d, now) ? t('ag_today') : (lang === 'hr' ? dayShort(d).toLowerCase() : dayShort(d));
+      const span = sameDay(first, last) ? (sameDay(first, now) ? t('ag_earlierToday') : name(first)) : `${name(first)} – ${name(last)}`;
+      html += `<button type="button" class="earlier" id="earlierBtn" aria-expanded="${!!state.showEarlier}">
+          <span><span class="chev" aria-hidden="true">${state.showEarlier ? '▾' : '▸'}</span>${state.showEarlier ? t('ag_hideEarlier') : t('ag_earlier')} · ${esc(span)}</span><span class="n">${count}</span></button>`;
+      if (state.showEarlier) html += `<div class="earlierlist">${earlier.map(x => `<div>${dayHead(x.d)}<ul>${x.list.map(row).join('')}</ul></div>`).join('')}</div>`;
+    }
+    html += state.days.filter(d => d.date >= new Date(now.getFullYear(), now.getMonth(), now.getDate())).map(d => {
+      const list = sorted(d).filter(s => !isEarlier(s));
+      return `<div>${dayHead(d)}${list.length?`<ul>${list.map(row).join('')}</ul>`:`<p class="empty">${t('nothingToday')}</p>`}</div>`;
+    }).join('');
+    el.innerHTML = html;
+    const b = document.getElementById('earlierBtn');
+    if (b) b.onclick = () => { state.showEarlier = !state.showEarlier; renderAgenda(); };
+  }
   el.querySelectorAll('.slot').forEach(b=>b.onclick=()=>openSlot(b.dataset.id));
 }
 
