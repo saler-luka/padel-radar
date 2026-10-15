@@ -3,7 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Padel Week</title>
+<title>Padel Radar</title>
+<meta name="description" content="Every padel court, league match and free slot for the week, with weather and booking. Built on Sporty.plus.">
+<meta name="theme-color" content="#0085b2">
+<meta name="apple-mobile-web-app-title" content="Padel Radar">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" href="icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
 <script>try{var t=JSON.parse(localStorage.getItem('pw.theme'));if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -47,6 +54,8 @@ button{cursor:pointer}
 /* Header band: blue turf with the court's white line along the bottom */
 .band{background:var(--band);color:var(--on-band);border-bottom:3px solid #fff;margin-bottom:4px}
 .band .wrap{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding-block:16px}
+.brand{display:grid;grid-template-columns:auto 1fr;column-gap:12px;align-items:center}
+.brand .logo{grid-row:span 2;width:44px;height:44px;border-radius:11px;box-shadow:0 0 0 2px color-mix(in srgb,#fff 70%,transparent)}
 .brand h1{font:600 1.7rem/1.1 var(--f-display);margin:0;letter-spacing:-.01em}
 .brand p{margin:2px 0 0;color:var(--band-soft);font-size:.85rem}
 .nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
@@ -174,7 +183,9 @@ button{cursor:pointer}
 .agenda .slot.league .court{color:var(--c)}
 .agenda .slot .sc{margin:0}
 .empty{color:var(--muted);font-size:.85rem}
-@media (max-width:760px){.board-scroll{display:none}.agenda{display:flex}.brand h1{font-size:1.4rem}.nav .range{min-width:0}}
+@media (max-width:760px){.board-scroll{display:none}.agenda{display:flex}.brand{display:grid;grid-template-columns:auto 1fr;column-gap:12px;align-items:center}
+.brand .logo{grid-row:span 2;width:44px;height:44px;border-radius:11px;box-shadow:0 0 0 2px color-mix(in srgb,#fff 70%,transparent)}
+.brand h1{font-size:1.4rem}.nav .range{min-width:0}}
 
 /* Results */
 .results{display:flex;flex-direction:column;gap:18px}
@@ -230,8 +241,9 @@ button{cursor:pointer}
 <header class="band">
   <div class="wrap">
     <div class="brand">
-      <h1 id="clubName">Padel week</h1>
-      <p id="clubSub">Live from Sporty.plus</p>
+      <img class="logo" src="icon.svg" alt="" width="44" height="44">
+      <h1 id="clubName">Padel Radar</h1>
+      <p id="clubSub">Padel Radar · live from Sporty.plus</p>
     </div>
     <div class="nav">
       <button class="pill" id="prev" aria-label="Previous week">←</button>
@@ -371,10 +383,10 @@ function wxBadge(s){
 
 async function loadClub(){
   try { state.club = await api('/v2/club/this'); } catch(e){ state.club = null; }
-  const n = state.club?.name || 'Padel';
+  const n = state.club?.name || 'Padel Radar';
   document.getElementById('clubName').textContent = n;
-  document.getElementById('clubSub').textContent = state.club ? [state.club.city, 'live from Sporty.plus'].filter(Boolean).join(' · ') : 'Live from Sporty.plus';
-  document.title = n + ' · Padel Week';
+  document.getElementById('clubSub').textContent = state.club ? ['Padel Radar', state.club.city].filter(Boolean).join(' · ') : 'Padel Radar · live from Sporty.plus';
+  document.title = n + ' · Padel Radar';
 }
 
 /* Results are public and carry team + player names (slots only carry team ids), but the

@@ -1,0 +1,16 @@
+{
+  "name": "Padel Radar",
+  "short_name": "Padel Radar",
+  "description": "Every padel court, league match and free slot for the week, with weather and booking. Built on Sporty.plus.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#eef5f8",
+  "theme_color": "#0085b2",
+  "icons": [
+    { "src": "icon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" },
+    { "src": "icon-192.png", "type": "image/png", "sizes": "192x192", "purpose": "any" },
+    { "src": "icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "type": "image/png", "sizes": "512x512", "purpose": "maskable" }
+  ]
+}

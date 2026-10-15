@@ -1,4 +1,6 @@
-# Padel Week
+# Padel Radar
+
+<img src="icon.svg" alt="" width="72" height="72">
 
 A faster, friendlier front end for [Sporty.plus](https://sporty.plus) court booking. See a whole week of courts at once, with league matches, results and open slots, and book a court in two clicks.
 
