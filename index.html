@@ -693,8 +693,8 @@ function openSlot(key){
   body += bookingSection(s);
   body += `<p class="hint"><a href="${bookUrl}" target="_blank" rel="noopener">Open in Sporty.plus</a></p>`;
   const cam = COURT_CAMERAS[s.court.id];
-  if (cam && slotEnd(s) >= new Date())
-    body += `<a class="stream" href="${esc(cam)}" target="_blank" rel="noopener"><i aria-hidden="true"></i>Stream on Matchi TV</a>
+  if (cam)
+    body +=`<a class="stream" href="${esc(cam)}" target="_blank" rel="noopener"><i aria-hidden="true"></i>Stream on Matchi TV</a>
       <p class="hint">${esc(s.court.name)} has a camera. Start a live stream or recording of your match.</p>`;
   openDrawer(`<div><div class="when">${esc(when)}</div><h2>${esc(slotTitle(s))}</h2></div>`+body);
   wireBooking(s);
