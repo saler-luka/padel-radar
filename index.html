@@ -1148,7 +1148,7 @@ function openSlot(key){
   if (s.kind==='league' || (s.kind==='booking' && s.teamIds.length===2)) {
     const sides = s.teamIds.map(id=>{
       const won = r && r.winner_team_id===id;
-      return `<div class="side"><b>${esc(teamLabel(id))}${won?t('wonMark'):''}</b><small>${playersHtml(state.teams.get(id)?.players) || esc(t('namesHidden'))}</small></div>`;
+      return `<div class="side"><b>${esc(teamLabel(id))}${won?t('wonMark'):''}</b><small>${playersHtml(state.teams.get(id)?.players) || playersHtml(s.players.filter(p => p.team_id === id && p.display_name)) || esc(t('namesHidden'))}</small></div>`;
     });
     body += `<div class="vs">${sides.join('<div class="sep">VS</div>')}</div>`;
   }
@@ -1160,7 +1160,7 @@ function openSlot(key){
   if (s.kind==='free') rows.push([t('r_price'), s.price!=null?'€'+s.price:'—']);
   if (s.booked) {
     rows.push([t('r_type'), s.kind==='league'?t('type_league'):s.byClub?t('type_club'):t('type_player')]);
-    const np = namedPlayers(s); rows.push([t('r_players'), np.length? esc(np.join(', ')) : t('namesHiddenN', { n: s.players.length })]);
+    const named = s.players.filter(p => p.display_name); rows.push([t('r_players'), named.length ? playersHtml(named) : t('namesHiddenN', { n: s.players.length })]);
     if (s.recurring) rows.push([t('r_repeats'), t('everyWeek')]);
     if (s.openSeats) rows.push([t('r_openSeats'), s.openSeats]);
     if (s.waiting) rows.push([t('r_waiting'), t('waitingN', { n: s.waiting })]);
