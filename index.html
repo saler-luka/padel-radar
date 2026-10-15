@@ -20,7 +20,7 @@
 :root{
   --bg:#eef5f8; --surface:#ffffff; --fg:#13222c; --muted:#5d6f7b; --line:#d3e3eb;
   --band:#0085b2; --on-band:#ffffff; --band-soft:#cfeaf5;
-  --court:#0085b2; --court-soft:#e3f2f8; --free:#4a6f0a; --free-bg:#eef7dc; --free-line:#a3c642; --peak:#7a5600; --peak-bg:#fdf4cf; --peak-line:#e0bb32; --rain:#2f6fd0; --rain-soft:#e8f0fc; --ball:#c9d82b; --now:#e0452b; --win:#13222c;
+  --court:#0085b2; --court-soft:#e3f2f8; --free:#4a6f0a; --free-bg:#eef7dc; --free-line:#a3c642; --peak:#7a5600; --peak-bg:#fdf4cf; --peak-line:#e0bb32; --rain:#2f6fd0; --rain-soft:#e8f0fc; --taken:#d64545; --taken-soft:#fde8e8; --ball:#c9d82b; --now:#e0452b; --win:#13222c;
   --l1:#d4762a; --l2:#7c4bc0; --l3:#1f9d6b; --l4:#c23d6b; --l5:#8a7a12; --l6:#0085b2;
   --f-display:"Outfit",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -31,13 +31,13 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0a1419; --surface:#12222b; --fg:#e4eef2; --muted:#8ea4af; --line:#223843;
   --band:#0b5f80; --on-band:#ffffff; --band-soft:#a9d9ec;
-  --court:#3bb4de; --court-soft:#15313d; --free:#d6e24a; --free-bg:#1d2b12; --free-line:#6f8f24; --peak:#f2d35c; --peak-bg:#2a2410; --peak-line:#8c7421; --rain:#7fb0ff; --rain-soft:#15243c; --ball:#d6e24a; --now:#ff6a4f; --win:#ffffff;
+  --court:#3bb4de; --court-soft:#15313d; --free:#d6e24a; --free-bg:#1d2b12; --free-line:#6f8f24; --peak:#f2d35c; --peak-bg:#2a2410; --peak-line:#8c7421; --rain:#7fb0ff; --rain-soft:#15243c; --taken:#ff6b6b; --taken-soft:#3a1d20; --ball:#d6e24a; --now:#ff6a4f; --win:#ffffff;
   --l1:#f0954a; --l2:#a77ee8; --l3:#3cc48e; --l4:#ec6a96; --l5:#cdb93a; --l6:#3bb4de;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0a1419; --surface:#12222b; --fg:#e4eef2; --muted:#8ea4af; --line:#223843;
   --band:#0b5f80; --on-band:#ffffff; --band-soft:#a9d9ec;
-  --court:#3bb4de; --court-soft:#15313d; --free:#d6e24a; --free-bg:#1d2b12; --free-line:#6f8f24; --peak:#f2d35c; --peak-bg:#2a2410; --peak-line:#8c7421; --rain:#7fb0ff; --rain-soft:#15243c; --ball:#d6e24a; --now:#ff6a4f; --win:#ffffff;
+  --court:#3bb4de; --court-soft:#15313d; --free:#d6e24a; --free-bg:#1d2b12; --free-line:#6f8f24; --peak:#f2d35c; --peak-bg:#2a2410; --peak-line:#8c7421; --rain:#7fb0ff; --rain-soft:#15243c; --taken:#ff6b6b; --taken-soft:#3a1d20; --ball:#d6e24a; --now:#ff6a4f; --win:#ffffff;
   --l1:#f0954a; --l2:#a77ee8; --l3:#3cc48e; --l4:#ec6a96; --l5:#cdb93a; --l6:#3bb4de;
   color-scheme:dark}
 *{box-sizing:border-box}
@@ -141,6 +141,11 @@ button{cursor:pointer}
 .slot.free .t{color:var(--free);opacity:.75}
 .slot.free .l{font-weight:600}
 .slot.free .open{font:600 .62rem var(--f-body);letter-spacing:.06em;text-transform:uppercase;opacity:.8}
+/* Booked by someone else: red strip across the top (your own bookings stay solid blue) */
+.slot.taken{border-top:3px solid var(--taken)}
+.agenda .slot.taken{border-top-width:3px}
+.tag.taken{background:var(--taken-soft);color:var(--taken)}
+.agenda .slot .court .tag{margin-right:6px;vertical-align:1px}
 .slot.mine{background:var(--court);border-color:var(--court);color:#fff}
 .slot.mine .t,.slot.mine .sub,.slot.mine .sc{color:color-mix(in srgb,#fff 82%,transparent)}
 .slot:hover{border-color:var(--c,var(--court))}
@@ -403,7 +408,7 @@ const I18N = {
     loginExpired:'Prijava je istekla. Prijavi se ponovno i pokušaj opet.', resultRefused:'Sporty.plus nije prihvatio rezultat: {msg}',
     st_yourBookings:'tvoje rezervacije', st_courtsBooked:'zauzetih termina', st_leagueMatches:'ligaških utakmica', st_resultsIn:'upisanih rezultata', st_freeLeft:'slobodnih termina',
     tournament:'Turnir', bookings:'Rezervacije', freeSlots:'Slobodni termini',
-    tagRain:'kiša', tagRainTitle:'Moguća kiša', tagWeekly:'tjedno', tagWeeklyTitle:'Ponavljajuća rezervacija', tagSeatsTitle:'Slobodna mjesta',
+    tagTaken:'zauzeto', tagTakenTitle:'Teren je zauzet u ovo vrijeme', tagRain:'kiša', tagRainTitle:'Moguća kiša', tagWeekly:'tjedno', tagWeeklyTitle:'Ponavljajuća rezervacija', tagSeatsTitle:'Slobodna mjesta',
     players_one:'{n} igrač', players_few:'{n} igrača', players_many:'{n} igrača', weekly:'tjedno', nothingToday:'Za ovaj dan nema ništa za prikaz.',
     close:'Zatvori', back:'Natrag', wonMark:' — pobjeda', namesHidden:'Imena igrača nisu javna',
     r_court:'Teren', r_weather:'Vrijeme', r_league:'Liga', rename:'Preimenuj', r_price:'Cijena', r_type:'Vrsta', r_players:'Igrači',
@@ -477,7 +482,7 @@ const I18N = {
     loginExpired:'Your login has expired. Log in again and retry.', resultRefused:'Sporty.plus didn’t accept the result: {msg}',
     st_yourBookings:'your bookings', st_courtsBooked:'courts booked', st_leagueMatches:'league matches', st_resultsIn:'results in', st_freeLeft:'free slots left',
     tournament:'Tournament', bookings:'Bookings', freeSlots:'Free slots',
-    tagRain:'rain', tagRainTitle:'Rain likely', tagWeekly:'weekly', tagWeeklyTitle:'Recurring booking', tagSeatsTitle:'Open seats',
+    tagTaken:'booked', tagTakenTitle:'This court is booked at this time', tagRain:'rain', tagRainTitle:'Rain likely', tagWeekly:'weekly', tagWeeklyTitle:'Recurring booking', tagSeatsTitle:'Open seats',
     players_one:'{n} player', players_few:'{n} players', players_many:'{n} players', weekly:'weekly', nothingToday:'Nothing to show for this day.',
     close:'Close', back:'Back', wonMark:' — won', namesHidden:'Player names not public',
     r_court:'Court', r_weather:'Weather', r_league:'League', rename:'Rename', r_price:'Price', r_type:'Type', r_players:'Players',
@@ -832,7 +837,9 @@ function isMine(s){
   return s.players.some(p => (p.id && p.id===m.id) || (teamId && p.team_id===teamId));
 }
 function freePrices(){ return allSlots().filter(x=>x.kind==='free' && x.price!=null).map(x=>x.price); }
-function slotClass(s){ return s.kind + (isMine(s)?' mine':'') + (rainFor(s)?.wet ? ' wet' : '') + (s.kind==='free' && s.price!=null && s.price === state.peak && state.low < state.peak ? ' peak' : ''); }
+// Show the 'zauzeto' tag only when the tile's title doesn't already say so.
+function takenTag(s){ return s.booked && !isMine(s) && slotTitle(s) !== t('booked') ? `<span class="tag taken" title="${esc(t('tagTakenTitle'))}">${t('tagTaken')}</span>` : ''; }
+function slotClass(s){ return s.kind + (isMine(s)?' mine':'') + (s.booked && !isMine(s) ? ' taken' : '') + (rainFor(s)?.wet ? ' wet' : '') + (s.kind==='free' && s.price!=null && s.price === state.peak && state.low < state.peak ? ' peak' : ''); }
 function slotTitle(s){
   if (s.kind==='free') return s.price!=null ? t('freePrice', { p: s.price }) : t('free');
   if (s.kind==='league'){
@@ -1141,7 +1148,7 @@ function slotEnd(s){ const d = new Date(s.date); d.setHours(Math.floor(s.end/100
 function slotInner(s, compact){
   if (s.kind==='free') return `<span class="top"><span class="t">${hm(s.start)}</span>${wxBadge(s)}</span><span class="open">${t('free')}${rainFor(s)?.wet ? ` · <span class="rw">${t('tagRain')}</span>` : ''}</span><span class="l">${s.price!=null?'€'+s.price:''}</span>`;
   const r = state.resultsByGame.get(s.gameId);
-  const tags = [rainFor(s)?.wet?`<span class="tag rain" title="${t('tagRainTitle')}">${t('tagRain')}</span>`:'', s.recurring?`<span class="tag" title="${t('tagWeeklyTitle')}">${t('tagWeekly')}</span>`:'', s.openSeats?`<span class="tag" title="${t('tagSeatsTitle')}">+${s.openSeats}</span>`:''].join(' ');
+  const tags = [compact ? '' : takenTag(s), rainFor(s)?.wet?`<span class="tag rain" title="${t('tagRainTitle')}">${t('tagRain')}</span>`:'', s.recurring?`<span class="tag" title="${t('tagWeeklyTitle')}">${t('tagWeekly')}</span>`:'', s.openSeats?`<span class="tag" title="${t('tagSeatsTitle')}">+${s.openSeats}</span>`:''].join(' ');
   const sub = s.kind==='league' ? leagueName(s.leagueId) : s.kind==='booking' ? (s.players.length ? tn('players', s.players.length) : '') : '';
   return `<span class="top"><span class="t">${compact ? hm(s.start) : hm(s.start)+'–'+hm(s.end)}</span>${wxBadge(s)}</span>
     <span class="${compact?'l':'x'}">${esc(slotTitle(s))}</span>
@@ -1194,7 +1201,7 @@ function renderAgenda(){
   const single = shownCourts().length === 1 && state.courts.length > 1;
   const meta = s => [single ? null : esc(courtLabel(s.court)), s.kind==='league' ? esc(leagueName(s.leagueId)) : null, s.recurring ? t('weekly') : null].filter(Boolean).join(' · ');
   const row = s => `<li><button class="slot ${slotClass(s)}${slotEnd(s)<now?' past':''}" style="${s.kind==='league'?'--c:'+leagueColor(s.leagueId):''}" data-id="${slotKey(s)}">
-        <span class="t">${hm(s.start)}</span><span class="body"><span class="l">${esc(slotTitle(s))}</span>${meta(s)?`<span class="court">${meta(s)}</span>`:''}</span>${wxBadge(s)}
+        <span class="t">${hm(s.start)}</span><span class="body"><span class="l">${esc(slotTitle(s))}</span>${meta(s)||takenTag(s)?`<span class="court">${takenTag(s)}${meta(s)}</span>`:''}</span>${wxBadge(s)}
         ${state.resultsByGame.get(s.gameId)?`<span class="sc">${esc(scoreLine(state.resultsByGame.get(s.gameId)))}</span>`:''}</button></li>`;
   const dayHead = d => { const today = sameDay(d.date, now);
     return `<h3 class="${today?'today':''}">${dayShort(d.date)} <small>${d.date.toLocaleDateString(LOC(),{day:'numeric',month:'long'})}${today?' · '+t('ag_today'):''}</small></h3>`; };
