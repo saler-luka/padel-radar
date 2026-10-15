@@ -54,7 +54,9 @@ button{cursor:pointer}
 /* Header band: blue turf with the court's white line along the bottom */
 .band{background:var(--band);color:var(--on-band);border-bottom:3px solid #fff;margin-bottom:4px}
 .band .wrap{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding-block:16px}
-.brand{display:grid;grid-template-columns:auto 1fr;column-gap:12px;align-items:center}
+.brand{display:grid;grid-template-columns:auto 1fr;column-gap:12px;align-items:center;color:inherit;text-decoration:none;border-radius:12px}
+.brand:hover .logo{box-shadow:0 0 0 2px #fff}
+.brand:focus-visible{outline-color:var(--on-band);outline-offset:4px}
 .brand .logo{grid-row:span 2;width:44px;height:44px;border-radius:11px;box-shadow:0 0 0 2px color-mix(in srgb,#fff 70%,transparent)}
 .brand h1{font:600 1.7rem/1.1 var(--f-display);margin:0;letter-spacing:-.01em}
 .brand p{margin:2px 0 0;color:var(--band-soft);font-size:.85rem}
@@ -64,6 +66,20 @@ button{cursor:pointer}
 .pill:hover{background:color-mix(in srgb,var(--on-band) 14%,transparent)}
 .pill.solid{background:var(--on-band);color:var(--band);border-color:var(--on-band)}
 .pill:focus-visible{outline-color:var(--on-band)}
+/* Light / dark switch: two halves, the active one filled white (like the court switch) */
+.tseg{display:inline-flex;border:1px solid color-mix(in srgb,var(--on-band) 70%,transparent);border-radius:999px;padding:2px;gap:2px}
+.tseg button{border:0;background:none;color:var(--on-band);border-radius:999px;padding:4px 10px;display:grid;place-items:center}
+.tseg button svg{width:16px;height:16px;display:block}
+.tseg button:hover{background:color-mix(in srgb,var(--on-band) 14%,transparent)}
+.tseg button[aria-pressed="true"]{background:var(--on-band);color:var(--band)}
+.tseg button:focus-visible{outline-color:var(--on-band)}
+.pill.icon{display:inline-grid;place-items:center;padding:5px 9px}
+.pill.icon svg{width:18px;height:18px;display:block}
+/* Logged in: profile tile with photo and first name */
+.pill.me{display:inline-flex;flex-direction:column;align-items:center;gap:2px;border-radius:14px;padding:4px 10px 3px;background:color-mix(in srgb,var(--on-band) 16%,transparent)}
+.pill.me:hover{background:color-mix(in srgb,var(--on-band) 26%,transparent)}
+.pill.me .av{width:28px;height:28px;border-radius:50%;object-fit:cover;background:var(--band-soft);color:var(--band);display:grid;place-items:center;font:600 .72rem var(--f-display)}
+.pill.me .nm{font-size:.72rem;line-height:1.1;max-width:10ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 .btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px}
 .btn:hover{border-color:var(--court)}
@@ -226,7 +242,9 @@ button{cursor:pointer}
 }
 @media (max-width:760px){.board-scroll{display:none}.agenda{display:flex}.brand{display:grid;grid-template-columns:auto 1fr;column-gap:12px;align-items:center}
 .brand .logo{grid-row:span 2;width:44px;height:44px;border-radius:11px;box-shadow:0 0 0 2px color-mix(in srgb,#fff 70%,transparent)}
-.brand h1{font-size:1.4rem}.nav .range{min-width:0}}
+.brand h1{font-size:1.4rem}.nav .range{min-width:0}
+/* Phones: the account button sits in the top-right corner, beside the logo */
+.band .wrap{position:relative}.brand{padding-right:72px}#accountBtn{position:absolute;top:16px;right:16px}#accountBtn:not(.me){top:24px}}
 
 /* Results */
 .results{display:flex;flex-direction:column;gap:18px}
@@ -331,20 +349,20 @@ button{cursor:pointer}
 <body>
 <header class="band">
   <div class="wrap">
-    <div class="brand">
+    <a class="brand" id="homeLink" href="./" data-i18n-title="home" title="Početna">
       <img class="logo" src="icon.svg" alt="" width="44" height="44">
       <h1 id="clubName">Padel Radar</h1>
       <p id="clubSub">Padel Radar · uživo sa Sporty.plus</p>
-    </div>
+    </a>
     <div class="nav">
       <button class="pill" id="prev" data-i18n-aria="prevWeek" aria-label="Prethodni tjedan">←</button>
       <button class="pill solid" id="today" data-i18n="thisWeek">Ovaj tjedan</button>
       <span class="range" id="range"></span>
       <button class="pill" id="next" data-i18n-aria="nextWeek" aria-label="Sljedeći tjedan">→</button>
       <button class="pill" id="refresh" data-i18n-title="reload" data-i18n-aria="reload" title="Osvježi podatke" aria-label="Osvježi podatke">↻</button>
-      <button class="pill" id="themeBtn" data-i18n-title="themeTitle" title="Promijeni temu">Auto</button>
+      <div class="tseg" role="group" data-i18n-aria="theme" aria-label="Tema"><button id="themeLight" data-i18n-aria="theme_light" data-i18n-title="theme_light" aria-label="Svijetla" title="Svijetla" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></button><button id="themeDark" data-i18n-aria="theme_dark" data-i18n-title="theme_dark" aria-label="Tamna" title="Tamna" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg></button></div>
       <button class="pill" id="langBtn" lang="en">EN</button>
-      <button class="pill" id="settingsBtn" data-i18n="settings">Postavke</button>
+      <button class="pill icon" id="settingsBtn" data-i18n-aria="settings" data-i18n-title="settings" aria-label="Postavke" title="Postavke"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></button>
       <button class="pill solid" id="accountBtn">Prijava</button>
     </div>
   </div>
@@ -379,8 +397,8 @@ const I18N = {
   hr: {
     locale:'hr-HR', switchTo:'EN', switchAria:'Prebaci na engleski',
     prevWeek:'Prethodni tjedan', nextWeek:'Sljedeći tjedan', thisWeek:'Ovaj tjedan', reload:'Osvježi podatke',
-    themeTitle:'Promijeni temu: automatska, svijetla ili tamna', themeAria:'Tema: {x}', theme_auto:'Auto', theme_light:'Svijetla', theme_dark:'Tamna',
-    settings:'Postavke', login:'Prijava', account:'Račun', liveFrom:'uživo sa Sporty.plus',
+    theme:'Tema', theme_light:'Svijetla tema', theme_dark:'Tamna tema',
+    settings:'Postavke', home:'Početna', login:'Prijava', account:'Račun', liveFrom:'uživo sa Sporty.plus',
     schedule:'Raspored', results:'Rezultati', loading:'Učitavanje…', loadingWeek:'Učitavanje tjedna…',
     credit:'Vremenska prognoza: {yr}, Norveški meteorološki institut (MET Norway).',
     tokenRefused:'Prijava je odbijena. Prijavi se ponovno ili obriši token u Postavkama.',
@@ -453,8 +471,8 @@ const I18N = {
   en: {
     locale:'en-GB', switchTo:'HR', switchAria:'Switch to Croatian',
     prevWeek:'Previous week', nextWeek:'Next week', thisWeek:'This week', reload:'Reload data',
-    themeTitle:'Switch between automatic, light and dark', themeAria:'Theme: {x}', theme_auto:'Auto', theme_light:'Light', theme_dark:'Dark',
-    settings:'Settings', login:'Log in', account:'Account', liveFrom:'live from Sporty.plus',
+    theme:'Theme', theme_light:'Light theme', theme_dark:'Dark theme',
+    settings:'Settings', home:'Home', login:'Log in', account:'Account', liveFrom:'live from Sporty.plus',
     schedule:'Schedule', results:'Results', loading:'Loading…', loadingWeek:'Loading week…',
     credit:'Weather forecast from {yr}, delivered by the Norwegian Meteorological Institute (MET Norway).',
     tokenRefused:'The login token was refused. Log in again or clear it in Settings.',
@@ -1440,9 +1458,18 @@ async function useToken(raw){
   await loadMe(); updateAccountBtn(); boot();
 }
 function updateAccountBtn(){
-  const b = document.getElementById('accountBtn');
-  b.textContent = state.me ? (myName().split(' ')[0] || t('account')) : (cfg.token ? t('account') : t('login'));
+  const b = document.getElementById('accountBtn'), me = state.me;
+  b.classList.toggle('me', !!me);
   b.classList.toggle('solid', !cfg.token);
+  if (!me) { b.textContent = cfg.token ? t('account') : t('login'); b.removeAttribute('aria-label'); return; }
+  // Logged in: a tile with the profile photo (or initials) and the first name underneath.
+  const name = myName(), face = img => img ? `<img class="av" src="${esc(img)}" alt="">` : `<span class="av ph" aria-hidden="true">${esc(initials(name))}</span>`;
+  b.innerHTML = `${face(me.image)}<span class="nm">${esc(name.split(' ')[0] || t('account'))}</span>`;
+  b.setAttribute('aria-label', t('myProfile') + (name ? ': ' + name : ''));
+  // /v2/me may not carry the photo; the public player record does.
+  if (!me.image && me.id) loadPlayer(me.id).then(({ player }) => {
+    if (player?.image && state.me === me) b.querySelector('.av').outerHTML = face(player.image);
+  }).catch(()=>{});
 }
 
 function openLogin(){
@@ -1760,21 +1787,34 @@ document.getElementById('today').onclick = ()=>showWeek(mondayOf(new Date()));
 document.getElementById('refresh').onclick = ()=>{ weekCache.clear(); boot(); };
 document.getElementById('settingsBtn').onclick = openSettings;
 document.getElementById('accountBtn').onclick = openLogin;
+// Logo: back to the start screen (this week's schedule, panel closed, top of the page). Ctrl/middle-click still opens a new tab.
+document.getElementById('homeLink').onclick = ev => {
+  if (ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.button) return;
+  ev.preventDefault();
+  if (!drawer.hidden) closeDrawer();
+  if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+  showTab('week');
+  showWeek(mondayOf(new Date()));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
 
-/* ---------- theme: Auto follows the device, or pick Light / Dark ---------- */
-const THEMES = ['auto','light','dark'];
-function applyTheme(th){
-  if (th==='auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = th;
-  const b = document.getElementById('themeBtn'), label = window.t('theme_'+th); b.textContent = label; b.setAttribute('aria-label', window.t('themeAria', { x: label }));
+/* ---------- theme: Light or Dark. Until the user picks one, follow the device. ---------- */
+const darkMq = matchMedia('(prefers-color-scheme: dark)');
+let theme = store.get('theme',''); if (!['light','dark'].includes(theme)) theme = '';   // '' = not picked yet
+function applyTheme(){
+  if (theme) document.documentElement.dataset.theme = theme; else delete document.documentElement.dataset.theme;
+  const cur = theme || (darkMq.matches ? 'dark' : 'light');
+  document.getElementById('themeLight').setAttribute('aria-pressed', cur==='light');
+  document.getElementById('themeDark').setAttribute('aria-pressed', cur==='dark');
 }
-let theme = store.get('theme','auto'); if (!THEMES.includes(theme)) theme = 'auto';
-applyTheme(theme);
-document.getElementById('themeBtn').onclick = () => { theme = THEMES[(THEMES.indexOf(theme)+1)%3]; store.set('theme',theme); applyTheme(theme); };
+applyTheme();
+darkMq.addEventListener('change', () => { if (!theme) applyTheme(); });
+for (const th of ['light','dark']) document.getElementById(th==='light' ? 'themeLight' : 'themeDark').onclick = () => { theme = th; store.set('theme', th); applyTheme(); };
 
 /* ---------- language switch: Croatian <-> English ---------- */
 function setLang(l){
   lang = l === 'en' ? 'en' : 'hr'; store.set('lang', lang);
-  applyStaticText(); applyTheme(theme); updateAccountBtn();
+  applyStaticText(); updateAccountBtn();
   const openKey = !drawer.hidden ? panel.dataset.key : null;
   render(); if (!document.getElementById('resultsView').hidden) renderResults();
   if (openKey && allSlots().some(x => slotKey(x) === openKey)) openSlot(openKey); else if (!drawer.hidden) closeDrawer();
