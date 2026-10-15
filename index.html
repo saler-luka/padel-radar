@@ -258,6 +258,10 @@ button{cursor:pointer}
 .prof .av{grid-row:span 2;width:64px;height:64px;border-radius:50%;object-fit:cover;background:var(--court-soft);border:2px solid var(--line)}
 .prof .av.ph{display:grid;place-items:center;font:600 1.4rem var(--f-display);color:var(--court)}
 .prof h2{margin:0}
+.prof.pair .avs{grid-row:span 2;display:flex}
+.prof.pair .avs .av{grid-row:auto;width:52px;height:52px}
+.prof.pair .avs .av + .av{margin-left:-10px;box-shadow:0 0 0 2px var(--surface)}
+.prof.pair .avs .av.ph{font-size:1rem}
 .prof .where{color:var(--muted);font-size:.85rem}
 .pstats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .pstats div{background:var(--bg);border:1px solid var(--line);border-radius:var(--r-tile);padding:8px 10px;display:flex;flex-direction:column}
@@ -415,7 +419,7 @@ const I18N = {
     pf_matches:'Mečevi', pf_wins:'Pobjede', pf_losses:'Porazi', pf_winRate:'Uspješnost', pf_sets:'Setovi', pf_form:'Forma (zadnjih 5)',
     pf_partners:'Najčešći partneri', pf_recent:'Zadnji mečevi', pf_upcoming:'Tvoji nadolazeći termini', pf_noUpcoming:'Nemaš nadolazećih termina u učitanim tjednima.',
     pf_noResults:'Još nema upisanih rezultata.', pf_basedOn:'Prema zadnjih {n} rezultata.', pf_with:'s {who}', pf_vs:'protiv {who}',
-    pf_win:'Pobjeda', pf_loss:'Poraz', pf_matchesN_one:'{n} meč', pf_matchesN_few:'{n} meča', pf_matchesN_many:'{n} mečeva', pf_openSporty:'Profil u Sporty.plus', pf_loadingResults:'Učitavam rezultate…',
+    pf_win:'Pobjeda', pf_loss:'Poraz', pf_matchesN_one:'{n} meč', pf_matchesN_few:'{n} meča', pf_matchesN_many:'{n} mečeva', pf_openSporty:'Profil u Sporty.plus', pair:'Par', openTeam:'Otvori profil para: {name}', tp_opponents:'Najčešći protivnici', tp_openSporty:'Par u Sporty.plus', pf_loadingResults:'Učitavam rezultate…',
     ed_title:'Igrači na rezervaciji', ed_hint:'Dodaj ili ukloni igrače pa spremi sve odjednom.', ed_remove:'Ukloni', ed_undo:'Vrati', ed_you:'ti',
     ed_search:'Traži člana kluba', ed_searchPh:'Upiši ime ili prezime', ed_searching:'Tražim…', ed_noHits:'Nema članova s tim imenom.', ed_add:'Dodaj', ed_added:'Dodano',
     ed_full:'Rezervacija može imati najviše {max} igrača.', ed_count:'{n} od {max} igrača', ed_save:'Spremi promjene', ed_confirm:'Dodirni ponovno za potvrdu',
@@ -489,7 +493,7 @@ const I18N = {
     pf_matches:'Matches', pf_wins:'Wins', pf_losses:'Losses', pf_winRate:'Win rate', pf_sets:'Sets', pf_form:'Form (last 5)',
     pf_partners:'Most frequent partners', pf_recent:'Recent matches', pf_upcoming:'Your upcoming slots', pf_noUpcoming:'No upcoming slots in the weeks loaded so far.',
     pf_noResults:'No results entered yet.', pf_basedOn:'Based on the last {n} results.', pf_with:'with {who}', pf_vs:'vs {who}',
-    pf_win:'Win', pf_loss:'Loss', pf_matchesN_one:'{n} match', pf_matchesN_few:'{n} matches', pf_matchesN_many:'{n} matches', pf_openSporty:'Profile in Sporty.plus', pf_loadingResults:'Loading results…',
+    pf_win:'Win', pf_loss:'Loss', pf_matchesN_one:'{n} match', pf_matchesN_few:'{n} matches', pf_matchesN_many:'{n} matches', pf_openSporty:'Profile in Sporty.plus', pair:'Pair', openTeam:'Open pair profile: {name}', tp_opponents:'Most frequent opponents', tp_openSporty:'Pair in Sporty.plus', pf_loadingResults:'Loading results…',
     ed_title:'Players on this booking', ed_hint:'Add or remove players, then save everything at once.', ed_remove:'Remove', ed_undo:'Undo', ed_you:'you',
     ed_search:'Find a club member', ed_searchPh:'Type a first or last name', ed_searching:'Searching…', ed_noHits:'No members with that name.', ed_add:'Add', ed_added:'Added',
     ed_full:'A booking can have at most {max} players.', ed_count:'{n} of {max} players', ed_save:'Save changes', ed_confirm:'Tap again to confirm',
@@ -1303,7 +1307,7 @@ function openSlot(key){
   if (s.kind==='league' || (s.kind==='booking' && s.teamIds.length===2)) {
     const sides = s.teamIds.map(id=>{
       const won = r && r.winner_team_id===id;
-      return `<div class="side"><b>${esc(teamLabel(id))}${won?t('wonMark'):''}</b><small>${playersHtml(state.teams.get(id)?.players) || playersHtml(s.players.filter(p => p.team_id === id && p.display_name)) || esc(t('namesHidden'))}</small></div>`;
+      return `<div class="side"><b>${s.kind==='league' ? teamLink(id, teamLabel(id)) : esc(teamLabel(id))}${won?t('wonMark'):''}</b><small>${playersHtml(state.teams.get(id)?.players) || playersHtml(s.players.filter(p => p.team_id === id && p.display_name)) || esc(t('namesHidden'))}</small></div>`;
     });
     body += `<div class="vs">${sides.join('<div class="sep">VS</div>')}</div>`;
   }
@@ -1461,6 +1465,84 @@ function resultFor(r, id){
            score: sets.map(x => side === 0 ? x[0]+'-'+x[1] : x[1]+'-'+x[0]).join(' '), setsWon, setsLost: sets.length - setsWon };
 }
 function initials(name){ return (name||'?').split(/\s+/).map(w => w[0]).slice(0,2).join('').toUpperCase(); }
+/* ---------- pair (team) profiles ----------
+   A league pair is its own Sporty+ team. Its results come from /v2/result?filter[team]=id (public); its name and
+   players come from the results we already have, or /v2/team/{id} (login) when the pair has no results yet.
+   Never use /v2/player/{id} for a pair: player and team ids overlap, so it returns a different person. */
+function teamLink(id, label){
+  return `<button type="button" class="plink" data-team="${id}" aria-label="${esc(t('openTeam', { name: label }))}">${esc(label)}</button>`;
+}
+const loadTeam = id => cached('t'+id, async () => { const r = await api(`/v2/team/${id}`); return { team: r.data || r }; });
+const loadTeamResults = id => cached('tr'+id, async () => {
+  const rs = await api(`/v2/result?filter[team]=${id}&limit=50&page=1`);
+  const results = (rs.data || []).map(trimResult);
+  for (const r of results) for (const tm of r.players||[]) if (tm && tm.players?.length && !state.teams.has(tm.id)) state.teams.set(tm.id, tm);
+  return { results, total: rs.meta?.total ?? results.length };
+});
+function teamResultFor(r, id){
+  const side = (r.players||[]).findIndex(tm => tm?.id === id);
+  if (side < 0) return null;
+  const other = r.players[1-side];
+  const sets = (r.sets||[]).filter(x => x[0]||x[1]);
+  const setsWon = sets.filter(x => side === 0 ? x[0] > x[1] : x[1] > x[0]).length;
+  return { r, won: r.winner_side === side, opponent: other, score: sets.map(x => side === 0 ? x[0]+'-'+x[1] : x[1]+'-'+x[0]).join(' '), setsWon, setsLost: sets.length - setsWon };
+}
+async function openTeamProfile(id){
+  id = Number(id);
+  if (!cfg.token) {
+    openDrawer(`<h2>${t('pair')}</h2><p class="hint">${t('profileLogin')}</p><button class="btn primary" type="button" id="pfLogin" style="align-self:flex-start">${t('profileLoginBtn')}</button>`);
+    document.getElementById('pfLogin').onclick = openLogin; return;
+  }
+  const token = Symbol(); openProfile.current = token;
+  openDrawer(`<h2>${t('pair')}</h2><p class="hint">${t('profileLoading')}</p>`);
+  panel.dataset.key = '';
+  const resultsP = loadTeamResults(id);
+  let team = state.teams.get(id);
+  if (!team || !team.players?.length) {
+    try { team = (await loadTeam(id)).team; } catch(e) { team = team || null; }
+  }
+  if (openProfile.current !== token || drawer.hidden) return;
+  if (team) renderTeamProfile(id, team, null);
+  let data = null;
+  try { data = await resultsP; } catch(e) { data = { results: [], total: 0, failed: true }; }
+  if (openProfile.current !== token || drawer.hidden) return;
+  team = team || state.teams.get(id) || { id, display_name: t('teamN', { id }), players: [] };
+  renderTeamProfile(id, team, data);
+}
+function renderTeamProfile(id, team, data){
+  const scroll = panel.scrollTop;
+  const name = team.display_name || t('teamN', { id });
+  const members = team.players || [];
+  const mine = (data?.results || []).map(r => teamResultFor(r, id)).filter(Boolean).sort((a,b) => b.r.date.localeCompare(a.r.date));
+  const wins = mine.filter(x => x.won).length, losses = mine.length - wins;
+  const sw = mine.reduce((a,x) => a + x.setsWon, 0), sl = mine.reduce((a,x) => a + x.setsLost, 0);
+  const opp = new Map();
+  for (const x of mine) if (x.opponent) { const e = opp.get(x.opponent.id) || { tm: x.opponent, n: 0, w: 0 }; e.n++; if (x.won) e.w++; opp.set(x.opponent.id, e); }
+  const topOpp = [...opp.values()].sort((a,b) => b.n - a.n || b.w - a.w).slice(0,3);
+  const avatars = members.slice(0,2).map(p => p.image ? `<img class="av" src="${esc(p.image)}" alt="">` : `<span class="av ph" aria-hidden="true">${esc(initials(p.display_name))}</span>`).join('');
+  let body = `<div class="hint">${t('pair')}</div><div class="prof pair"><span class="avs">${avatars || `<span class="av ph" aria-hidden="true">${esc(initials(name))}</span>`}</span><h2>${esc(name)}</h2><div class="where">${playersHtml(members)}</div></div>`;
+  if (!data) body += `<p class="hint">${t('pf_loadingResults')}</p>`;
+  else if (data.failed) body += `<p class="msg err">${t('profileFail')}</p>`;
+  else if (mine.length) {
+    body += `<div class="pstats">
+      <div><b>${mine.length}</b><span>${t('pf_matches')}</span></div>
+      <div><b>${wins}</b><span>${t('pf_wins')}</span></div>
+      <div><b>${losses}</b><span>${t('pf_losses')}</span></div>
+      <div><b>${Math.round(100*wins/mine.length)}%</b><span>${t('pf_winRate')}</span></div></div>
+      <p class="hint">${t('pf_sets')}: ${sw}–${sl}${data.total > mine.length ? ' · ' + t('pf_basedOn', { n: mine.length }) : ''}</p>
+      <div class="psec"><h3>${t('pf_form')}</h3><div class="form">${mine.slice(0,5).map(x => `<i class="${x.won?'w':'l'}" title="${x.won?t('pf_win'):t('pf_loss')} ${esc(x.score)}">${x.won?'✓':'✕'}</i>`).join('')}</div></div>`;
+    if (topOpp.length) body += `<div class="psec"><h3>${t('tp_opponents')}</h3><ul class="plist">${topOpp.map(e => `<li><span class="d">${tn('pf_matchesN', e.n)}</span><span class="who">${teamLink(e.tm.id, e.tm.display_name || t('teamN', { id: e.tm.id }))}</span><span class="s">${e.w}–${e.n-e.w}</span></li>`).join('')}</ul></div>`;
+    body += `<div class="psec"><h3>${t('pf_recent')}</h3><ul class="plist">${mine.slice(0,8).map(x => `<li class="${x.won?'w':'l'}">
+        <span class="d">${new Date(x.r.date.slice(0,10)+'T12:00').toLocaleDateString(LOC(),{day:'numeric',month:'short'})}</span>
+        <span class="who">${t('pf_vs', { who: x.opponent ? teamLink(x.opponent.id, x.opponent.display_name || t('teamN', { id: x.opponent.id })) : '—' })}${x.opponent?.players?.length ? `<small>${playersHtml(x.opponent.players)}</small>` : ''}</span>
+        <span class="s">${x.won?'✓':'✕'} ${esc(x.score)}${x.r.game?.round ? ` <small>${esc(t('roundN', { n: x.r.game.round }))}</small>` : ''}</span></li>`).join('')}</ul></div>`;
+  } else body += `<p class="hint">${t('pf_noResults')}</p>`;
+  body += `<p class="hint"><a href="https://${cfg.sub}.sporty.plus/app/team/${id}/results" target="_blank" rel="noopener">${t('tp_openSporty')}</a></p>`;
+  openDrawer(body);
+  panel.dataset.key = ''; panel.scrollTop = scroll;
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-team]'); if (b) { e.preventDefault(); openTeamProfile(b.dataset.team); } });
+
 async function openProfile(id){
   id = Number(id);
   const self = state.me?.id === id;
@@ -1562,7 +1644,7 @@ function renderResults(){
     ${list.map(r=>{
       const sets = (r.sets||[]).filter(x=>x[0]||x[1]);
       const [a,b] = r.players||[];
-      const team = (t,i)=>`<div class="team${r.winner_side===i?' w':''}"><b>${esc(t?.display_name||'—')}</b><small>${playersHtml(t?.players)}</small></div>`;
+      const team = (t,i)=>`<div class="team${r.winner_side===i?' w':''}"><b>${t?.id && (t.players||[]).length > 1 ? teamLink(t.id, t.display_name||'—') : esc(t?.display_name||'—')}</b><small>${playersHtml(t?.players)}</small></div>`;
       const g = r.game || {};
       return `<div class="res"><div style="display:flex;flex-direction:column;gap:6px;min-width:0">${team(a,0)}${team(b,1)}</div>
         <div class="sets">${sets.map(x=>`<span><em style="${x[0]>x[1]?'':'font-weight:400;opacity:.6'}">${x[0]}</em><em style="${x[1]>x[0]?'':'font-weight:400;opacity:.6'}">${x[1]}</em></span>`).join('')}</div>
