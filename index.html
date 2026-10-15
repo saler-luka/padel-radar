@@ -20,7 +20,7 @@
 :root{
   --bg:#eef5f8; --surface:#ffffff; --fg:#13222c; --muted:#5d6f7b; --line:#d3e3eb;
   --band:#0085b2; --on-band:#ffffff; --band-soft:#cfeaf5;
-  --court:#0085b2; --court-soft:#e3f2f8; --free:#4a6f0a; --free-bg:#eef7dc; --free-line:#a3c642; --peak:#7a5600; --peak-bg:#fdf4cf; --peak-line:#e0bb32; --rain:#2f6fd0; --rain-soft:#e8f0fc; --taken:#d64545; --taken-soft:#fde8e8; --ball:#c9d82b; --now:#e0452b; --win:#13222c;
+  --court:#0085b2; --court-soft:#e3f2f8; --free:#2d6a4f; --free-bg:#e3f3e9; --free-line:#a8d4bd; --peak:#7a5a20; --peak-bg:#f5ead7; --peak-line:#d8c7a6; --rain:#2f6fd0; --rain-soft:#e8f0fc; --taken:#d64545; --taken-soft:#fde8e8; --ball:#c9d82b; --now:#e0452b; --win:#13222c;
   --l1:#d4762a; --l2:#7c4bc0; --l3:#1f9d6b; --l4:#c23d6b; --l5:#8a7a12; --l6:#0085b2;
   --f-display:"Outfit",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -31,13 +31,13 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0a1419; --surface:#12222b; --fg:#e4eef2; --muted:#8ea4af; --line:#223843;
   --band:#0b5f80; --on-band:#ffffff; --band-soft:#a9d9ec;
-  --court:#3bb4de; --court-soft:#15313d; --free:#d6e24a; --free-bg:#1d2b12; --free-line:#6f8f24; --peak:#f2d35c; --peak-bg:#2a2410; --peak-line:#8c7421; --rain:#7fb0ff; --rain-soft:#15243c; --taken:#ff6b6b; --taken-soft:#3a1d20; --ball:#d6e24a; --now:#ff6a4f; --win:#ffffff;
+  --court:#3bb4de; --court-soft:#15313d; --free:#8fd3b0; --free-bg:#173126; --free-line:#2f5a45; --peak:#e0c792; --peak-bg:#33291a; --peak-line:#5a4c33; --rain:#7fb0ff; --rain-soft:#15243c; --taken:#ff6b6b; --taken-soft:#3a1d20; --ball:#d6e24a; --now:#ff6a4f; --win:#ffffff;
   --l1:#f0954a; --l2:#a77ee8; --l3:#3cc48e; --l4:#ec6a96; --l5:#cdb93a; --l6:#3bb4de;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0a1419; --surface:#12222b; --fg:#e4eef2; --muted:#8ea4af; --line:#223843;
   --band:#0b5f80; --on-band:#ffffff; --band-soft:#a9d9ec;
-  --court:#3bb4de; --court-soft:#15313d; --free:#d6e24a; --free-bg:#1d2b12; --free-line:#6f8f24; --peak:#f2d35c; --peak-bg:#2a2410; --peak-line:#8c7421; --rain:#7fb0ff; --rain-soft:#15243c; --taken:#ff6b6b; --taken-soft:#3a1d20; --ball:#d6e24a; --now:#ff6a4f; --win:#ffffff;
+  --court:#3bb4de; --court-soft:#15313d; --free:#8fd3b0; --free-bg:#173126; --free-line:#2f5a45; --peak:#e0c792; --peak-bg:#33291a; --peak-line:#5a4c33; --rain:#7fb0ff; --rain-soft:#15243c; --taken:#ff6b6b; --taken-soft:#3a1d20; --ball:#d6e24a; --now:#ff6a4f; --win:#ffffff;
   --l1:#f0954a; --l2:#a77ee8; --l3:#3cc48e; --l4:#ec6a96; --l5:#cdb93a; --l6:#3bb4de;
   color-scheme:dark}
 *{box-sizing:border-box}
@@ -100,7 +100,7 @@ button{cursor:pointer}
 .chip[aria-pressed="false"]{opacity:.45}
 .chip[aria-pressed="false"] i{background:transparent;outline:1.5px solid var(--c,var(--court))}
 .chip .n{color:var(--muted);font-variant-numeric:tabular-nums}
-.chip.free i{background:linear-gradient(90deg,var(--free-bg) 50%,var(--peak-bg) 50%);border:1.5px solid var(--free-line);border-right-color:var(--peak-line);border-bottom-color:var(--peak-line)}
+.chip.free i{background:var(--surface);border:1.5px dashed var(--muted)}
 
 .status{color:var(--muted);font-size:.85rem}
 .status.err{color:var(--now)}
@@ -137,10 +137,14 @@ button{cursor:pointer}
 .slot.league{border-color:color-mix(in srgb,var(--c) 65%,transparent);background:color-mix(in srgb,var(--c) 6%,var(--surface))}
 .slot.league .sub,.slot.league .sc{color:var(--c)}
 .slot.booking{border-color:color-mix(in srgb,var(--court) 25%,var(--line))}
-.slot.free{background:var(--free-bg);border:1px solid var(--free-line);color:var(--free)}
-.slot.free .t{color:var(--free);opacity:.75}
+/* Free slots: neutral dashed tile; only the price chip carries colour (green = cheaper, sand = week's top price) */
+.slot.free{background:var(--surface);border:1px dashed color-mix(in srgb,var(--muted) 50%,transparent);color:var(--fg)}
+.slot.free .t{color:var(--muted)}
 .slot.free .l{font-weight:600}
-.slot.free .open{font:600 .62rem var(--f-body);letter-spacing:.06em;text-transform:uppercase;opacity:.8}
+.slot.free .open{font:600 .62rem var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.pchip{display:inline-block;border-radius:999px;padding:0 8px;font:600 .74rem/1.5 var(--f-body);font-variant-numeric:tabular-nums;background:var(--free-bg);color:var(--free);white-space:nowrap}
+.slot.peak .pchip{background:var(--peak-bg);color:var(--peak)}
+.agenda .slot .pchip{font-size:.8rem;padding:1px 9px}
 /* Booked by someone else: red strip across the top (your own bookings stay solid blue) */
 .slot.taken{border-top:3px solid var(--taken)}
 .agenda .slot.taken{border-top-width:3px}
@@ -150,12 +154,11 @@ button{cursor:pointer}
 .slot.mine .t,.slot.mine .sub,.slot.mine .sc{color:color-mix(in srgb,#fff 82%,transparent)}
 .slot:hover{border-color:var(--c,var(--court))}
 /* Free slots at the week's top price (peak hours) turn padel-ball yellow; cheaper ones stay green */
-.slot.free.peak{--free:var(--peak);--free-bg:var(--peak-bg);--free-line:var(--peak-line)}
-.slot.free:hover{background:color-mix(in srgb,var(--free-line) 30%,var(--free-bg));border-color:var(--free)}
+.slot.free:hover{background:var(--court-soft);border-color:var(--court);border-style:solid}
 .slot.past{opacity:.55}
 /* Rain plan: outdoor slots where rain is likely */
 .slot.wet{box-shadow:inset 3px 0 0 var(--rain)}
-.slot.free .open .rw{color:var(--rain)}
+.slot.free .open .rw,.agenda .slot.free .rw{color:var(--rain)}
 .tag.rain{background:var(--rain-soft);color:var(--rain)}
 .rainplan{display:flex;flex-direction:column;gap:8px;border:1px solid color-mix(in srgb,var(--rain) 45%,var(--line));border-radius:var(--r-panel);padding:12px 14px;background:var(--rain-soft)}
 .rainplan b{color:var(--rain);font-weight:600}
@@ -174,7 +177,7 @@ button{cursor:pointer}
 .wx{display:inline-flex;flex:none;align-items:center;gap:1px;font:500 .68rem var(--f-body);font-variant-numeric:tabular-nums;color:var(--fg);
   pointer-events:none}
 .wx img{width:15px;height:15px;flex:none}
-.slot.free .wx{background:transparent;color:var(--free)}
+.slot.free .wx{background:transparent;color:var(--fg)}
 .slot.mine .wx{color:#fff}
 .agenda .wx{font-size:.82rem}
 .agenda .wx img{width:22px;height:22px}
@@ -191,6 +194,8 @@ button{cursor:pointer}
 .agenda{display:none;flex-direction:column;gap:18px}
 .agenda h3{font:500 1.1rem var(--f-display);margin:0 0 6px;display:flex;gap:8px;align-items:baseline}
 .agenda h3 small{font:400 .82rem var(--f-body);color:var(--muted)}
+.agenda h3 .freecount{margin-left:auto;align-self:center;font:500 .72rem var(--f-body);color:var(--free);background:var(--free-bg);border:1px solid var(--free-line);border-radius:999px;padding:1px 9px;white-space:nowrap}
+.agenda h3 .freecount.none{color:var(--muted);background:transparent;border-color:var(--line)}
 .agenda h3.today,.agenda h3.today small{color:var(--court)}
 .agenda ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
 .agenda .slot{position:static;flex-direction:row;align-items:center;gap:10px;padding:9px 12px;font-size:.85rem;width:100%}
@@ -442,7 +447,7 @@ const I18N = {
     ed_full:'Rezervacija može imati najviše {max} igrača.', ed_count:'{n} od {max} igrača', ed_save:'Spremi promjene', ed_confirm:'Dodirni ponovno za potvrdu',
     ed_summary:'Dodaješ: {add}. Uklanjaš: {remove}.', ed_none:'nikoga', ed_saving:'Spremam…', ed_saved:'Spremljeno. Osvježavam raspored…',
     ed_refused:'Sporty.plus nije prihvatio promjenu: {msg}', ed_nothing:'Nema promjena za spremanje.', ed_pending:'Novi igrač', ed_willRemove:'bit će uklonjen',
-    ag_earlier:'Raniji termini', ag_hideEarlier:'Sakrij ranije termine', ag_today:'danas', ag_earlierToday:'danas ranije',
+    ag_earlier:'Raniji termini', ag_hideEarlier:'Sakrij ranije termine', ag_today:'danas', ag_earlierToday:'danas ranije', ag_free_one:'{n} slobodan termin', ag_free_few:'{n} slobodna termina', ag_free_many:'{n} slobodnih termina', ag_full:'popunjeno',
     noResults:'Rezultati još nisu učitani.', roundN:'{n}. kolo', official:'službeno', verified:'potvrđeno'
   },
   en: {
@@ -516,7 +521,7 @@ const I18N = {
     ed_full:'A booking can have at most {max} players.', ed_count:'{n} of {max} players', ed_save:'Save changes', ed_confirm:'Tap again to confirm',
     ed_summary:'Adding: {add}. Removing: {remove}.', ed_none:'nobody', ed_saving:'Saving…', ed_saved:'Saved. Updating the schedule…',
     ed_refused:'Sporty.plus refused the change: {msg}', ed_nothing:'Nothing to save yet.', ed_pending:'New player', ed_willRemove:'will be removed',
-    ag_earlier:'Earlier slots', ag_hideEarlier:'Hide earlier slots', ag_today:'today', ag_earlierToday:'earlier today',
+    ag_earlier:'Earlier slots', ag_hideEarlier:'Hide earlier slots', ag_today:'today', ag_earlierToday:'earlier today', ag_free_one:'{n} free slot', ag_free_few:'{n} free slots', ag_free_many:'{n} free slots', ag_full:'fully booked',
     noResults:'No results loaded yet.', roundN:'Round {n}', official:'official', verified:'verified'
   }
 };
@@ -1146,7 +1151,7 @@ function slotDate(s){ const d = new Date(s.date); const h = Math.floor(s.start/1
 function slotEnd(s){ const d = new Date(s.date); d.setHours(Math.floor(s.end/100), Math.round((s.end%100)*0.6)); return d; }
 
 function slotInner(s, compact){
-  if (s.kind==='free') return `<span class="top"><span class="t">${hm(s.start)}</span>${wxBadge(s)}</span><span class="open">${t('free')}${rainFor(s)?.wet ? ` · <span class="rw">${t('tagRain')}</span>` : ''}</span><span class="l">${s.price!=null?'€'+s.price:''}</span>`;
+  if (s.kind==='free') return `<span class="top"><span class="t">${hm(s.start)}</span>${wxBadge(s)}</span><span class="open">${t('free')}${rainFor(s)?.wet ? ` · <span class="rw">${t('tagRain')}</span>` : ''}</span>${s.price!=null?`<span class="l"><span class="pchip">€${s.price}</span></span>`:''}`;
   const r = state.resultsByGame.get(s.gameId);
   const tags = [compact ? '' : takenTag(s), rainFor(s)?.wet?`<span class="tag rain" title="${t('tagRainTitle')}">${t('tagRain')}</span>`:'', s.recurring?`<span class="tag" title="${t('tagWeeklyTitle')}">${t('tagWeekly')}</span>`:'', s.openSeats?`<span class="tag" title="${t('tagSeatsTitle')}">+${s.openSeats}</span>`:''].join(' ');
   const sub = s.kind==='league' ? leagueName(s.leagueId) : s.kind==='booking' ? (s.players.length ? tn('players', s.players.length) : '') : '';
@@ -1201,10 +1206,14 @@ function renderAgenda(){
   const single = shownCourts().length === 1 && state.courts.length > 1;
   const meta = s => [single ? null : esc(courtLabel(s.court)), s.kind==='league' ? esc(leagueName(s.leagueId)) : null, s.recurring ? t('weekly') : null].filter(Boolean).join(' · ');
   const row = s => `<li><button class="slot ${slotClass(s)}${slotEnd(s)<now?' past':''}" style="${s.kind==='league'?'--c:'+leagueColor(s.leagueId):''}" data-id="${slotKey(s)}">
-        <span class="t">${hm(s.start)}</span><span class="body"><span class="l">${esc(slotTitle(s))}</span>${meta(s)||takenTag(s)?`<span class="court">${takenTag(s)}${meta(s)}</span>`:''}</span>${wxBadge(s)}
+        <span class="t">${hm(s.start)}</span><span class="body"><span class="l">${s.kind==='free' ? esc(t('free')) + (rainFor(s)?.wet ? ` · <span class="rw">${t('tagRain')}</span>` : '') : esc(slotTitle(s))}</span>${meta(s)||takenTag(s)?`<span class="court">${takenTag(s)}${meta(s)}</span>`:''}</span>${s.kind==='free' && s.price!=null ? `<span class="pchip">€${s.price}</span>` : ''}${wxBadge(s)}
         ${state.resultsByGame.get(s.gameId)?`<span class="sc">${esc(scoreLine(state.resultsByGame.get(s.gameId)))}</span>`:''}</button></li>`;
-  const dayHead = d => { const today = sameDay(d.date, now);
-    return `<h3 class="${today?'today':''}">${dayShort(d.date)} <small>${d.date.toLocaleDateString(LOC(),{day:'numeric',month:'long'})}${today?' · '+t('ag_today'):''}</small></h3>`; };
+  // Free slots still bookable that day, on the courts being shown (no pill for days that are over).
+  const freeLeft = d => d.slots.filter(s => s.kind === 'free' && inCourt(s) && slotEnd(s) >= now).length;
+  const dayEnded = d => new Date(d.date.getFullYear(), d.date.getMonth(), d.date.getDate() + 1) <= now;
+  const dayHead = d => { const today = sameDay(d.date, now), n = freeLeft(d);
+    const pill = dayEnded(d) ? '' : n ? `<span class="freecount">${tn('ag_free', n)}</span>` : `<span class="freecount none">${t('ag_full')}</span>`;
+    return `<h3 class="${today?'today':''}">${dayShort(d.date)} <small>${d.date.toLocaleDateString(LOC(),{day:'numeric',month:'long'})}${today?' · '+t('ag_today'):''}</small>${pill}</h3>`; };
   const sorted = d => d.slots.filter(visible).sort((a,b)=>a.start-b.start || courtLabel(a.court).localeCompare(courtLabel(b.court)));
   const thisWeek = ymd(state.monday) === ymd(mondayOf(now));
   const isEarlier = s => slotEnd(s) < now;   // finished slots, earlier days included
