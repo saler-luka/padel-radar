@@ -313,9 +313,9 @@ const I18N = {
     wx_heavysnow:'Jak snijeg', wx_rainandthunder:'Kiša i grmljavina', wx_rainshowersandthunder:'Pljuskovi i grmljavina', wx_other:'Promjenjivo',
     rainMm:'{mm} mm kiše', inHours:' u {h} h', noRain:'Bez kiše', wind:'vjetar {w} m/s', sixHour:'6-satna prognoza',
     rainDuring:'<b>Moguća kiša</b> u ovom terminu: {what}{six}.', rainAmount:'oko {mm} mm tijekom {min} minuta', rainSym:'prognoza: {desc}',
-    rainSix:' (6-satna prognoza, manje precizna)', altSame:'Teren {court} je slobodan u isto vrijeme.',
-    altNear:'Teren {court} je zauzet u {t}. Najbliži slobodan termin u dvorani je u {t2}.', playIndoors:'Igraj u dvorani u {t}{price}',
-    noIndoor:'Taj dan više nema slobodnih termina u dvorani.', cancelOutdoor:'Ako prebaciš, otkaži ovu vanjsku rezervaciju u Sporty.plus da teren ne ostane prazan.',
+    rainSix:' (6-satna prognoza, manje precizna)', altSame:'{court} je slobodan u isto vrijeme.',
+    altNear:'{court} je zauzet u {t}. Najbliži slobodan unutarnji termin je u {t2}.', playIndoors:'Igraj unutra u {t}{price}',
+    noIndoor:'Taj dan više nema slobodnih unutarnjih termina.', cancelOutdoor:'Ako prebaciš, otkaži ovu vanjsku rezervaciju u Sporty.plus da teren ne ostane prazan.',
     leagueN:'Liga #{id}', free:'Slobodno', freePrice:'Slobodno · €{p}', leagueMatch:'Ligaška utakmica', yourBooking:'Tvoja rezervacija',
     clubBooking:'Rezervacija kluba', booked:'Zauzeto', yourTeam:'Tvoj tim', teamN:'Tim #{id}',
     allCourts:'Svi tereni', showCourts:'Prikaži terene', freeToday_one:'{n} slobodan termin danas', freeToday_few:'{n} slobodna termina danas',
@@ -357,6 +357,7 @@ const I18N = {
     yourAccount:'Tvoj račun', accountHint:'Prijavljen si putem Sporty.plus. Vidiš imena igrača i privatne lige te možeš rezervirati terene.', logout:'Odjava',
     clubId:'ID kluba', clubAddr:'Web adresa kluba (dio prije .sporty.plus)', devOptions:'Opcije za developere', sessionToken:'Token sesije',
     tokenHint:'Potrebno samo ako radije zalijepiš token umjesto prijave. Ostaje u ovom pregledniku. Čuvaj ga kao lozinku.', saveReload:'Spremi i osvježi',
+    court_indoor:'Unutarnji teren', court_outdoor:'Vanjski teren', courtShort_indoor:'Unutarnji', courtShort_outdoor:'Vanjski', sportyName:'U Sporty.plus: {name}',
     noResults:'Rezultati još nisu učitani.', roundN:'{n}. kolo', official:'službeno', verified:'potvrđeno'
   },
   en: {
@@ -374,8 +375,8 @@ const I18N = {
     wx_heavysnow:'Heavy snow', wx_rainandthunder:'Rain and thunder', wx_rainshowersandthunder:'Rain showers and thunder', wx_other:'Changeable',
     rainMm:'{mm} mm rain', inHours:' in {h} h', noRain:'No rain expected', wind:'wind {w} m/s', sixHour:'6-hour forecast',
     rainDuring:'<b>Rain likely</b> during this slot: {what}{six}.', rainAmount:'about {mm} mm over the {min} minutes', rainSym:'{desc} in the forecast',
-    rainSix:' (6-hour forecast, so less precise)', altSame:'{court} is free at the same time.',
-    altNear:'{court} is taken at {t}. The nearest free indoor slot is at {t2}.', playIndoors:'Play indoors at {t}{price}',
+    rainSix:' (6-hour forecast, so less precise)', altSame:'The {court} is free at the same time.',
+    altNear:'The {court} is taken at {t}. The nearest free indoor slot is at {t2}.', playIndoors:'Play indoors at {t}{price}',
     noIndoor:'No indoor court is free later that day.', cancelOutdoor:"If you switch, cancel this outdoor booking in Sporty.plus so the court isn't left empty.",
     leagueN:'League #{id}', free:'Free', freePrice:'Free · €{p}', leagueMatch:'League match', yourBooking:'Your booking',
     clubBooking:'Club booking', booked:'Booked', yourTeam:'Your team', teamN:'Team #{id}',
@@ -383,7 +384,7 @@ const I18N = {
     freeToday_many:'{n} free slots left today', camera:'Matchi TV camera',
     wantCourt:'Want this court?', loginToBookHint:'Log in with your Sporty.plus account to book it from here.', loginToBook:'Log in to book',
     bookForYourself:'Book for yourself', inYourName:'In your name', paidAtClub:"Paid at the club. Cancelling follows the club's Sporty.plus rules.",
-    bookBtn:'Book {t} on {court}', tapConfirm:'Tap again to confirm', bookLine:'{court}, {date} at {t}.', booking:'Booking…',
+    bookBtn:'Book {t} · {court}', tapConfirm:'Tap again to confirm', bookLine:'{court}, {date} at {t}.', booking:'Booking…',
     bookedOk:'Booked. Updating the schedule…', tokenRefusedShort:'Your login was refused. Log in again.', bookRefused:'Sporty.plus refused the booking: {msg}', tryAgain:'Try again',
     resultNeedTeams:'To enter a result here, both teams need to be on the booking. You can still enter it in Sporty.plus.',
     yourMatch:'Your match', enterResult:'Enter the result', setN:'Set {n}', setAria:'{team}, set {n}',
@@ -403,7 +404,7 @@ const I18N = {
     r_repeats:'Repeats', everyWeek:'Every week', r_openSeats:'Open seats', r_waiting:'Waiting list', waitingN:'{n} waiting',
     r_paid:'Paid', yes:'Yes', no:'No', r_bookedOn:'Booked on', r_result:'Result',
     type_league:'League match', type_club:'Booked by the club', type_player:'Player booking', namesHiddenN:'{n} (names hidden)',
-    openInSporty:'Open in Sporty.plus', stream:'Stream on Matchi TV', camHint:'{court} has a camera. Start a live stream or recording of your match.',
+    openInSporty:'Open in Sporty.plus', stream:'Stream on Matchi TV', camHint:'The {court} has a camera. Start a live stream or recording of your match.',
     nickPlaceholder:'e.g. Winter doubles', saveName:'Save name',
     share:'Share', addCal:'Add to calendar', copyText:'Copy text and link', icsBtn:'Apple or Outlook (.ics)',
     copied:'Copied. Paste it into your group chat.', icsDone:'Calendar file downloaded. Open it to add the match.',
@@ -418,6 +419,7 @@ const I18N = {
     yourAccount:'Your account', accountHint:'Logged in with Sporty.plus. You see player names and private leagues, and you can book courts from here.', logout:'Log out',
     clubId:'Club ID', clubAddr:'Club web address (the part before .sporty.plus)', devOptions:'Developer options', sessionToken:'Session token',
     tokenHint:"Only needed if you'd rather paste a token than log in. It stays in this browser. Treat it like a password.", saveReload:'Save and reload',
+    court_indoor:'Indoor court', court_outdoor:'Outdoor court', courtShort_indoor:'Indoor', courtShort_outdoor:'Outdoor', sportyName:'In Sporty.plus: {name}',
     noResults:'No results loaded yet.', roundN:'Round {n}', official:'official', verified:'verified'
   }
 };
@@ -500,7 +502,13 @@ async function loadMe(){
    Hourly for ~2.5 days, then every 6 hours up to ~9 days. Cached for 30 minutes per club. */
 /* Courts with a Matchi TV camera (Sporty+ court id -> stream link). Only Padel otvoreni for now. */
 /* Outdoor courts get the rain plan. Sporty+ has no indoor/outdoor flag (both courts are "open"), so it's set here. */
-const OUTDOOR_COURTS = new Set([798]);
+const COURT_TYPES = { 797: 'indoor', 798: 'outdoor' };   // Padel Dvorana, Padel otvoreni
+const OUTDOOR_COURTS = new Set(Object.keys(COURT_TYPES).filter(id => COURT_TYPES[id] === 'outdoor').map(Number));
+// Shown name: "Indoor court" / "Vanjski teren" for known courts, the Sporty+ name otherwise.
+function courtLabel(c){ const k = COURT_TYPES[c.id]; return k ? t('court_' + k) : c.name; }
+// Mid-sentence: English lower-cases it ("The indoor court is free"); Croatian keeps the capital at sentence start.
+function courtInSentence(c){ return lang === 'en' && COURT_TYPES[c.id] ? courtLabel(c).toLowerCase() : courtLabel(c); }
+function courtShortLabel(c){ const k = COURT_TYPES[c.id]; return k ? t('courtShort_' + k) : c.name.replace(/^padel\s+/i, '').replace(/^./, x => x.toUpperCase()); }
 const COURT_CAMERAS = { 798: 'https://www.matchi.tv/create-stream/start?id=9i2bjHsKpf3&v2' };
 
 const WX_ICONS = 'https://cdn.jsdelivr.net/gh/metno/weathericons@89e3173756248b4696b9b10677b66c4ef435db53/weather/svg/';
@@ -567,7 +575,7 @@ function rainPlan(s){
   const alt = indoorAlternative(s);
   const what = r.mm ? t('rainAmount', { mm: r.mm.toLocaleString(LOC()), min: Math.round((slotEnd(s)-slotDate(s))/60000) }) : t('rainSym', { desc: esc(wxText(r.sym)).toLowerCase() });
   let body = `<div>${t('rainDuring', { what, six: r.six ? t('rainSix') : '' })}</div>`;
-  if (alt) body += `<div>${alt.same ? t('altSame', { court: esc(alt.slot.court.name) }) : t('altNear', { court: esc(alt.slot.court.name), t: hm(s.start), t2: hm(alt.slot.start) })}</div>
+  if (alt) body += `<div>${alt.same ? t('altSame', { court: esc(courtInSentence(alt.slot.court)) }) : t('altNear', { court: esc(courtInSentence(alt.slot.court)), t: hm(s.start), t2: hm(alt.slot.start) })}</div>
     <button class="btn primary" type="button" data-alt="${esc(slotKey(alt.slot))}">${t('playIndoors', { t: hm(alt.slot.start), price: alt.slot.price!=null ? ' · €'+alt.slot.price : '' })}</button>`;
   else body += `<div>${t('noIndoor')}</div>`;
   if (isMine(s) && s.booked) body += `<p class="hint">${t('cancelOutdoor')}</p>`;
@@ -752,18 +760,17 @@ function shownCourts(){
   return cfg.court === 'all' || !one.length ? state.courts : one;
 }
 function inCourt(s){ const c = shownCourts(); return c.length === state.courts.length || c.some(x => x.id === s.court.id); }
-function shortCourt(name){ const n = name.replace(/^padel\s+/i, ''); return n.charAt(0).toUpperCase() + n.slice(1); }
 function renderCourtBar(){
   const el = document.getElementById('courtBar');
   if (state.courts.length < 2) { el.innerHTML = ''; return; }
   const sel = shownCourts().length === 1 ? String(shownCourts()[0].id) : 'all';
   const now = new Date();
   const freeToday = id => allSlots().filter(s => s.kind==='free' && sameDay(s.date, now) && slotEnd(s) >= now && (id==='all' || s.court.id===id)).length;
-  const opts = [['all',t('allCourts')], ...state.courts.map(c => [String(c.id), shortCourt(c.name)])];
+  const opts = [['all',t('allCourts')], ...state.courts.map(c => [String(c.id), courtShortLabel(c)])];
   const one = sel !== 'all' ? state.courts.find(c => String(c.id) === sel) : null;
   const n = freeToday(one ? one.id : 'all');
   el.innerHTML = `<div class="seg" role="group" aria-label="${t('showCourts')}">${opts.map(([v,l]) => `<button type="button" data-court="${v}" aria-pressed="${v===sel}">${esc(l)}</button>`).join('')}</div>
-    <span class="courtnote">${one ? esc(one.name)+' · ' : ''}${tn('freeToday', n)}${one && COURT_CAMERAS[one.id] ? ' · <span class="cam"><i aria-hidden="true"></i>'+t('camera')+'</span>' : ''}</span>`;
+    <span class="courtnote">${one ? esc(courtLabel(one))+' · ' : ''}${tn('freeToday', n)}${one && COURT_CAMERAS[one.id] ? ' · <span class="cam"><i aria-hidden="true"></i>'+t('camera')+'</span>' : ''}</span>`;
   el.querySelectorAll('[data-court]').forEach(b => b.onclick = () => { cfg.court = b.dataset.court; store.set('court', cfg.court); render(); });
 }
 
@@ -796,7 +803,7 @@ function bookingSection(s){
     <div><div class="hint">${t('bookForYourself')}</div><b>${esc(myName() || t('inYourName'))}</b></div>
     <div class="price" id="bookPrice">${s.price!=null?'€'+s.price:''}</div>
     <p class="hint">${t('paidAtClub')}</p>
-    <button class="btn primary" id="bookGo" style="align-self:flex-start">${t('bookBtn', { t: esc(hm(s.start)), court: esc(s.court.name) })}</button>
+    <button class="btn primary" id="bookGo" style="align-self:flex-start">${t('bookBtn', { t: esc(hm(s.start)), court: esc(courtLabel(s.court)) })}</button>
     <p class="msg" id="bookMsg" aria-live="polite"></p></div>`;
 }
 
@@ -901,7 +908,7 @@ function wireBooking(s){
   }).catch(()=>{});
   let armed = false;
   go.onclick = async () => {
-    if (!armed){ armed = true; go.textContent = t('tapConfirm'); msg.className='msg'; msg.textContent = t('bookLine', { court: s.court.name, date: dateLong(s.date), t: hm(s.start) }); return; }
+    if (!armed){ armed = true; go.textContent = t('tapConfirm'); msg.className='msg'; msg.textContent = t('bookLine', { court: courtLabel(s.court), date: dateLong(s.date), t: hm(s.start) }); return; }
     go.disabled = true; go.textContent = t('booking');
     try {
       await api('/v2/reservation', bookingPayload(s));
@@ -974,7 +981,7 @@ function renderBoard(){
   state.days.forEach((d,i)=>{
     const t = sameDay(d.date, now);
     html += `<div class="dayhead${t?' today':''}"><div class="d">${dayShort(d.date)} <small>${d.date.getDate()}.${d.date.getMonth()+1}.</small></div>
-      <div class="lanes-h">${courts.map(c=>`<span title="${esc(c.name)}">${esc(c.name)}</span>`).join('')}</div></div>`;
+      <div class="lanes-h">${courts.map(c=>`<span title="${esc(c.name)}">${esc(courtLabel(c))}</span>`).join('')}</div></div>`;
   });
   html += `<div class="axis" style="height:${height}px">${[...Array(max-min+1)].map((_,i)=>i&&i<max-min?`<span style="top:${i*H}px">${min+i}:00</span>`:'').join('')}</div>`;
   state.days.forEach((d)=>{
@@ -1000,9 +1007,9 @@ function renderBoard(){
 function renderAgenda(){
   const el = document.getElementById('agenda'); const now = new Date();
   const single = shownCourts().length === 1 && state.courts.length > 1;
-  const meta = s => [single ? null : esc(s.court.name), s.kind==='league' ? esc(leagueName(s.leagueId)) : null, s.recurring ? t('weekly') : null].filter(Boolean).join(' · ');
+  const meta = s => [single ? null : esc(courtLabel(s.court)), s.kind==='league' ? esc(leagueName(s.leagueId)) : null, s.recurring ? t('weekly') : null].filter(Boolean).join(' · ');
   el.innerHTML = state.days.map((d,i)=>{
-    const list = d.slots.filter(visible).sort((a,b)=>a.start-b.start || a.court.name.localeCompare(b.court.name));
+    const list = d.slots.filter(visible).sort((a,b)=>a.start-b.start || courtLabel(a.court).localeCompare(courtLabel(b.court)));
     return `<div><h3 class="${sameDay(d.date,now)?'today':''}">${dayShort(d.date)} <small>${d.date.toLocaleDateString(LOC(),{day:'numeric',month:'long'})}</small></h3>
       ${list.length?`<ul>${list.map(s=>`<li><button class="slot ${slotClass(s)}${slotEnd(s)<now?' past':''}" style="${s.kind==='league'?'--c:'+leagueColor(s.leagueId):''}" data-id="${slotKey(s)}">
         <span class="t">${hm(s.start)}</span><span class="body"><span class="l">${esc(slotTitle(s))}</span>${meta(s)?`<span class="court">${meta(s)}</span>`:''}</span>${wxBadge(s)}
@@ -1027,7 +1034,7 @@ function shareText(s){
   const day = s.date.toLocaleDateString(LOC(),{weekday:'short',day:'numeric',month:'short'});
   const w = weatherFor(s), rr = rainFor(s);
   const what = s.kind==='free' ? t('freeCourt')+(s.price!=null?' · €'+s.price:'') : slotTitle(s);
-  const bits = [`🎾 ${day} ${hm(s.start)}–${hm(s.end)}`, `${s.court.name}${state.club?.name ? ' ('+state.club.name+')' : ''}`, what];
+  const bits = [`🎾 ${day} ${hm(s.start)}–${hm(s.end)}`, `${courtLabel(s.court)}${state.club?.name ? ' ('+state.club.name+')' : ''}`, what];
   if (w) bits.push(`${Math.round(w.temp)}°${rr?.wet ? ', '+t('rainLikelyShort') : ''}`);
   if (s.openSeats) bits.push(tn('spots', s.openSeats));
   return bits.join(' · ');
@@ -1035,9 +1042,9 @@ function shareText(s){
 const icsEsc = t => String(t).replace(/\\/g,'\\\\').replace(/[,;]/g, m => '\\'+m).replace(/\n/g,'\\n');
 const icsTime = d => d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');
 function calEvent(s){
-  const title = s.kind==='free' ? `Padel · ${s.court.name}` : `Padel · ${slotTitle(s)}`;
+  const title = s.kind==='free' ? `Padel · ${courtLabel(s.court)}` : `Padel · ${slotTitle(s)}`;
   const details = shareText(s) + '\n' + slotLink(s);
-  return { title, details, start: slotDate(s), end: slotEnd(s), place: [s.court.name, clubPlace()].filter(Boolean).join(', ') };
+  return { title, details, start: slotDate(s), end: slotEnd(s), place: [courtLabel(s.court) + (COURT_TYPES[s.court.id] ? ' ('+s.court.name+')' : ''), clubPlace()].filter(Boolean).join(', ') };
 }
 function icsFile(s){
   const e = calEvent(s);
@@ -1107,7 +1114,7 @@ function openSlot(key){
     body += `<div class="vs">${sides.join('<div class="sep">VS</div>')}</div>`;
   }
   const rows = [];
-  rows.push([t('r_court'), esc(s.court.name)]);
+  rows.push([t('r_court'), esc(courtLabel(s.court)) + (COURT_TYPES[s.court.id] ? `<br><span class="hint">${esc(t('sportyName', { name: s.court.name }))}</span>` : '')]);
   const w = weatherFor(s);
   if (w) rows.push([t('r_weather'), `<span class="wxrow"><img src="${WX_ICONS}${w.sym}.svg" alt="">${esc(wxText(w.sym))}, ${Math.round(w.temp)} °C</span><br><span class="hint">${w.rain ? t('rainMm', { mm: w.rain.toLocaleString(LOC()) })+(w.span>1?t('inHours', { h: w.span }):'') : t('noRain')} · ${t('wind', { w: Math.round(w.wind) })}${w.span>1?' · '+t('sixHour'):''}</span>`]);
   if (s.kind==='league') rows.push([t('r_league'), `${esc(leagueName(s.leagueId))} <button class="btn" id="renameL" style="padding:1px 8px;font-size:.75rem">${t('rename')}</button>`]);
@@ -1131,7 +1138,7 @@ function openSlot(key){
   const cam = COURT_CAMERAS[s.court.id];
   if (cam)
     body +=`<a class="stream" href="${esc(cam)}" target="_blank" rel="noopener"><i aria-hidden="true"></i>${t('stream')}</a>
-      <p class="hint">${t('camHint', { court: esc(s.court.name) })}</p>`;
+      <p class="hint">${t('camHint', { court: esc(courtInSentence(s.court)) })}</p>`;
   openDrawer(`<div><div class="when">${esc(when)}</div><h2>${esc(slotTitle(s))}</h2></div>`+body);
   wireBooking(s);
   wireResult(s);
