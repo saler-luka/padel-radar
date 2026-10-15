@@ -233,6 +233,30 @@ button{cursor:pointer}
 .field input{border:1px solid var(--line);background:var(--bg);border-radius:var(--r-tile);padding:8px 11px;width:100%}
 .hint{color:var(--muted);font-size:.8rem;margin:0}
 
+/* Player profiles */
+.plink{border:0;background:none;padding:0;font:inherit;color:inherit;text-decoration:underline;text-decoration-color:color-mix(in srgb,currentColor 35%,transparent);text-underline-offset:2px;cursor:pointer}
+.plink:hover{color:var(--court);text-decoration-color:currentColor}
+.prof{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;align-items:center}
+.prof .av{grid-row:span 2;width:64px;height:64px;border-radius:50%;object-fit:cover;background:var(--court-soft);border:2px solid var(--line)}
+.prof .av.ph{display:grid;place-items:center;font:600 1.4rem var(--f-display);color:var(--court)}
+.prof h2{margin:0}
+.prof .where{color:var(--muted);font-size:.85rem}
+.pstats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.pstats div{background:var(--bg);border:1px solid var(--line);border-radius:var(--r-tile);padding:8px 10px;display:flex;flex-direction:column}
+.pstats b{font:600 1.35rem/1.1 var(--f-display);font-variant-numeric:tabular-nums}
+.pstats span{color:var(--muted);font-size:.72rem}
+.psec h3{font:500 .95rem var(--f-display);margin:0 0 6px;color:var(--muted)}
+.form{display:flex;gap:5px}
+.form i{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:600 .72rem var(--f-body);font-style:normal;color:#fff}
+.form .w{background:var(--l3)}.form .l{background:var(--now)}
+.plist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.plist li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:2px 10px;align-items:center;border:1px solid var(--line);border-radius:var(--r-tile);padding:7px 10px;font-size:.84rem}
+.plist li .d{color:var(--muted);font:400 .74rem var(--f-mono);white-space:nowrap}
+.plist li .who{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.plist li .who small{display:block;color:var(--muted);font-size:.74rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.plist li .s{font:500 .8rem var(--f-mono);white-space:nowrap}
+.plist li.w .s{color:var(--l3)}.plist li.l .s{color:var(--now)}
+@media (max-width:420px){.pstats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 /* Booking */
 /* Result entry */
 .score{display:grid;grid-template-columns:minmax(0,1fr) repeat(3,44px);gap:6px 6px;align-items:center}
@@ -358,6 +382,12 @@ const I18N = {
     clubId:'ID kluba', clubAddr:'Web adresa kluba (dio prije .sporty.plus)', devOptions:'Opcije za developere', sessionToken:'Token sesije',
     tokenHint:'Potrebno samo ako radije zalijepiš token umjesto prijave. Ostaje u ovom pregledniku. Čuvaj ga kao lozinku.', saveReload:'Spremi i osvježi',
     court_indoor:'Unutarnji teren', court_outdoor:'Vanjski teren', courtShort_indoor:'Unutarnji', courtShort_outdoor:'Vanjski', sportyName:'U Sporty.plus: {name}',
+    profile:'Profil', myProfile:'Moj profil', openProfile:'Otvori profil: {name}', profileLoading:'Učitavam profil…', profileFail:'Profil se nije mogao učitati.',
+    profileLogin:'Profili igrača vidljivi su samo prijavljenim članovima, kao u Sporty.plus aplikaciji.', profileLoginBtn:'Prijavi se',
+    pf_matches:'Mečevi', pf_wins:'Pobjede', pf_losses:'Porazi', pf_winRate:'Uspješnost', pf_sets:'Setovi', pf_form:'Forma (zadnjih 5)',
+    pf_partners:'Najčešći partneri', pf_recent:'Zadnji mečevi', pf_upcoming:'Tvoji nadolazeći termini', pf_noUpcoming:'Nemaš nadolazećih termina u učitanim tjednima.',
+    pf_noResults:'Još nema upisanih rezultata.', pf_basedOn:'Prema zadnjih {n} rezultata.', pf_with:'s {who}', pf_vs:'protiv {who}',
+    pf_win:'Pobjeda', pf_loss:'Poraz', pf_matchesN_one:'{n} meč', pf_matchesN_few:'{n} meča', pf_matchesN_many:'{n} mečeva', pf_openSporty:'Profil u Sporty.plus', pf_loadingResults:'Učitavam rezultate…',
     noResults:'Rezultati još nisu učitani.', roundN:'{n}. kolo', official:'službeno', verified:'potvrđeno'
   },
   en: {
@@ -420,6 +450,12 @@ const I18N = {
     clubId:'Club ID', clubAddr:'Club web address (the part before .sporty.plus)', devOptions:'Developer options', sessionToken:'Session token',
     tokenHint:"Only needed if you'd rather paste a token than log in. It stays in this browser. Treat it like a password.", saveReload:'Save and reload',
     court_indoor:'Indoor court', court_outdoor:'Outdoor court', courtShort_indoor:'Indoor', courtShort_outdoor:'Outdoor', sportyName:'In Sporty.plus: {name}',
+    profile:'Profile', myProfile:'My profile', openProfile:'Open profile: {name}', profileLoading:'Loading profile…', profileFail:'Could not load this profile.',
+    profileLogin:'Player profiles are only visible to logged-in members, as in the Sporty.plus app.', profileLoginBtn:'Log in',
+    pf_matches:'Matches', pf_wins:'Wins', pf_losses:'Losses', pf_winRate:'Win rate', pf_sets:'Sets', pf_form:'Form (last 5)',
+    pf_partners:'Most frequent partners', pf_recent:'Recent matches', pf_upcoming:'Your upcoming slots', pf_noUpcoming:'No upcoming slots in the weeks loaded so far.',
+    pf_noResults:'No results entered yet.', pf_basedOn:'Based on the last {n} results.', pf_with:'with {who}', pf_vs:'vs {who}',
+    pf_win:'Win', pf_loss:'Loss', pf_matchesN_one:'{n} match', pf_matchesN_few:'{n} matches', pf_matchesN_many:'{n} matches', pf_openSporty:'Profile in Sporty.plus', pf_loadingResults:'Loading results…',
     noResults:'No results loaded yet.', roundN:'Round {n}', official:'official', verified:'verified'
   }
 };
@@ -600,7 +636,7 @@ async function loadClub(){
    endpoint is slow (~4-6 s per page), so they load in the background and are cached in a
    trimmed form so the next visit has names and scores straight away. */
 function trimResult(r){
-  const team = t => t && { id:t.id, display_name:t.display_name, players:(t.players||[]).map(p=>({display_name:p.display_name})) };
+  const team = t => t && { id:t.id, display_name:t.display_name, players:(t.players||[]).map(p=>({id:p.id, display_name:p.display_name})) };
   return { id:r.id, date:r.date, sets:r.sets, winner_side:r.winner_side, winner_team_id:r.winner_team_id, game_id:r.game_id,
            official:r.official, verified:r.verified, game: r.game ? { round:r.game.round } : null, players:(r.players||[]).map(team) };
 }
@@ -729,6 +765,9 @@ function leagueColor(id){
 }
 function teamName(id){ return state.teams.get(id)?.display_name || null; }
 function teamPlayers(id){ return (state.teams.get(id)?.players||[]).map(p=>p.display_name).join(', '); }
+// Player names as profile links (plain text when Sporty+ didn't give us the player's id).
+function playerLink(pl){ return pl && pl.id ? `<button type="button" class="plink" data-player="${pl.id}" aria-label="${esc(t('openProfile', { name: pl.display_name }))}">${esc(pl.display_name)}</button>` : esc(pl?.display_name || ''); }
+function playersHtml(list){ return (list||[]).map(playerLink).join(', '); }
 function namedPlayers(s){ return s.players.map(p=>p.display_name).filter(Boolean); }
 // A booking is yours when you or your team is on it (player ids are only visible with a login token).
 function isMine(s){
@@ -1109,7 +1148,7 @@ function openSlot(key){
   if (s.kind==='league' || (s.kind==='booking' && s.teamIds.length===2)) {
     const sides = s.teamIds.map(id=>{
       const won = r && r.winner_team_id===id;
-      return `<div class="side"><b>${esc(teamLabel(id))}${won?t('wonMark'):''}</b><small>${esc(teamPlayers(id)||t('namesHidden'))}</small></div>`;
+      return `<div class="side"><b>${esc(teamLabel(id))}${won?t('wonMark'):''}</b><small>${playersHtml(state.teams.get(id)?.players) || esc(t('namesHidden'))}</small></div>`;
     });
     body += `<div class="vs">${sides.join('<div class="sep">VS</div>')}</div>`;
   }
@@ -1230,18 +1269,113 @@ function openLogin(){
   };
 }
 
+function logout(){
+  const tok = cfg.token;
+  cfg.token = ''; store.set('token',''); state.me = null;
+  authPost('/logout', {}, tok).catch(()=>{});   // end the session on Sporty+ too; logging out here works either way
+  state.teams.clear(); state.resultsByGame.clear(); state.leagues.clear(); weekCache.clear(); profileCache.clear();
+  closeDrawer(); updateAccountBtn(); boot();
+}
 function openAccount(){
+  if (state.me?.id) return openProfile(state.me.id);
   openDrawer(`<h2>${esc(myName() || t('yourAccount'))}</h2>
     <p class="hint">${t('accountHint')}</p>
     <button class="btn" id="logoutBtn" style="align-self:flex-start">${t('logout')}</button>`);
-  document.getElementById('logoutBtn').onclick = async () => {
-    const t = cfg.token;
-    cfg.token = ''; store.set('token',''); state.me = null;
-    authPost('/logout', {}, t).catch(()=>{});   // end the session on Sporty+ too; logging out here works either way
-    state.teams.clear(); state.resultsByGame.clear(); state.leagues.clear(); weekCache.clear();
-    closeDrawer(); updateAccountBtn(); boot();
-  };
+  document.getElementById('logoutBtn').onclick = logout;
 }
+
+/* ---------- player profiles ----------
+   Like the official app, profiles are for logged-in members. We show only what other members see there:
+   name, photo, city and country, plus statistics from published results. Email, phone, birth year, age range and
+   ranking are never shown (Modesto hides personal data and ranks). */
+const profileCache = new Map();   // 'p'+id -> { at, player }, 'r'+id -> { at, results, total }
+const FRESH_PROFILE = 5*60_000;
+async function cached(key, load){ const c = profileCache.get(key); if (c && Date.now() - c.at < FRESH_PROFILE) return c; const v = { at: Date.now(), ...(await load()) }; profileCache.set(key, v); return v; }
+const loadPlayer = id => cached('p'+id, async () => { const pl = await api(`/v2/player/${id}`); return { player: pl.data || pl }; });
+const loadPlayerResults = id => cached('r'+id, async () => { const rs = await api(`/v2/result?filter[player]=${id}&limit=50&page=1`); return { results: (rs.data || []).map(trimResult), total: rs.meta?.total ?? (rs.data||[]).length }; });
+// One player's view of a result: which side they were on, partner(s), opponents, win/loss, sets.
+function resultFor(r, id){
+  const side = (r.players||[]).findIndex(tm => (tm?.players||[]).some(x => x.id === id) || tm?.id === id);
+  if (side < 0) return null;
+  const mine = r.players[side], other = r.players[1-side];
+  const sets = (r.sets||[]).filter(x => x[0]||x[1]);
+  const setsWon = sets.filter(x => side === 0 ? x[0] > x[1] : x[1] > x[0]).length;
+  return { r, side, won: r.winner_side === side, partners: (mine?.players||[]).filter(x => x.id !== id), opponents: other?.players?.length ? other.players : (other ? [other] : []),
+           score: sets.map(x => side === 0 ? x[0]+'-'+x[1] : x[1]+'-'+x[0]).join(' '), setsWon, setsLost: sets.length - setsWon };
+}
+function initials(name){ return (name||'?').split(/\s+/).map(w => w[0]).slice(0,2).join('').toUpperCase(); }
+async function openProfile(id){
+  id = Number(id);
+  const self = state.me?.id === id;
+  if (!cfg.token) {
+    openDrawer(`<h2>${t('profile')}</h2><p class="hint">${t('profileLogin')}</p><button class="btn primary" type="button" id="pfLogin" style="align-self:flex-start">${t('profileLoginBtn')}</button>`);
+    document.getElementById('pfLogin').onclick = openLogin; return;
+  }
+  const token = Symbol(); openProfile.current = token;   // ignore late answers for a profile that's no longer open
+  openDrawer(`<h2>${self ? t('myProfile') : t('profile')}</h2><p class="hint">${t('profileLoading')}</p>`);
+  panel.dataset.key = '';
+  const resultsP = loadPlayerResults(id);   // slow endpoint: start it now, render it when it lands
+  let pl;
+  try { pl = (await loadPlayer(id)).player; } catch(e) {
+    if (openProfile.current !== token || drawer.hidden) return;
+    openDrawer(`<h2>${t('profile')}</h2><p class="msg err">${e.status===401 ? t('tokenRefusedShort') : t('profileFail')}</p>`); return;
+  }
+  if (openProfile.current !== token || drawer.hidden) return;
+  renderProfile(id, pl, null, self);
+  let data = null;
+  try { data = await resultsP; } catch(e) { data = { results: [], total: 0, failed: true }; }
+  if (openProfile.current !== token || drawer.hidden) return;
+  renderProfile(id, pl, data, self);
+}
+function renderProfile(id, pl, data, self){
+  const scroll = panel.scrollTop;
+  const name = pl.display_name || [pl.first_name, pl.last_name].filter(Boolean).join(' ');
+  const mine = (data?.results || []).map(r => resultFor(r, id)).filter(Boolean).sort((a,b) => b.r.date.localeCompare(a.r.date));
+  const wins = mine.filter(x => x.won).length, losses = mine.length - wins;
+  const sw = mine.reduce((a,x) => a + x.setsWon, 0), sl = mine.reduce((a,x) => a + x.setsLost, 0);
+  const partners = new Map();
+  for (const x of mine) for (const pp of x.partners) { const e = partners.get(pp.id) || { pl: pp, n: 0, w: 0 }; e.n++; if (x.won) e.w++; partners.set(pp.id, e); }
+  const topPartners = [...partners.values()].sort((a,b) => b.n - a.n).slice(0,3);
+  const where = [pl.city?.name, pl.country ? ((pl.country.emoji ? pl.country.emoji+' ' : '') + pl.country.name) : null].filter(Boolean).join(' · ');
+  const av = pl.image ? `<img class="av" src="${esc(pl.image)}" alt="">` : `<span class="av ph" aria-hidden="true">${esc(initials(name))}</span>`;
+  let body = `${self ? `<div class="hint">${t('myProfile')}</div>` : ''}<div class="prof">${av}<h2>${esc(name)}</h2><div class="where">${esc(where)}</div></div>`;
+  if (!data) body += `<p class="hint">${t('pf_loadingResults')}</p>`;
+  else if (data.failed) body += `<p class="msg err">${t('profileFail')}</p>`;
+  else if (mine.length) {
+    body += `<div class="pstats">
+      <div><b>${mine.length}</b><span>${t('pf_matches')}</span></div>
+      <div><b>${wins}</b><span>${t('pf_wins')}</span></div>
+      <div><b>${losses}</b><span>${t('pf_losses')}</span></div>
+      <div><b>${Math.round(100*wins/mine.length)}%</b><span>${t('pf_winRate')}</span></div></div>
+      <p class="hint">${t('pf_sets')}: ${sw}–${sl}${data.total > mine.length ? ' · ' + t('pf_basedOn', { n: mine.length }) : ''}</p>
+      <div class="psec"><h3>${t('pf_form')}</h3><div class="form">${mine.slice(0,5).map(x => `<i class="${x.won?'w':'l'}" title="${x.won?t('pf_win'):t('pf_loss')} ${esc(x.score)}">${x.won?'✓':'✕'}</i>`).join('')}</div></div>`;
+    if (topPartners.length) body += `<div class="psec"><h3>${t('pf_partners')}</h3><ul class="plist">${topPartners.map(e => `<li><span class="d">${tn('pf_matchesN', e.n)}</span><span class="who">${playerLink(e.pl)}</span><span class="s">${e.w}–${e.n-e.w}</span></li>`).join('')}</ul></div>`;
+    body += `<div class="psec"><h3>${t('pf_recent')}</h3><ul class="plist">${mine.slice(0,8).map(x => `<li class="${x.won?'w':'l'}">
+        <span class="d">${new Date(x.r.date.slice(0,10)+'T12:00').toLocaleDateString(LOC(),{day:'numeric',month:'short'})}</span>
+        <span class="who">${t('pf_vs', { who: playersHtml(x.opponents) })}${x.partners.length ? `<small>${t('pf_with', { who: playersHtml(x.partners) })}</small>` : ''}</span>
+        <span class="s">${x.won?'✓':'✕'} ${esc(x.score)}</span></li>`).join('')}</ul></div>`;
+  } else body += `<p class="hint">${t('pf_noResults')}</p>`;
+  if (self) {
+    const now = new Date();
+    const upcoming = [...weekCache.entries()].sort().flatMap(([key, entry]) => {
+      const m = new Date(key + 'T12:00'); const dates = [...Array(7)].map((_,i) => addDays(mondayOf(m), i));
+      return entry.days.flatMap((list,i) => list.flatMap(c => Object.values(c.parsed_reservations||{}).filter(s => !s.hidden).map(s => normalize(s, c, dates[i]))));
+    }).filter(s => isMine(s) && slotEnd(s) >= now).sort((a,b) => slotDate(a) - slotDate(b));
+    body += `<div class="psec"><h3>${t('pf_upcoming')}</h3>${upcoming.length ? `<ul class="plist">${upcoming.slice(0,6).map(s => `<li><span class="d">${dayShort(s.date)} ${s.date.getDate()}.${s.date.getMonth()+1}.</span><span class="who"><button type="button" class="plink" data-slot="${esc(slotKey(s))}">${esc(slotTitle(s))}</button><small>${esc(courtLabel(s.court))}</small></span><span class="s">${hm(s.start)}</span></li>`).join('')}</ul>` : `<p class="hint">${t('pf_noUpcoming')}</p>`}</div>`;
+  }
+  body += `<p class="hint"><a href="https://${cfg.sub}.sporty.plus/app/player/${id}" target="_blank" rel="noopener">${t('pf_openSporty')}</a></p>`;
+  if (self) body += `<p class="hint">${t('accountHint')}</p><button class="btn" id="logoutBtn" type="button" style="align-self:flex-start">${t('logout')}</button>`;
+  openDrawer(body);
+  panel.dataset.key = ''; panel.scrollTop = scroll;
+  const lo = document.getElementById('logoutBtn'); if (lo) lo.onclick = logout;
+  panel.querySelectorAll('[data-slot]').forEach(b => b.onclick = async () => {
+    const key = b.dataset.slot, d = new Date(key.slice(0,10)+'T12:00');
+    if (ymd(mondayOf(d)) !== ymd(state.monday)) await showWeek(mondayOf(d));
+    openSlot(key);
+  });
+}
+// Any player name link, anywhere (slot panel, results, profiles) opens that profile.
+document.addEventListener('click', e => { const b = e.target.closest('[data-player]'); if (b) { e.preventDefault(); openProfile(b.dataset.player); } });
 
 function openSettings(){
   openDrawer(`<h2>${t('settings')}</h2>
@@ -1271,7 +1405,7 @@ function renderResults(){
     ${list.map(r=>{
       const sets = (r.sets||[]).filter(x=>x[0]||x[1]);
       const [a,b] = r.players||[];
-      const team = (t,i)=>`<div class="team${r.winner_side===i?' w':''}"><b>${esc(t?.display_name||'—')}</b><small>${esc((t?.players||[]).map(p=>p.display_name).join(', '))}</small></div>`;
+      const team = (t,i)=>`<div class="team${r.winner_side===i?' w':''}"><b>${esc(t?.display_name||'—')}</b><small>${playersHtml(t?.players)}</small></div>`;
       const g = r.game || {};
       return `<div class="res"><div style="display:flex;flex-direction:column;gap:6px;min-width:0">${team(a,0)}${team(b,1)}</div>
         <div class="sets">${sets.map(x=>`<span><em style="${x[0]>x[1]?'':'font-weight:400;opacity:.6'}">${x[0]}</em><em style="${x[1]>x[0]?'':'font-weight:400;opacity:.6'}">${x[1]}</em></span>`).join('')}</div>
