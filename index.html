@@ -290,6 +290,9 @@ button{cursor:pointer}
 .stand .nm{text-align:left;width:100%}
 .stand td.nm{max-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .stand .pts{font-weight:600}
+.stand td.dp{color:var(--free)}
+.stand td.dn{color:var(--taken)}
+.stand td.dz{color:var(--muted)}
 .stand .mv{font-size:.7rem;margin-right:3px}
 .stand tr.up .pos{color:var(--l3)}
 .stand tr.dn .pos{color:var(--taken)}
@@ -837,13 +840,14 @@ function groupRows(g){
 function groupCard(g, first, last){
   const rows = groupRows(g), up = first ? 0 : (g.move_up || 0), down = last ? 0 : (g.move_down || 0);
   const played = g.total_number_of_played_games, total = g.total_number_of_games;
-  const diff = (w,l) => { const d = (w||0) - (l||0); return d > 0 ? '+'+d : d < 0 ? '−'+(-d) : '0'; };
+  // Set and game difference: green above zero, red below, grey at zero.
+  const diff = (w,l) => { const d = (w||0) - (l||0); return d > 0 ? `<td class="wide dp">+${d}</td>` : d < 0 ? `<td class="wide dn">−${-d}</td>` : '<td class="wide dz">0</td>'; };
   const name = p => p.type === 'team' && (p.players||[]).length > 1 ? teamLink(p.id, p.display_name || '—') : p.type === 'team' ? esc(p.display_name || '—') : playerLink(p);
   const body = rows.length ? rows.map((r, i) => {
       const mv = i < up ? 'up' : i >= rows.length - down ? 'dn' : '';
       const mark = mv === 'up' ? `<span class="mv" aria-label="${t('lg_up')}">▲</span>` : mv === 'dn' ? `<span class="mv" aria-label="${t('lg_down')}">▼</span>` : '';
       const wl = `${r.m.wins||0}-${r.m.losses||0}${r.m.draws ? '-'+r.m.draws : ''}`;
-      return `<tr class="${mv}${isMeRow(r.p) ? ' me' : ''}"><td class="pos">${mark}${r.pos ?? i+1}</td><td class="nm">${name(r.p)}</td><td>${r.m.total||0}</td><td>${wl}</td><td class="wide">${diff(r.sets.wins, r.sets.losses)}</td><td class="wide">${diff(r.games.wins, r.games.losses)}</td><td class="pts">${r.score}</td></tr>`;
+      return `<tr class="${mv}${isMeRow(r.p) ? ' me' : ''}"><td class="pos">${mark}${r.pos ?? i+1}</td><td class="nm">${name(r.p)}</td><td>${r.m.total||0}</td><td>${wl}</td>${diff(r.sets.wins, r.sets.losses)}${diff(r.games.wins, r.games.losses)}<td class="pts">${r.score}</td></tr>`;
     }).join('') : `<tr><td colspan="7" class="empty">${t('lg_emptyGroup')}</td></tr>`;
   return `<section class="lgroup"><div class="lghead"><h3>${esc(g.name || '')}</h3>${total ? `<small>${t('lg_played', { p: played||0, n: total })}</small>` : ''}</div>
     <table class="stand"><thead><tr><th class="pos">#</th><th class="nm">${t('lg_pair')}</th><th title="${t('lg_playedT')}">${t('lg_P')}</th><th title="${t('lg_wlT')}">${t('lg_WL')}</th><th class="wide" title="${t('lg_setsT')}">${t('lg_sets')}</th><th class="wide" title="${t('lg_gamesT')}">${t('lg_games')}</th><th title="${t('lg_ptsT')}">${t('lg_pts')}</th></tr></thead>
