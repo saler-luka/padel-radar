@@ -159,9 +159,9 @@ button{cursor:pointer}
 .lanes-h span{font-size:.68rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-bottom:6px}
 .corner{border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--surface);z-index:3}
 .axis{position:relative}
-.axis span{position:absolute;right:6px;transform:translateY(-50%);font:400 .72rem var(--f-mono);color:var(--muted)}
+.axis span{position:absolute;right:6px;margin-top:3px;font:400 .72rem var(--f-mono);color:var(--muted)}
 .daycol{position:relative;border-left:1px solid var(--line);display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;padding:0 4px;
-  background-image:repeating-linear-gradient(to bottom,color-mix(in srgb,var(--line) 70%,transparent) 0 1px,transparent 1px var(--hour))}
+  background-image:repeating-linear-gradient(to bottom,color-mix(in srgb,var(--line) 70%,transparent) 0 1px,transparent 1px var(--step,var(--hour)));background-position:0 var(--off,0)}
 .daycol.today{background-color:color-mix(in srgb,var(--court-soft) 60%,transparent)}
 .lane{position:relative}
 .now{position:absolute;left:0;right:0;height:0;border-top:2px solid var(--now);z-index:2;pointer-events:none}
@@ -1471,9 +1471,16 @@ function renderBoard(){
   const courts = shownCourts(), single = courts.length === 1 && state.courts.length > 1;
   board.classList.toggle('one', single);
   const min = Math.floor(Math.min(...all.map(s=>hrs(s.start)), 8));
-  const max = Math.ceil(Math.max(...all.map(s=>hrs(s.end)), 22));
+  const max = Math.max(...all.map(s=>hrs(s.end)), 22);   // ends with the last slot (e.g. 23:30)
   const H = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hour'));
   const height = (max-min)*H;
+  // Time marks at slot starts (7:00, 8:30, 10:00 … for 90-minute slots). The step is the most common gap between
+  // start times, so other slot lengths work too; with no slots at all, fall back to whole hours.
+  const starts = [...new Set(all.map(s => hrs(s.start)))].sort((a,b) => a-b), gaps = new Map();
+  starts.slice(1).forEach((x,i) => { const g = +(x - starts[i]).toFixed(2); gaps.set(g, (gaps.get(g)||0) + 1); });
+  const step = [...gaps].sort((a,b) => b[1]-a[1] || a[0]-b[0])[0]?.[0] || 1, first = starts.length ? starts[0] : min;
+  const ticks = []; for (let x = first; x + step <= max + 1e-6; x += step) ticks.push(x);   // only where a whole slot fits
+  const lines = `--step:${step*H}px;--off:${(first-min)*H}px`;
   const now = new Date();
   let html = `<div class="corner"></div>`;
   state.days.forEach((d,i)=>{
@@ -1481,10 +1488,10 @@ function renderBoard(){
     html += `<div class="dayhead${t?' today':''}" data-day="${ymd(d.date)}"><div class="d">${dayShort(d.date)} <small>${d.date.getDate()}.${d.date.getMonth()+1}.</small></div>
       <div class="lanes-h">${courts.map(c=>`<span title="${esc(c.name)}">${esc(courtLabel(c))}</span>`).join('')}</div></div>`;
   });
-  html += `<div class="axis" style="height:${height}px">${[...Array(max-min+1)].map((_,i)=>i&&i<max-min?`<span style="top:${i*H}px">${min+i}:00</span>`:'').join('')}</div>`;
+  html += `<div class="axis" style="height:${height}px">${ticks.map(x => `<span style="top:${(x-min)*H}px">${hm(Math.round(x*100))}</span>`).join('')}</div>`;
   state.days.forEach((d)=>{
     const t = sameDay(d.date, now);
-    html += `<div class="daycol${t?' today':''}" style="height:${height}px">`;
+    html += `<div class="daycol${t?' today':''}" style="height:${height}px;${lines}">`;
     for (const c of courts){
       html += `<div class="lane">`;
       for (const s of d.slots.filter(s=>s.court.id===c.id && visible(s))){
