@@ -274,6 +274,8 @@ button{cursor:pointer}
 .results{display:flex;flex-direction:column;gap:18px}
 /* Leagues: one standings card per group */
 .leagues{display:flex;flex-direction:column;gap:14px}
+#lgBody{display:flex;flex-direction:column;gap:14px}
+#lgBody .hint{margin:0}
 .lchips .chip{max-width:100%}
 .lchips .chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lghero{display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -847,7 +849,7 @@ async function loadLeague(id){
 const standingsCache = new Map();   // league id -> { at, league } | { at, error }
 function knownLeagues(){
   const ids = new Set([...store.get('seenLeagues.'+cfg.club, []), ...state.leagues.keys()]);
-  return [...ids].filter(Boolean).sort((a,b) => a-b);
+  return [...ids].filter(Boolean).sort((a,b) => b-a);   // newest league first, so it opens by default
 }
 function rememberLeagues(ids){
   const seen = store.get('seenLeagues.'+cfg.club, []), add = ids.filter(id => !seen.includes(id));
