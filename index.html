@@ -66,13 +66,7 @@ button{cursor:pointer}
 .pill:hover{background:color-mix(in srgb,var(--on-band) 14%,transparent)}
 .pill.solid{background:var(--on-band);color:var(--band);border-color:var(--on-band)}
 .pill:focus-visible{outline-color:var(--on-band)}
-/* Light / dark switch: two halves, the active one filled white (like the court switch) */
-.tseg{display:inline-flex;border:1px solid color-mix(in srgb,var(--on-band) 70%,transparent);border-radius:999px;padding:2px;gap:2px}
-.tseg button{border:0;background:none;color:var(--on-band);border-radius:999px;padding:4px 10px;display:grid;place-items:center}
-.tseg button svg{width:16px;height:16px;display:block}
-.tseg button:hover{background:color-mix(in srgb,var(--on-band) 14%,transparent)}
-.tseg button[aria-pressed="true"]{background:var(--on-band);color:var(--band)}
-.tseg button:focus-visible{outline-color:var(--on-band)}
+.acts{display:flex;align-items:center;gap:6px}
 .pill.icon{display:inline-grid;place-items:center;padding:5px 9px}
 .pill.icon svg{width:18px;height:18px;display:block}
 /* Logged in: profile tile with photo and first name */
@@ -89,6 +83,22 @@ button{cursor:pointer}
 .tabs button[aria-selected="true"]{color:var(--court);background:var(--surface);border-color:var(--line)}
 
 /* Court switch bar: All courts / one court. Pinned under the header on phones. */
+/* Date strip: the week's days with their free count */
+.stick{display:flex;flex-direction:column;gap:10px}
+.dstrip{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;max-width:620px}
+.dstrip button{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:5px 0 4px;display:flex;flex-direction:column;align-items:center;line-height:1.15;min-width:0}
+.dstrip button:hover{border-color:var(--court)}
+.dstrip .dn{font-size:.7rem;color:var(--muted)}
+.dstrip b{font:600 1.05rem var(--f-display);font-variant-numeric:tabular-nums}
+.dstrip .n{font:500 .7rem var(--f-body);color:var(--free);font-variant-numeric:tabular-nums}
+.dstrip .n.none{color:var(--muted)}
+.dstrip .today b{color:var(--court)}
+.dstrip .past{opacity:.55}
+.dstrip .on{background:var(--court);border-color:var(--court);color:#fff;opacity:1}
+.dstrip .on .dn,.dstrip .on .n,.dstrip .on b{color:#fff}
+.seg.pick button{display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.seg.pick svg{width:16px;height:16px}
+.flabel{font-size:.85rem;color:var(--muted)}
 .courtbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px}
 .seg{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px}
 .seg button{border:0;background:none;border-radius:999px;padding:6px 16px;color:var(--muted);font:500 .92rem var(--f-display);white-space:nowrap}
@@ -99,7 +109,8 @@ button{cursor:pointer}
 .courtnote .cam i{width:7px;height:7px;border-radius:50%;background:var(--now)}
 .board.one{grid-template-columns:52px repeat(7,minmax(124px,1fr));min-width:920px}
 @media (max-width:760px){
-  .courtbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);margin-inline:-16px;padding:8px 16px;border-bottom:1px solid var(--line)}
+  .stick{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);margin-inline:-16px;padding:8px 16px;border-bottom:1px solid var(--line);gap:8px}
+  .dstrip{max-width:none}
   .seg{display:flex;width:100%}
   .seg button{flex:1;padding:8px 4px}
   .courtnote{display:none}
@@ -244,7 +255,7 @@ button{cursor:pointer}
 .brand .logo{grid-row:span 2;width:44px;height:44px;border-radius:11px;box-shadow:0 0 0 2px color-mix(in srgb,#fff 70%,transparent)}
 .brand h1{font-size:1.4rem}.nav .range{min-width:0}
 /* Phones: the account button sits in the top-right corner, beside the logo */
-.band .wrap{position:relative}.brand{padding-right:72px}#accountBtn{position:absolute;top:16px;right:16px}#accountBtn:not(.me){top:24px}}
+.band .wrap{position:relative}.brand{padding-right:124px}.acts{position:absolute;top:16px;right:16px;min-height:44px}}
 
 /* Results */
 .results{display:flex;flex-direction:column;gap:18px}
@@ -360,10 +371,10 @@ button{cursor:pointer}
       <span class="range" id="range"></span>
       <button class="pill" id="next" data-i18n-aria="nextWeek" aria-label="Sljedeći tjedan">→</button>
       <button class="pill" id="refresh" data-i18n-title="reload" data-i18n-aria="reload" title="Osvježi podatke" aria-label="Osvježi podatke">↻</button>
-      <div class="tseg" role="group" data-i18n-aria="theme" aria-label="Tema"><button id="themeLight" data-i18n-aria="theme_light" data-i18n-title="theme_light" aria-label="Svijetla" title="Svijetla" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></button><button id="themeDark" data-i18n-aria="theme_dark" data-i18n-title="theme_dark" aria-label="Tamna" title="Tamna" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg></button></div>
-      <button class="pill" id="langBtn" lang="en">EN</button>
-      <button class="pill icon" id="settingsBtn" data-i18n-aria="settings" data-i18n-title="settings" aria-label="Postavke" title="Postavke"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></button>
-      <button class="pill solid" id="accountBtn">Prijava</button>
+      <div class="acts">
+        <button class="pill icon" id="settingsBtn" data-i18n-aria="settings" data-i18n-title="settings" aria-label="Postavke" title="Postavke"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        <button class="pill solid" id="accountBtn">Prijava</button>
+      </div>
     </div>
   </div>
 </header>
@@ -374,7 +385,7 @@ button{cursor:pointer}
   </div>
 
   <section id="weekView" class="wrap" style="gap:12px">
-    <div class="courtbar" id="courtBar"></div>
+    <div class="stick" id="weekStick"><div class="courtbar" id="courtBar"></div><nav class="dstrip" id="dateStrip" data-i18n-aria="days" aria-label="Dani u tjednu"></nav></div>
     <div class="summary" id="summary"></div>
     <div class="filters" id="filters"></div>
     <div class="status" id="status" data-i18n="loading">Učitavanje…</div>
@@ -395,9 +406,9 @@ const LEAGUE_COLORS = ['--l1','--l2','--l3','--l4','--l5','--l6'];
 /* ---------- languages: Croatian (default) and English ---------- */
 const I18N = {
   hr: {
-    locale:'hr-HR', switchTo:'EN', switchAria:'Prebaci na engleski',
+    locale:'hr-HR',
     prevWeek:'Prethodni tjedan', nextWeek:'Sljedeći tjedan', thisWeek:'Ovaj tjedan', reload:'Osvježi podatke',
-    theme:'Tema', theme_light:'Svijetla tema', theme_dark:'Tamna tema',
+    theme:'Tema', language:'Jezik', days:'Dani u tjednu', theme_light:'Svijetla tema', theme_dark:'Tamna tema',
     settings:'Postavke', home:'Početna', login:'Prijava', account:'Račun', liveFrom:'uživo sa Sporty.plus',
     schedule:'Raspored', results:'Rezultati', loading:'Učitavanje…', loadingWeek:'Učitavanje tjedna…',
     credit:'Vremenska prognoza: {yr}, Norveški meteorološki institut (MET Norway).',
@@ -469,9 +480,9 @@ const I18N = {
     noResults:'Rezultati još nisu učitani.', roundN:'{n}. kolo', official:'službeno', verified:'potvrđeno'
   },
   en: {
-    locale:'en-GB', switchTo:'HR', switchAria:'Switch to Croatian',
+    locale:'en-GB',
     prevWeek:'Previous week', nextWeek:'Next week', thisWeek:'This week', reload:'Reload data',
-    theme:'Theme', theme_light:'Light theme', theme_dark:'Dark theme',
+    theme:'Theme', language:'Language', days:'Days of the week', theme_light:'Light theme', theme_dark:'Dark theme',
     settings:'Settings', home:'Home', login:'Log in', account:'Account', liveFrom:'live from Sporty.plus',
     schedule:'Schedule', results:'Results', loading:'Loading…', loadingWeek:'Loading week…',
     credit:'Weather forecast from {yr}, delivered by the Norwegian Meteorological Institute (MET Norway).',
@@ -568,7 +579,6 @@ function applyStaticText(){
   document.querySelectorAll('[data-i18n-aria]').forEach(el => el.setAttribute('aria-label', t(el.dataset.i18nAria)));
   document.querySelectorAll('[data-i18n-title]').forEach(el => el.title = t(el.dataset.i18nTitle));
   document.getElementById('credit').innerHTML = t('credit', { yr: '<a href="https://www.yr.no/" target="_blank" rel="noopener">Yr</a>' });
-  const lb = document.getElementById('langBtn'); lb.textContent = t('switchTo'); lb.setAttribute('aria-label', t('switchAria'));
 }
 
 const store = {
@@ -899,11 +909,61 @@ function renderCourtBar(){
   el.querySelectorAll('[data-court]').forEach(b => b.onclick = () => { cfg.court = b.dataset.court; store.set('court', cfg.court); render(); });
 }
 
+// Free slots still bookable that day, on the courts being shown.
+function freeLeft(d, now = new Date()){ return d.slots.filter(s => s.kind === 'free' && inCourt(s) && slotEnd(s) >= now).length; }
+function dayEnded(d, now = new Date()){ return new Date(d.date.getFullYear(), d.date.getMonth(), d.date.getDate() + 1) <= now; }
+
+/* ---------- date strip: the shown week's days with their free count; tap one to jump to it ---------- */
+function renderDateStrip(){
+  const el = document.getElementById('dateStrip'), now = new Date();
+  if (!state.days.length) { el.innerHTML = ''; return; }
+  if (!state.days.some(d => ymd(d.date) === state.stripDay)) state.stripDay = ymd((state.days.find(d => sameDay(d.date, now)) || state.days[0]).date);
+  el.innerHTML = state.days.map(d => { const key = ymd(d.date), ended = dayEnded(d, now), n = freeLeft(d, now), today = sameDay(d.date, now);
+    const label = `${dayShort(d.date)} ${d.date.toLocaleDateString(LOC(),{day:'numeric',month:'long'})}${ended ? '' : ', ' + (n ? tn('ag_free', n) : t('ag_full'))}`;
+    return `<button type="button" data-day="${key}" class="${ended ? 'past' : ''}${today ? ' today' : ''}${key === state.stripDay ? ' on' : ''}"${today ? ' aria-current="date"' : ''} aria-label="${esc(label)}">
+      <span class="dn">${dayShort(d.date)}</span><b>${d.date.getDate()}</b><span class="n${n ? '' : ' none'}">${ended ? '·' : n}</span></button>`; }).join('');
+  el.querySelectorAll('[data-day]').forEach(b => b.onclick = () => jumpToDay(b.dataset.day));
+}
+function markStripDay(key){
+  if (state.stripDay === key) return;
+  state.stripDay = key;
+  document.querySelectorAll('#dateStrip [data-day]').forEach(b => b.classList.toggle('on', b.dataset.day === key));
+}
+// Height the sticky court bar + strip take at the top of the screen once stuck (0 where it doesn't stick).
+const stickyBottom = () => { const s = document.getElementById('weekStick'), cs = getComputedStyle(s); return cs.position === 'sticky' ? (parseFloat(cs.top) || 0) + s.offsetHeight : 0; };
+function jumpToDay(key){
+  markStripDay(key);
+  const agenda = document.getElementById('agenda');
+  if (agenda.offsetParent) {   // phone list
+    let head = agenda.querySelector(`:scope > [data-day="${key}"]`) || agenda.querySelector(`[data-day="${key}"]`);
+    if (!head && document.getElementById('earlierBtn') && !state.showEarlier) { state.showEarlier = true; renderAgenda(); head = agenda.querySelector(`[data-day="${key}"]`); }
+    if (head) { spyPause = Date.now() + 900; window.scrollTo({ top: head.getBoundingClientRect().top + scrollY - stickyBottom() - 10, behavior: 'smooth' }); }
+  } else {   // desktop board: bring that day's column into view
+    const head = document.querySelector(`#board .dayhead[data-day="${key}"]`);
+    if (head) { const sc = document.querySelector('.board-scroll'); sc.scrollTo({ left: head.offsetLeft - 52, behavior: 'smooth' }); sc.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+  }
+}
+// On phones the highlighted day follows the list as you scroll.
+let spyPause = 0, spyQueued = false;
+window.addEventListener('scroll', () => {
+  if (spyQueued) return; spyQueued = true;
+  requestAnimationFrame(() => { spyQueued = false; spyDay(); });
+}, { passive: true });
+function spyDay(){
+  const agenda = document.getElementById('agenda');
+  if (Date.now() < spyPause || !agenda.offsetParent || document.getElementById('weekView').hidden) return;
+  const line = stickyBottom() + 30;
+  const heads = agenda.querySelectorAll(':scope > [data-day]');
+  let cur = heads[0]?.dataset.day;
+  for (const h of heads) { if (h.getBoundingClientRect().top <= line) cur = h.dataset.day; else break; }
+  if (cur) markStripDay(cur);
+}
+
 /* ---------- render ---------- */
 function render(){
   document.getElementById('range').textContent = rangeText(state.monday);
   const fp = freePrices(); state.peak = fp.length ? Math.max(...fp) : 0; state.low = fp.length ? Math.min(...fp) : 0;
-  renderCourtBar(); renderSummary(); renderFilters(); renderBoard(); renderAgenda();
+  renderCourtBar(); renderDateStrip(); renderSummary(); renderFilters(); renderBoard(); renderAgenda();
 }
 
 function visible(s){
@@ -1193,7 +1253,7 @@ function renderBoard(){
   let html = `<div class="corner"></div>`;
   state.days.forEach((d,i)=>{
     const t = sameDay(d.date, now);
-    html += `<div class="dayhead${t?' today':''}"><div class="d">${dayShort(d.date)} <small>${d.date.getDate()}.${d.date.getMonth()+1}.</small></div>
+    html += `<div class="dayhead${t?' today':''}" data-day="${ymd(d.date)}"><div class="d">${dayShort(d.date)} <small>${d.date.getDate()}.${d.date.getMonth()+1}.</small></div>
       <div class="lanes-h">${courts.map(c=>`<span title="${esc(c.name)}">${esc(courtLabel(c))}</span>`).join('')}</div></div>`;
   });
   html += `<div class="axis" style="height:${height}px">${[...Array(max-min+1)].map((_,i)=>i&&i<max-min?`<span style="top:${i*H}px">${min+i}:00</span>`:'').join('')}</div>`;
@@ -1227,10 +1287,8 @@ function renderAgenda(){
         <span class="t">${hm(s.start)}</span><span class="body"><span class="l">${s.kind==='free' ? esc(t('free')) + (rainFor(s)?.wet ? ` · <span class="rw">${t('tagRain')}</span>` : '') : esc(slotTitle(s))}</span>${meta(s)||takenTag(s)?`<span class="court">${takenTag(s)}${meta(s)}</span>`:''}</span>${s.kind==='free' && s.price!=null ? `<span class="pchip">€${s.price}</span>` : ''}${wxBadge(s)}
         ${state.resultsByGame.get(s.gameId)?`<span class="sc">${esc(scoreLine(state.resultsByGame.get(s.gameId)))}</span>`:''}</button></li>`;
   // Free slots still bookable that day, on the courts being shown (no pill for days that are over).
-  const freeLeft = d => d.slots.filter(s => s.kind === 'free' && inCourt(s) && slotEnd(s) >= now).length;
-  const dayEnded = d => new Date(d.date.getFullYear(), d.date.getMonth(), d.date.getDate() + 1) <= now;
-  const dayHead = d => { const today = sameDay(d.date, now), n = freeLeft(d);
-    const pill = dayEnded(d) ? '' : n ? `<span class="freecount">${tn('ag_free', n)}</span>` : `<span class="freecount none">${t('ag_full')}</span>`;
+  const dayHead = d => { const today = sameDay(d.date, now), n = freeLeft(d, now);
+    const pill = dayEnded(d, now) ? '' : n ? `<span class="freecount">${tn('ag_free', n)}</span>` : `<span class="freecount none">${t('ag_full')}</span>`;
     return `<h3 class="${today?'today':''}">${dayShort(d.date)} <small>${d.date.toLocaleDateString(LOC(),{day:'numeric',month:'long'})}${today?' · '+t('ag_today'):''}</small>${pill}</h3>`; };
   const sorted = d => d.slots.filter(visible).sort((a,b)=>a.start-b.start || courtLabel(a.court).localeCompare(courtLabel(b.court)));
   const thisWeek = ymd(state.monday) === ymd(mondayOf(now));
@@ -1238,7 +1296,7 @@ function renderAgenda(){
 
   if (!thisWeek) {
     el.innerHTML = state.days.map(d => { const list = sorted(d);
-      return `<div>${dayHead(d)}${list.length?`<ul>${list.map(row).join('')}</ul>`:`<p class="empty">${t('nothingToday')}</p>`}</div>`; }).join('');
+      return `<div data-day="${ymd(d.date)}">${dayHead(d)}${list.length?`<ul>${list.map(row).join('')}</ul>`:`<p class="empty">${t('nothingToday')}</p>`}</div>`; }).join('');
   } else {
     const earlier = state.days.map(d => ({ d, list: sorted(d).filter(isEarlier) })).filter(x => x.list.length);
     const count = earlier.reduce((a,x) => a + x.list.length, 0);
@@ -1249,11 +1307,11 @@ function renderAgenda(){
       const span = sameDay(first, last) ? (sameDay(first, now) ? t('ag_earlierToday') : name(first)) : `${name(first)} – ${name(last)}`;
       html += `<button type="button" class="earlier" id="earlierBtn" aria-expanded="${!!state.showEarlier}">
           <span><span class="chev" aria-hidden="true">${state.showEarlier ? '▾' : '▸'}</span>${state.showEarlier ? t('ag_hideEarlier') : t('ag_earlier')} · ${esc(span)}</span><span class="n">${count}</span></button>`;
-      if (state.showEarlier) html += `<div class="earlierlist">${earlier.map(x => `<div>${dayHead(x.d)}<ul>${x.list.map(row).join('')}</ul></div>`).join('')}</div>`;
+      if (state.showEarlier) html += `<div class="earlierlist">${earlier.map(x => `<div data-day="${ymd(x.d.date)}">${dayHead(x.d)}<ul>${x.list.map(row).join('')}</ul></div>`).join('')}</div>`;
     }
     html += state.days.filter(d => d.date >= new Date(now.getFullYear(), now.getMonth(), now.getDate())).map(d => {
       const list = sorted(d).filter(s => !isEarlier(s));
-      return `<div>${dayHead(d)}${list.length?`<ul>${list.map(row).join('')}</ul>`:`<p class="empty">${t('nothingToday')}</p>`}</div>`;
+      return `<div data-day="${ymd(d.date)}">${dayHead(d)}${list.length?`<ul>${list.map(row).join('')}</ul>`:`<p class="empty">${t('nothingToday')}</p>`}</div>`;
     }).join('');
     el.innerHTML = html;
     const b = document.getElementById('earlierBtn');
@@ -1736,7 +1794,13 @@ document.addEventListener('click', e => { const b = e.target.closest('[data-play
 
 function openSettings(){
   navReset();
+  const sun = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>';
+  const moon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>';
   openDrawer(`<h2>${t('settings')}</h2>
+    <div class="field"><span class="flabel" id="sThemeL">${t('theme')}</span><div class="seg pick" role="group" aria-labelledby="sThemeL">
+      <button type="button" data-theme-pick="light" aria-pressed="${curTheme()==='light'}">${sun}${t('theme_light')}</button><button type="button" data-theme-pick="dark" aria-pressed="${curTheme()==='dark'}">${moon}${t('theme_dark')}</button></div></div>
+    <div class="field"><span class="flabel" id="sLangL">${t('language')}</span><div class="seg pick" role="group" aria-labelledby="sLangL">
+      <button type="button" data-lang-pick="hr" lang="hr" aria-pressed="${lang==='hr'}">Hrvatski</button><button type="button" data-lang-pick="en" lang="en" aria-pressed="${lang==='en'}">English</button></div></div>
     <div class="field"><label for="sClub">${t('clubId')}</label><input id="sClub" inputmode="numeric" value="${esc(cfg.club)}"></div>
     <div class="field"><label for="sSub">${t('clubAddr')}</label><input id="sSub" value="${esc(cfg.sub)}"></div>
     <details><summary class="hint" style="cursor:pointer">${t('devOptions')}</summary>
@@ -1744,6 +1808,8 @@ function openSettings(){
       <p class="hint" style="margin-top:6px">${t('tokenHint')}</p>
     </details>
     <button class="btn primary" id="sSave" style="align-self:flex-start">${t('saveReload')}</button>`);
+  panel.querySelectorAll('[data-theme-pick]').forEach(b => b.onclick = () => { theme = b.dataset.themePick; store.set('theme', theme); applyTheme(); });
+  panel.querySelectorAll('[data-lang-pick]').forEach(b => b.onclick = () => { if (b.dataset.langPick !== lang) { setLang(b.dataset.langPick); openSettings(); } });
   document.getElementById('sSave').onclick = () => {
     cfg.club = parseInt(document.getElementById('sClub').value,10) || 139;
     cfg.sub = document.getElementById('sSub').value.trim() || 'modesto';
@@ -1798,18 +1864,16 @@ document.getElementById('homeLink').onclick = ev => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-/* ---------- theme: Light or Dark. Until the user picks one, follow the device. ---------- */
+/* ---------- theme: Light or Dark, picked in Settings. Until the user picks one, follow the device. ---------- */
 const darkMq = matchMedia('(prefers-color-scheme: dark)');
 let theme = store.get('theme',''); if (!['light','dark'].includes(theme)) theme = '';   // '' = not picked yet
+const curTheme = () => theme || (darkMq.matches ? 'dark' : 'light');
 function applyTheme(){
   if (theme) document.documentElement.dataset.theme = theme; else delete document.documentElement.dataset.theme;
-  const cur = theme || (darkMq.matches ? 'dark' : 'light');
-  document.getElementById('themeLight').setAttribute('aria-pressed', cur==='light');
-  document.getElementById('themeDark').setAttribute('aria-pressed', cur==='dark');
+  document.querySelectorAll('[data-theme-pick]').forEach(b => b.setAttribute('aria-pressed', b.dataset.themePick === curTheme()));
 }
 applyTheme();
 darkMq.addEventListener('change', () => { if (!theme) applyTheme(); });
-for (const th of ['light','dark']) document.getElementById(th==='light' ? 'themeLight' : 'themeDark').onclick = () => { theme = th; store.set('theme', th); applyTheme(); };
 
 /* ---------- language switch: Croatian <-> English ---------- */
 function setLang(l){
@@ -1819,7 +1883,6 @@ function setLang(l){
   render(); if (!document.getElementById('resultsView').hidden) renderResults();
   if (openKey && allSlots().some(x => slotKey(x) === openKey)) openSlot(openKey); else if (!drawer.hidden) closeDrawer();
 }
-document.getElementById('langBtn').onclick = () => setLang(lang === 'hr' ? 'en' : 'hr');
 applyStaticText();
 document.addEventListener('keydown', e => {
   if (!drawer.hidden || e.target.closest('input,textarea')) return;
