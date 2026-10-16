@@ -83,22 +83,36 @@ button{cursor:pointer}
 .tabs button[aria-selected="true"]{color:var(--court);background:var(--surface);border-color:var(--line)}
 
 /* Court switch bar: All courts / one court. Pinned under the header on phones. */
-/* Date strip: the week's days with their free count */
-.stick{display:flex;flex-direction:column;gap:10px}
-.dstrip{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;max-width:620px}
-.dstrip button{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:5px 0 4px;display:flex;flex-direction:column;align-items:center;line-height:1.15;min-width:0}
-.dstrip button:hover{border-color:var(--court)}
-.dstrip .dn{font-size:.7rem;color:var(--muted)}
-.dstrip b{font:600 1.05rem var(--f-display);font-variant-numeric:tabular-nums}
-.dstrip .n{font:500 .7rem var(--f-body);color:var(--free);font-variant-numeric:tabular-nums}
-.dstrip .n.none{color:var(--muted)}
-.dstrip .today b{color:var(--court)}
-.dstrip .past{opacity:.55}
-.dstrip .on{background:var(--court);border-color:var(--court);color:#fff;opacity:1}
-.dstrip .on .dn,.dstrip .on .n,.dstrip .on b{color:#fff}
 .seg.pick button{display:inline-flex;align-items:center;justify-content:center;gap:6px}
 .seg.pick svg{width:16px;height:16px}
 .flabel{font-size:.85rem;color:var(--muted)}
+.tabs .caltab{display:inline-flex;align-items:center;gap:6px}
+.tabs .caltab svg{width:16px;height:16px}
+.tabs .caltab:hover{color:var(--fg)}
+/* Calendar popup */
+.modal{position:fixed;inset:0;z-index:11;display:grid;place-items:center;padding:16px;background:color-mix(in srgb,#0a1419 45%,transparent)}
+.mbox{width:min(380px,100%);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-panel);box-shadow:0 18px 50px rgba(0,0,0,.25);padding:16px;display:flex;flex-direction:column;gap:12px}
+.chead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.chead h2{font:600 1.15rem var(--f-display);margin:0}
+.btn.icon{width:36px;height:36px;padding:0;display:grid;place-items:center;font-size:1.2rem;line-height:1}
+.cgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.cgrid .ch{text-align:center;font-size:.72rem;color:var(--muted);padding-bottom:2px}
+.cday{border:1px solid transparent;background:none;border-radius:10px;padding:5px 0 3px;display:flex;flex-direction:column;align-items:center;line-height:1.1;min-width:0}
+.cday b{font:500 .98rem var(--f-display);font-variant-numeric:tabular-nums}
+.cday small{font:500 .68rem var(--f-body);color:var(--free);min-height:1.1em;font-variant-numeric:tabular-nums}
+.cday small.none{color:var(--muted)}
+.cday:hover{border-color:var(--court)}
+.cday.wk{background:var(--court-soft)}
+.cday.today{border-color:var(--court)}
+.cday.today b{color:var(--court)}
+.cday.past b,.cday.out b{color:var(--muted);font-weight:400}
+.cday.out{opacity:.6}
+.cfoot{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.dayhead.flash{animation:flash 1.4s ease-out}
+@keyframes flash{from{background:var(--court-soft)}to{background:var(--surface)}}
+@media (prefers-reduced-motion:reduce){.dayhead.flash{animation:none}}
+.seg.pick{display:flex}
+.seg.pick button{flex:1}
 .courtbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px}
 .seg{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px}
 .seg button{border:0;background:none;border-radius:999px;padding:6px 16px;color:var(--muted);font:500 .92rem var(--f-display);white-space:nowrap}
@@ -109,8 +123,7 @@ button{cursor:pointer}
 .courtnote .cam i{width:7px;height:7px;border-radius:50%;background:var(--now)}
 .board.one{grid-template-columns:52px repeat(7,minmax(124px,1fr));min-width:920px}
 @media (max-width:760px){
-  .stick{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);margin-inline:-16px;padding:8px 16px;border-bottom:1px solid var(--line);gap:8px}
-  .dstrip{max-width:none}
+  .courtbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);margin-inline:-16px;padding:8px 16px;border-bottom:1px solid var(--line)}
   .seg{display:flex;width:100%}
   .seg button{flex:1;padding:8px 4px}
   .courtnote{display:none}
@@ -382,10 +395,11 @@ button{cursor:pointer}
   <div class="tabs" role="tablist">
     <button role="tab" id="tabWeek" aria-selected="true" data-i18n="schedule">Raspored</button>
     <button role="tab" id="tabResults" aria-selected="false" data-i18n="results">Rezultati</button>
+    <button type="button" id="tabCal" class="caltab" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span data-i18n="calendar">Kalendar</span></button>
   </div>
 
   <section id="weekView" class="wrap" style="gap:12px">
-    <div class="stick" id="weekStick"><div class="courtbar" id="courtBar"></div><nav class="dstrip" id="dateStrip" data-i18n-aria="days" aria-label="Dani u tjednu"></nav></div>
+    <div class="courtbar" id="courtBar"></div>
     <div class="summary" id="summary"></div>
     <div class="filters" id="filters"></div>
     <div class="status" id="status" data-i18n="loading">Učitavanje…</div>
@@ -397,6 +411,7 @@ button{cursor:pointer}
   <p class="hint credit" id="credit">Vremenska prognoza: <a href="https://www.yr.no/" target="_blank" rel="noopener">Yr</a>, Norveški meteorološki institut (MET Norway).</p>
 </div>
 
+<div class="modal" id="calModal" hidden><div class="mbox" id="calBox" role="dialog" aria-modal="true" aria-labelledby="calTitle"></div></div>
 <div class="drawer" id="drawer" hidden><div class="panel" id="panel" role="dialog" aria-modal="true"></div></div>
 
 <script>
@@ -408,7 +423,7 @@ const I18N = {
   hr: {
     locale:'hr-HR',
     prevWeek:'Prethodni tjedan', nextWeek:'Sljedeći tjedan', thisWeek:'Ovaj tjedan', reload:'Osvježi podatke',
-    theme:'Tema', language:'Jezik', days:'Dani u tjednu', theme_light:'Svijetla tema', theme_dark:'Tamna tema',
+    theme:'Tema', language:'Jezik', calendar:'Kalendar', prevMonth:'Prethodni mjesec', nextMonth:'Sljedeći mjesec', calHint:'Broj = slobodni termini', theme_light:'Svijetla tema', theme_dark:'Tamna tema',
     settings:'Postavke', home:'Početna', login:'Prijava', account:'Račun', liveFrom:'uživo sa Sporty.plus',
     schedule:'Raspored', results:'Rezultati', loading:'Učitavanje…', loadingWeek:'Učitavanje tjedna…',
     credit:'Vremenska prognoza: {yr}, Norveški meteorološki institut (MET Norway).',
@@ -482,7 +497,7 @@ const I18N = {
   en: {
     locale:'en-GB',
     prevWeek:'Previous week', nextWeek:'Next week', thisWeek:'This week', reload:'Reload data',
-    theme:'Theme', language:'Language', days:'Days of the week', theme_light:'Light theme', theme_dark:'Dark theme',
+    theme:'Theme', language:'Language', calendar:'Calendar', prevMonth:'Previous month', nextMonth:'Next month', calHint:'Number = free slots', theme_light:'Light theme', theme_dark:'Dark theme',
     settings:'Settings', home:'Home', login:'Log in', account:'Account', liveFrom:'live from Sporty.plus',
     schedule:'Schedule', results:'Results', loading:'Loading…', loadingWeek:'Loading week…',
     credit:'Weather forecast from {yr}, delivered by the Norwegian Meteorological Institute (MET Norway).',
@@ -913,57 +928,88 @@ function renderCourtBar(){
 function freeLeft(d, now = new Date()){ return d.slots.filter(s => s.kind === 'free' && inCourt(s) && slotEnd(s) >= now).length; }
 function dayEnded(d, now = new Date()){ return new Date(d.date.getFullYear(), d.date.getMonth(), d.date.getDate() + 1) <= now; }
 
-/* ---------- date strip: the shown week's days with their free count; tap one to jump to it ---------- */
-function renderDateStrip(){
-  const el = document.getElementById('dateStrip'), now = new Date();
-  if (!state.days.length) { el.innerHTML = ''; return; }
-  if (!state.days.some(d => ymd(d.date) === state.stripDay)) state.stripDay = ymd((state.days.find(d => sameDay(d.date, now)) || state.days[0]).date);
-  el.innerHTML = state.days.map(d => { const key = ymd(d.date), ended = dayEnded(d, now), n = freeLeft(d, now), today = sameDay(d.date, now);
-    const label = `${dayShort(d.date)} ${d.date.toLocaleDateString(LOC(),{day:'numeric',month:'long'})}${ended ? '' : ', ' + (n ? tn('ag_free', n) : t('ag_full'))}`;
-    return `<button type="button" data-day="${key}" class="${ended ? 'past' : ''}${today ? ' today' : ''}${key === state.stripDay ? ' on' : ''}"${today ? ' aria-current="date"' : ''} aria-label="${esc(label)}">
-      <span class="dn">${dayShort(d.date)}</span><b>${d.date.getDate()}</b><span class="n${n ? '' : ' none'}">${ended ? '·' : n}</span></button>`; }).join('');
-  el.querySelectorAll('[data-day]').forEach(b => b.onclick = () => jumpToDay(b.dataset.day));
+/* ---------- calendar: a month popup; pick a day to jump to it ----------
+   Days in weeks we already have (shown, cached or prefetched) also show how many slots are still free. */
+const calModal = document.getElementById('calModal'), calBox = document.getElementById('calBox');
+let calMonth = null, calReturn = null;
+function freeByDay(){
+  const m = new Map(), now = new Date();
+  for (const [key, entry] of weekCache) {
+    const monday = new Date(key + 'T00:00');
+    entry.days.forEach((list, i) => { const date = addDays(monday, i), slots = [];
+      for (const c of list) for (const s of Object.values(c.parsed_reservations || {})) if (!s.hidden && !s.id) slots.push(normalize(s, c, date));
+      const d = { date, slots }; if (!dayEnded(d, now)) m.set(ymd(date), freeLeft(d, now)); });
+  }
+  return m;
 }
-function markStripDay(key){
-  if (state.stripDay === key) return;
-  state.stripDay = key;
-  document.querySelectorAll('#dateStrip [data-day]').forEach(b => b.classList.toggle('on', b.dataset.day === key));
+function openCalendar(){
+  calReturn = document.activeElement;
+  calMonth = new Date(state.monday.getFullYear(), state.monday.getMonth(), 1);
+  const last = addDays(state.monday, 6);
+  if (state.monday.getMonth() !== last.getMonth() && sameDay(mondayOf(new Date()), state.monday) && new Date().getMonth() === last.getMonth()) calMonth = new Date(last.getFullYear(), last.getMonth(), 1);
+  calModal.hidden = false; renderCalendar();
+  (calBox.querySelector('.cday.today') || calBox.querySelector('.cday.wk') || calBox.querySelector('.cday'))?.focus();
 }
-// Height the sticky court bar + strip take at the top of the screen once stuck (0 where it doesn't stick).
-const stickyBottom = () => { const s = document.getElementById('weekStick'), cs = getComputedStyle(s); return cs.position === 'sticky' ? (parseFloat(cs.top) || 0) + s.offsetHeight : 0; };
+function closeCalendar(){ calModal.hidden = true; calReturn?.focus?.(); }
+function renderCalendar(){
+  const now = new Date(), free = freeByDay(), shown = ymd(state.monday);
+  const first = mondayOf(calMonth), title = cap(calMonth.toLocaleDateString(LOC(), { month:'long', year:'numeric' })).replace(/\.$/, '');
+  const heads = [...Array(7)].map((_, i) => `<span class="ch">${dayShort(addDays(first, i))}</span>`).join('');
+  let cells = '';
+  for (let i = 0; i < 42; i++) {
+    const d = addDays(first, i), key = ymd(d), n = free.get(key), out = d.getMonth() !== calMonth.getMonth();
+    if (i % 7 === 0 && i >= 35 && out) break;   // no empty last row
+    const cls = ['cday', out ? 'out' : '', sameDay(d, now) ? 'today' : '', ymd(mondayOf(d)) === shown ? 'wk' : '', d < new Date(now.getFullYear(), now.getMonth(), now.getDate()) ? 'past' : ''].filter(Boolean).join(' ');
+    const label = d.toLocaleDateString(LOC(), { weekday:'long', day:'numeric', month:'long' }) + (n == null ? '' : ', ' + (n ? tn('ag_free', n) : t('ag_full')));
+    cells += `<button type="button" class="${cls}" data-day="${key}" aria-label="${esc(label)}"${sameDay(d, now) ? ' aria-current="date"' : ''}><b>${d.getDate()}</b><small class="${n === 0 ? 'none' : ''}">${n == null ? '' : n}</small></button>`;
+  }
+  calBox.innerHTML = `<div class="chead"><button type="button" class="btn icon" id="calPrev" aria-label="${t('prevMonth')}">‹</button><h2 id="calTitle">${esc(title)}</h2><button type="button" class="btn icon" id="calNext" aria-label="${t('nextMonth')}">›</button></div>
+    <div class="cgrid">${heads}${cells}</div>
+    <div class="cfoot"><span class="hint">${t('calHint')}</span><button type="button" class="btn" id="calClose">${t('close')}</button></div>`;
+  document.getElementById('calPrev').onclick = () => { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() - 1, 1); renderCalendar(); document.getElementById('calPrev').focus(); };
+  document.getElementById('calNext').onclick = () => { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + 1, 1); renderCalendar(); document.getElementById('calNext').focus(); };
+  document.getElementById('calClose').onclick = closeCalendar;
+  calBox.querySelectorAll('.cday').forEach(b => b.onclick = () => pickDay(b.dataset.day));
+}
+async function pickDay(key){
+  calModal.hidden = true;
+  if (!drawer.hidden) closeDrawer();
+  showTab('week');
+  const d = new Date(key + 'T12:00');
+  if (ymd(mondayOf(d)) !== ymd(state.monday)) await showWeek(mondayOf(d));
+  jumpToDay(key);
+}
+calModal.onclick = e => { if (e.target === calModal) closeCalendar(); };
+calModal.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { e.stopPropagation(); closeCalendar(); }
+  if (e.key === 'Tab') {   // keep focus inside the popup
+    const f = [...calBox.querySelectorAll('button')], a = f[0], z = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === a) { e.preventDefault(); z.focus(); } else if (!e.shiftKey && document.activeElement === z) { e.preventDefault(); a.focus(); }
+  }
+});
+
+// Height the sticky court bar takes at the top of the screen once stuck (0 where it doesn't stick).
+const stickyBottom = () => { const s = document.getElementById('courtBar'), cs = getComputedStyle(s); return cs.position === 'sticky' ? (parseFloat(cs.top) || 0) + s.offsetHeight : 0; };
 function jumpToDay(key){
-  markStripDay(key);
   const agenda = document.getElementById('agenda');
   if (agenda.offsetParent) {   // phone list
     let head = agenda.querySelector(`:scope > [data-day="${key}"]`) || agenda.querySelector(`[data-day="${key}"]`);
     if (!head && document.getElementById('earlierBtn') && !state.showEarlier) { state.showEarlier = true; renderAgenda(); head = agenda.querySelector(`[data-day="${key}"]`); }
-    if (head) { spyPause = Date.now() + 900; window.scrollTo({ top: head.getBoundingClientRect().top + scrollY - stickyBottom() - 10, behavior: 'smooth' }); }
-  } else {   // desktop board: bring that day's column into view
+    if (head) window.scrollTo({ top: head.getBoundingClientRect().top + scrollY - stickyBottom() - 10, behavior: 'smooth' });
+  } else {   // desktop board: bring that day's column into view and mark it briefly
     const head = document.querySelector(`#board .dayhead[data-day="${key}"]`);
-    if (head) { const sc = document.querySelector('.board-scroll'); sc.scrollTo({ left: head.offsetLeft - 52, behavior: 'smooth' }); sc.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+    if (!head) return;
+    const sc = document.querySelector('.board-scroll');
+    sc.scrollTo({ left: head.offsetLeft - 52, behavior: 'smooth' }); sc.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    head.classList.remove('flash'); void head.offsetWidth; head.classList.add('flash');
   }
-}
-// On phones the highlighted day follows the list as you scroll.
-let spyPause = 0, spyQueued = false;
-window.addEventListener('scroll', () => {
-  if (spyQueued) return; spyQueued = true;
-  requestAnimationFrame(() => { spyQueued = false; spyDay(); });
-}, { passive: true });
-function spyDay(){
-  const agenda = document.getElementById('agenda');
-  if (Date.now() < spyPause || !agenda.offsetParent || document.getElementById('weekView').hidden) return;
-  const line = stickyBottom() + 30;
-  const heads = agenda.querySelectorAll(':scope > [data-day]');
-  let cur = heads[0]?.dataset.day;
-  for (const h of heads) { if (h.getBoundingClientRect().top <= line) cur = h.dataset.day; else break; }
-  if (cur) markStripDay(cur);
 }
 
 /* ---------- render ---------- */
 function render(){
   document.getElementById('range').textContent = rangeText(state.monday);
   const fp = freePrices(); state.peak = fp.length ? Math.max(...fp) : 0; state.low = fp.length ? Math.min(...fp) : 0;
-  renderCourtBar(); renderDateStrip(); renderSummary(); renderFilters(); renderBoard(); renderAgenda();
+  renderCourtBar(); renderSummary(); renderFilters(); renderBoard(); renderAgenda();
 }
 
 function visible(s){
@@ -1801,13 +1847,13 @@ function openSettings(){
       <button type="button" data-theme-pick="light" aria-pressed="${curTheme()==='light'}">${sun}${t('theme_light')}</button><button type="button" data-theme-pick="dark" aria-pressed="${curTheme()==='dark'}">${moon}${t('theme_dark')}</button></div></div>
     <div class="field"><span class="flabel" id="sLangL">${t('language')}</span><div class="seg pick" role="group" aria-labelledby="sLangL">
       <button type="button" data-lang-pick="hr" lang="hr" aria-pressed="${lang==='hr'}">Hrvatski</button><button type="button" data-lang-pick="en" lang="en" aria-pressed="${lang==='en'}">English</button></div></div>
-    <div class="field"><label for="sClub">${t('clubId')}</label><input id="sClub" inputmode="numeric" value="${esc(cfg.club)}"></div>
-    <div class="field"><label for="sSub">${t('clubAddr')}</label><input id="sSub" value="${esc(cfg.sub)}"></div>
     <details><summary class="hint" style="cursor:pointer">${t('devOptions')}</summary>
+      <div class="field" style="margin-top:10px"><label for="sClub">${t('clubId')}</label><input id="sClub" inputmode="numeric" value="${esc(cfg.club)}"></div>
+      <div class="field" style="margin-top:10px"><label for="sSub">${t('clubAddr')}</label><input id="sSub" value="${esc(cfg.sub)}"></div>
       <div class="field" style="margin-top:10px"><label for="sTok">${t('sessionToken')}</label><input id="sTok" type="password" value="${esc(cfg.token)}" placeholder="Bearer …" autocomplete="off"></div>
       <p class="hint" style="margin-top:6px">${t('tokenHint')}</p>
-    </details>
-    <button class="btn primary" id="sSave" style="align-self:flex-start">${t('saveReload')}</button>`);
+      <button class="btn primary" id="sSave" style="margin-top:12px">${t('saveReload')}</button>
+    </details>`);
   panel.querySelectorAll('[data-theme-pick]').forEach(b => b.onclick = () => { theme = b.dataset.themePick; store.set('theme', theme); applyTheme(); });
   panel.querySelectorAll('[data-lang-pick]').forEach(b => b.onclick = () => { if (b.dataset.langPick !== lang) { setLang(b.dataset.langPick); openSettings(); } });
   document.getElementById('sSave').onclick = () => {
@@ -1847,6 +1893,7 @@ function showTab(which){
   store.set('tab', which);
 }
 tabWeek.onclick = ()=>showTab('week'); tabRes.onclick = ()=>showTab('results');
+document.getElementById('tabCal').onclick = openCalendar;
 document.getElementById('prev').onclick = ()=>showWeek(addDays(state.monday,-7));
 document.getElementById('next').onclick = ()=>showWeek(addDays(state.monday,7));
 document.getElementById('today').onclick = ()=>showWeek(mondayOf(new Date()));
@@ -1885,7 +1932,7 @@ function setLang(l){
 }
 applyStaticText();
 document.addEventListener('keydown', e => {
-  if (!drawer.hidden || e.target.closest('input,textarea')) return;
+  if (!drawer.hidden || !calModal.hidden || e.target.closest('input,textarea')) return;
   if (e.key==='ArrowLeft') document.getElementById('prev').click();
   if (e.key==='ArrowRight') document.getElementById('next').click();
 });
