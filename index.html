@@ -276,11 +276,18 @@ button{cursor:pointer}
 .leagues{display:flex;flex-direction:column;gap:14px}
 .lchips .chip{max-width:100%}
 .lchips .chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lghero h2{font:600 1.3rem var(--f-display);margin:0}
-.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:12px;align-items:start}
+.lghero{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.lghero h2{font:600 1.3rem var(--f-display);margin:0;min-width:0}
+.vsw{flex:none}
+.seg.vsw{display:inline-flex;width:auto}
+.seg.vsw button{flex:none}
+.stand .ln{display:none}
+.vsw button{padding:6px 12px;display:grid;place-items:center}
+.vsw svg{width:17px;height:17px;display:block}
+.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,400px),1fr));gap:12px}
 .lgroup{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-panel);padding:12px 14px}
 .lghead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}
-.lghead h3{font:500 1.05rem var(--f-display);margin:0}
+.lghead h3{font:500 1.05rem var(--f-display);margin:0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lghead small{color:var(--muted);font-size:.78rem;white-space:nowrap}
 .stand{width:100%;border-collapse:collapse;font-size:.85rem;font-variant-numeric:tabular-nums}
 .stand th{font:400 .72rem var(--f-body);color:var(--muted);text-align:right;padding:4px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
@@ -299,6 +306,35 @@ button{cursor:pointer}
 .stand tr.me td{background:var(--court-soft)}
 .stand tr.me td:first-child{box-shadow:inset 3px 0 0 var(--court)}
 .stand td.empty{text-align:left}
+.stand.fixed{table-layout:fixed}
+.stand.fixed .c-pos{width:3.2em}.stand.fixed .c-n{width:2.2em}.stand.fixed .c-wl{width:3.4em}.stand.fixed .c-d{width:3.2em}.stand.fixed .c-pts{width:2.8em}
+.stand.fixed .nm{width:auto}
+.stand tr.pad td{border-bottom-color:transparent}
+/* One-group view: group list on the left, the chosen group's table on the right */
+.lgsplit{display:grid;grid-template-columns:240px minmax(0,1fr);gap:14px;align-items:start}
+.lglist{display:flex;flex-direction:column;gap:6px}
+.lgitem{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:8px 12px}
+.lgitem:hover{border-color:var(--court)}
+.lgitem .gn{font:500 .95rem var(--f-display);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lgitem small{color:var(--muted);font-size:.75rem;font-variant-numeric:tabular-nums}
+.lgitem .lead{grid-column:1 / -1;color:var(--muted);font-size:.78rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lgitem[aria-pressed="true"]{background:var(--court);border-color:var(--court);color:#fff}
+.lgitem[aria-pressed="true"] small,.lgitem[aria-pressed="true"] .lead{color:color-mix(in srgb,#fff 80%,transparent)}
+.lgroup.big .stand{font-size:.92rem}
+.lgroup.big .stand td{padding-block:8px}
+@media (max-width:760px){
+  .lgsplit{grid-template-columns:minmax(0,1fr)}
+  .lglist{flex-direction:row;overflow-x:auto;margin-inline:-16px;padding:0 16px 2px;scrollbar-width:none}
+  .lgitem{flex:none;max-width:70%}
+  .lgitem .lead{display:none}
+  /* cards sit one under another on phones, so they don't need matching sizes */
+  .stand.fixed{table-layout:auto}
+  .stand.fixed col{width:auto!important}
+  .stand.fixed .nm{width:100%}
+  .stand tr.pad{display:none}
+  .lgroup.big .stand .raw,.lgroup.big .stand .lw{display:none}
+  .lgroup.big .stand .ln{display:inline}
+}
 @media (max-width:420px){.tabs{gap:0}.tabs button{padding:6px 10px}.stand td,.stand th{padding-inline:3px}.stand{font-size:.8rem}.lgroup{padding:10px 10px}}
 .results h3{font:500 1rem var(--f-display);margin:0 0 6px;color:var(--muted)}
 .res{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-panel);padding:12px 16px;margin-bottom:8px}
@@ -453,7 +489,7 @@ const I18N = {
   hr: {
     locale:'hr-HR',
     prevWeek:'Prethodni tjedan', nextWeek:'Sljedeći tjedan', thisWeek:'Ovaj tjedan', reload:'Osvježi podatke',
-    theme:'Tema', language:'Jezik', calendar:'Kalendar', leagues:'Lige', lg_pair:'Par', lg_P:'O', lg_playedT:'Odigrano', lg_WL:'P-I', lg_wlT:'Pobjede - izgubljeno', lg_sets:'Set', lg_setsT:'Razlika u setovima', lg_games:'Gem', lg_gamesT:'Razlika u gemovima', lg_pts:'Bod', lg_ptsT:'Bodovi', lg_played:'{p} / {n} odigrano', lg_up:'ide gore', lg_down:'ide dolje', lg_legend:'▲ ide u višu grupu · ▼ ide u nižu grupu', lg_none:'Lige će se pojaviti ovdje čim se u rasporedu pojavi ligaška utakmica.', lg_login:'Lige kluba su privatne. Prijavi se da vidiš grupe i tablice.', lg_fail:'Liga se nije mogla učitati.', lg_loading:'Učitavam ligu…', lg_noGroups:'Liga još nema grupa.', lg_emptyGroup:'Još nema parova.', prevMonth:'Prethodni mjesec', nextMonth:'Sljedeći mjesec', calHint:'Broj = slobodni termini', theme_light:'Svijetla tema', theme_dark:'Tamna tema',
+    theme:'Tema', language:'Jezik', calendar:'Kalendar', leagues:'Lige', lg_pair:'Par', lg_P:'O', lg_playedT:'Odigrano', lg_WL:'P-I', lg_wlT:'Pobjede - izgubljeno', lg_sets:'Set', lg_setsT:'Razlika u setovima', lg_games:'Gem', lg_gamesT:'Razlika u gemovima', lg_pts:'Bod', lg_ptsT:'Bodovi', lg_played:'{p} / {n} odigrano', lg_up:'ide gore', lg_down:'ide dolje', lg_legend:'▲ ide u višu grupu · ▼ ide u nižu grupu', lg_none:'Lige će se pojaviti ovdje čim se u rasporedu pojavi ligaška utakmica.', lg_login:'Lige kluba su privatne. Prijavi se da vidiš grupe i tablice.', lg_fail:'Liga se nije mogla učitati.', lg_loading:'Učitavam ligu…', lg_noGroups:'Liga još nema grupa.', lg_emptyGroup:'Još nema parova.', lg_groups:'Grupe', lg_view:'Prikaz lige', lg_view_grid:'Sve grupe', lg_view_list:'Jedna grupa', lg_W:'P', lg_wonT:'Pobjede', lg_D:'N', lg_drawT:'Neriješeno', lg_L:'I', lg_lostT:'Porazi', lg_setsWL:'Setovi', lg_gamesWL:'Gemovi', prevMonth:'Prethodni mjesec', nextMonth:'Sljedeći mjesec', calHint:'Broj = slobodni termini', theme_light:'Svijetla tema', theme_dark:'Tamna tema',
     settings:'Postavke', home:'Početna', login:'Prijava', account:'Račun', liveFrom:'uživo sa Sporty.plus',
     schedule:'Raspored', results:'Rezultati', loading:'Učitavanje…', loadingWeek:'Učitavanje tjedna…',
     credit:'Vremenska prognoza: {yr}, Norveški meteorološki institut (MET Norway).',
@@ -527,7 +563,7 @@ const I18N = {
   en: {
     locale:'en-GB',
     prevWeek:'Previous week', nextWeek:'Next week', thisWeek:'This week', reload:'Reload data',
-    theme:'Theme', language:'Language', calendar:'Calendar', leagues:'Leagues', lg_pair:'Pair', lg_P:'P', lg_playedT:'Played', lg_WL:'W-L', lg_wlT:'Won - lost', lg_sets:'Sets', lg_setsT:'Set difference', lg_games:'Games', lg_gamesT:'Game difference', lg_pts:'Pts', lg_ptsT:'Points', lg_played:'{p} / {n} played', lg_up:'moves up', lg_down:'moves down', lg_legend:'▲ moves up a group · ▼ moves down a group', lg_none:'Leagues show up here once a league match appears on the schedule.', lg_login:'The club\'s leagues are private. Log in to see groups and standings.', lg_fail:'Could not load this league.', lg_loading:'Loading league…', lg_noGroups:'This league has no groups yet.', lg_emptyGroup:'No pairs yet.', prevMonth:'Previous month', nextMonth:'Next month', calHint:'Number = free slots', theme_light:'Light theme', theme_dark:'Dark theme',
+    theme:'Theme', language:'Language', calendar:'Calendar', leagues:'Leagues', lg_pair:'Pair', lg_P:'P', lg_playedT:'Played', lg_WL:'W-L', lg_wlT:'Won - lost', lg_sets:'Sets', lg_setsT:'Set difference', lg_games:'Games', lg_gamesT:'Game difference', lg_pts:'Pts', lg_ptsT:'Points', lg_played:'{p} / {n} played', lg_up:'moves up', lg_down:'moves down', lg_legend:'▲ moves up a group · ▼ moves down a group', lg_none:'Leagues show up here once a league match appears on the schedule.', lg_login:'The club\'s leagues are private. Log in to see groups and standings.', lg_fail:'Could not load this league.', lg_loading:'Loading league…', lg_noGroups:'This league has no groups yet.', lg_emptyGroup:'No pairs yet.', lg_groups:'Groups', lg_view:'League view', lg_view_grid:'All groups', lg_view_list:'One group', lg_W:'W', lg_wonT:'Won', lg_D:'D', lg_drawT:'Drawn', lg_L:'L', lg_lostT:'Lost', lg_setsWL:'Sets', lg_gamesWL:'Games', prevMonth:'Previous month', nextMonth:'Next month', calHint:'Number = free slots', theme_light:'Light theme', theme_dark:'Dark theme',
     settings:'Settings', home:'Home', login:'Log in', account:'Account', liveFrom:'live from Sporty.plus',
     schedule:'Schedule', results:'Results', loading:'Loading…', loadingWeek:'Loading week…',
     credit:'Weather forecast from {yr}, delivered by the Norwegian Meteorological Institute (MET Norway).',
@@ -831,28 +867,50 @@ function isMeRow(p){
   const me = state.me; if (!me) return false;
   return p.id === me.id || p.id === me.team?.id || (p.players||[]).some(x => x.id === me.id);
 }
-function groupRows(g){
-  const stats = g.stats || {};
-  return (g.players || []).map(p => { const s = stats[p.id] || {};
+function groupRows(g, first, last){
+  const stats = g.stats || {}, up = first ? 0 : (g.move_up || 0), down = last ? 0 : (g.move_down || 0);
+  const rows = (g.players || []).map(p => { const s = stats[p.id] || {};
       return { p, pos: p.pivot?.position, m: s.matches || {}, sets: s.sets || {}, games: s.points || {}, score: s.score ?? p.pivot?.score ?? 0 }; })
     .sort((a,b) => (a.pos ?? 999) - (b.pos ?? 999) || b.score - a.score || ((b.sets.wins||0)-(b.sets.losses||0)) - ((a.sets.wins||0)-(a.sets.losses||0)));
+  rows.forEach((r, i) => { r.n = r.pos ?? i+1; r.mv = i < up ? 'up' : i >= rows.length - down ? 'dn' : ''; r.me = isMeRow(r.p); });
+  return rows;
 }
-function groupCard(g, first, last){
-  const rows = groupRows(g), up = first ? 0 : (g.move_up || 0), down = last ? 0 : (g.move_down || 0);
-  const played = g.total_number_of_played_games, total = g.total_number_of_games;
-  // Set and game difference: green above zero, red below, grey at zero.
-  const diff = (w,l) => { const d = (w||0) - (l||0); return d > 0 ? `<td class="wide dp">+${d}</td>` : d < 0 ? `<td class="wide dn">−${-d}</td>` : '<td class="wide dz">0</td>'; };
-  const name = p => p.type === 'team' && (p.players||[]).length > 1 ? teamLink(p.id, p.display_name || '—') : p.type === 'team' ? esc(p.display_name || '—') : playerLink(p);
-  const body = rows.length ? rows.map((r, i) => {
-      const mv = i < up ? 'up' : i >= rows.length - down ? 'dn' : '';
-      const mark = mv === 'up' ? `<span class="mv" aria-label="${t('lg_up')}">▲</span>` : mv === 'dn' ? `<span class="mv" aria-label="${t('lg_down')}">▼</span>` : '';
-      const wl = `${r.m.wins||0}-${r.m.losses||0}${r.m.draws ? '-'+r.m.draws : ''}`;
-      return `<tr class="${mv}${isMeRow(r.p) ? ' me' : ''}"><td class="pos">${mark}${r.pos ?? i+1}</td><td class="nm">${name(r.p)}</td><td>${r.m.total||0}</td><td>${wl}</td>${diff(r.sets.wins, r.sets.losses)}${diff(r.games.wins, r.games.losses)}<td class="pts">${r.score}</td></tr>`;
-    }).join('') : `<tr><td colspan="7" class="empty">${t('lg_emptyGroup')}</td></tr>`;
-  return `<section class="lgroup"><div class="lghead"><h3>${esc(g.name || '')}</h3>${total ? `<small>${t('lg_played', { p: played||0, n: total })}</small>` : ''}</div>
-    <table class="stand"><thead><tr><th class="pos">#</th><th class="nm">${t('lg_pair')}</th><th title="${t('lg_playedT')}">${t('lg_P')}</th><th title="${t('lg_wlT')}">${t('lg_WL')}</th><th class="wide" title="${t('lg_setsT')}">${t('lg_sets')}</th><th class="wide" title="${t('lg_gamesT')}">${t('lg_games')}</th><th title="${t('lg_ptsT')}">${t('lg_pts')}</th></tr></thead>
+// Pieces shared by both views.
+const lgName = p => p.type === 'team' && (p.players||[]).length > 1 ? teamLink(p.id, p.display_name || '—') : p.type === 'team' ? esc(p.display_name || '—') : playerLink(p);
+const lgMark = r => r.mv === 'up' ? `<span class="mv" aria-label="${t('lg_up')}">▲</span>` : r.mv === 'dn' ? `<span class="mv" aria-label="${t('lg_down')}">▼</span>` : '';
+// Set and game difference: green above zero, red below, grey at zero.
+const lgDiff = (w, l) => { const d = (w||0) - (l||0); return d > 0 ? `<td class="dp">+${d}</td>` : d < 0 ? `<td class="dn">−${-d}</td>` : '<td class="dz">0</td>'; };
+const lgPlayed = g => g.total_number_of_games ? t('lg_played', { p: g.total_number_of_played_games || 0, n: g.total_number_of_games }) : '';
+const lgTr = r => `class="${r.mv}${r.me ? ' me' : ''}"`;
+
+// View A: every group a card. Fixed column widths, and shorter groups padded with empty rows so all cards match.
+function groupCard(g, first, last, height){
+  const rows = groupRows(g, first, last);
+  const body = rows.map(r => `<tr ${lgTr(r)}><td class="pos">${lgMark(r)}${r.n}</td><td class="nm">${lgName(r.p)}</td><td>${r.m.total||0}</td><td>${r.m.wins||0}-${r.m.losses||0}${r.m.draws ? '-'+r.m.draws : ''}</td>${lgDiff(r.sets.wins, r.sets.losses)}${lgDiff(r.games.wins, r.games.losses)}<td class="pts">${r.score}</td></tr>`).join('')
+    + (rows.length ? '' : `<tr><td colspan="7" class="empty">${t('lg_emptyGroup')}</td></tr>`)
+    + `<tr class="pad" aria-hidden="true"><td colspan="7">&nbsp;</td></tr>`.repeat(Math.max(0, height - Math.max(rows.length, 1)));
+  return `<section class="lgroup"><div class="lghead"><h3 title="${esc(g.name || '')}">${esc(g.name || '')}</h3><small>${lgPlayed(g)}</small></div>
+    <table class="stand fixed"><colgroup><col class="c-pos"><col><col class="c-n"><col class="c-wl"><col class="c-d"><col class="c-d"><col class="c-pts"></colgroup>
+    <thead><tr><th class="pos">#</th><th class="nm">${t('lg_pair')}</th><th title="${t('lg_playedT')}">${t('lg_P')}</th><th title="${t('lg_wlT')}">${t('lg_WL')}</th><th title="${t('lg_setsT')}">${t('lg_sets')}</th><th title="${t('lg_gamesT')}">${t('lg_games')}</th><th title="${t('lg_ptsT')}">${t('lg_pts')}</th></tr></thead>
     <tbody>${body}</tbody></table></section>`;
 }
+// View C: the groups as a list, the chosen one as a large table with sets and games won-lost.
+function groupDetail(groups, selId){
+  const i = Math.max(0, groups.findIndex(g => g.id === selId)), g = groups[i];
+  const rows = groupRows(g, i === 0, i === groups.length-1), draws = rows.some(r => r.m.draws);
+  const list = groups.map((x, j) => { const lead = groupRows(x, j === 0, j === groups.length-1)[0];
+      return `<button type="button" class="lgitem" data-group="${x.id}" aria-pressed="${x.id === g.id}"><span class="gn">${esc(x.name || '')}</span><small>${x.total_number_of_games ? `${x.total_number_of_played_games||0}/${x.total_number_of_games}` : ''}</small>${lead ? `<span class="lead">${esc(lead.p.display_name || '')}</span>` : ''}</button>`; }).join('');
+  const body = rows.map(r => `<tr ${lgTr(r)}><td class="pos">${lgMark(r)}${r.n}</td><td class="nm">${lgName(r.p)}</td><td>${r.m.total||0}</td><td>${r.m.wins||0}</td>${draws ? `<td>${r.m.draws||0}</td>` : ''}<td>${r.m.losses||0}</td><td class="raw">${r.sets.wins||0}-${r.sets.losses||0}</td>${lgDiff(r.sets.wins, r.sets.losses)}<td class="raw">${r.games.wins||0}-${r.games.losses||0}</td>${lgDiff(r.games.wins, r.games.losses)}<td class="pts">${r.score}</td></tr>`).join('')
+    || `<tr><td colspan="11" class="empty">${t('lg_emptyGroup')}</td></tr>`;
+  return `<div class="lgsplit"><nav class="lglist" aria-label="${t('lg_groups')}">${list}</nav>
+    <section class="lgroup big"><div class="lghead"><h3>${esc(g.name || '')}</h3><small>${lgPlayed(g)}</small></div>
+    <table class="stand"><thead><tr><th class="pos">#</th><th class="nm">${t('lg_pair')}</th><th title="${t('lg_playedT')}">${t('lg_P')}</th><th title="${t('lg_wonT')}">${t('lg_W')}</th>${draws ? `<th title="${t('lg_drawT')}">${t('lg_D')}</th>` : ''}<th title="${t('lg_lostT')}">${t('lg_L')}</th><th class="raw">${t('lg_setsWL')}</th><th title="${t('lg_setsT')}"><span class="lw">±</span><span class="ln">${t('lg_sets')}</span></th><th class="raw">${t('lg_gamesWL')}</th><th title="${t('lg_gamesT')}"><span class="lw">±</span><span class="ln">${t('lg_games')}</span></th><th title="${t('lg_ptsT')}">${t('lg_pts')}</th></tr></thead>
+    <tbody>${body}</tbody></table></section></div>`;
+}
+const LG_ICONS = {
+  grid: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
+  list: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="6" height="16" rx="1"/><path d="M13 6h8M13 10h8M13 14h8M13 18h8"/></svg>'
+};
 let leaguesSeq = 0;
 async function renderLeagues(){
   const el = document.getElementById('leaguesView'), ids = knownLeagues(), seq = ++leaguesSeq;
@@ -872,9 +930,21 @@ async function renderLeagues(){
       return;
     }
     const groups = [...(res.league.groups || [])].sort((a,b) => (a.order ?? 0) - (b.order ?? 0));
-    body.innerHTML = `<div class="lghero"><h2>${esc(leagueName(sel))}</h2></div>` + (groups.length
-      ? `<div class="lgrid">${groups.map((g,i) => groupCard(g, i === 0, i === groups.length-1)).join('')}</div><p class="hint">${t('lg_legend')}</p>`
-      : `<p class="empty">${t('lg_noGroups')}</p>`);
+    const view = store.get('leagueView', 'grid') === 'list' ? 'list' : 'grid';
+    const sw = `<div class="seg vsw" role="group" aria-label="${t('lg_view')}">${['grid','list'].map(v => `<button type="button" data-lview="${v}" aria-pressed="${v===view}" aria-label="${t('lg_view_'+v)}" title="${t('lg_view_'+v)}">${LG_ICONS[v]}</button>`).join('')}</div>`;
+    let inner = `<p class="empty">${t('lg_noGroups')}</p>`;
+    if (groups.length && view === 'grid') {
+      const height = Math.max(...groups.map(g => (g.players||[]).length), 1);
+      inner = `<div class="lgrid">${groups.map((g,i) => groupCard(g, i === 0, i === groups.length-1, height)).join('')}</div><p class="hint">${t('lg_legend')}</p>`;
+    } else if (groups.length) {
+      // Open the group you play in, else the last one picked, else the first.
+      const picked = store.get('leagueGroup.'+sel, 0), mine = groups.find(g => (g.players||[]).some(isMeRow));
+      const gid = groups.some(g => g.id === picked) ? picked : (mine || groups[0]).id;
+      inner = groupDetail(groups, gid) + `<p class="hint">${t('lg_legend')}</p>`;
+    }
+    body.innerHTML = `<div class="lghero"><h2>${esc(leagueName(sel))}</h2>${groups.length ? sw : ''}</div>` + inner;
+    body.querySelectorAll('[data-lview]').forEach(b => b.onclick = () => { store.set('leagueView', b.dataset.lview); draw(res); });
+    body.querySelectorAll('[data-group]').forEach(b => b.onclick = () => { store.set('leagueGroup.'+sel, Number(b.dataset.group)); draw(res); body.querySelector(`[data-group="${b.dataset.group}"]`)?.focus(); });
   };
   if (c) draw(c);
   if (!c || Date.now() - c.at >= FRESH_PROFILE) draw(await loadStandings(sel, true));
