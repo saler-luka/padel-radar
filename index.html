@@ -107,6 +107,20 @@ button{cursor:pointer}
 .cday.today b{color:var(--court)}
 .cday.past b,.cday.out b{color:var(--muted);font-weight:400}
 .cday.out{opacity:.6}
+/* Cancel booking: button in the panel, confirm popup above it */
+.btn.danger{border-color:var(--taken);color:var(--taken)}
+.btn.danger:hover{background:var(--taken-soft)}
+.btn.dangersolid{background:var(--taken);border-color:var(--taken);color:#fff;font-weight:600}
+.btn.dangersolid:hover{filter:brightness(1.08)}
+.cancelrow{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.cancelnote{display:flex;flex-direction:column;gap:3px;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.cancelnote b{font-weight:600}
+#confirmModal{z-index:12}
+#confirmBox h2{font:600 1.32rem var(--f-display);margin:0}
+.cfwhat{display:flex;flex-direction:column;gap:2px;background:var(--court-soft);border-radius:10px;padding:10px 12px}
+.cfwhat span{color:var(--muted);font-size:.85rem}
+#confirmBox .hint{margin:0}
+.cfbtns{display:flex;flex-wrap:wrap;gap:8px}
 .cfoot{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .dayhead.flash{animation:flash 1.4s ease-out}
 @keyframes flash{from{background:var(--court-soft)}to{background:var(--surface)}}
@@ -479,6 +493,7 @@ button{cursor:pointer}
   <p class="hint credit" id="credit">Vremenska prognoza: <a href="https://www.yr.no/" target="_blank" rel="noopener">Yr</a>, Norveški meteorološki institut (MET Norway).</p>
 </div>
 
+<div class="modal" id="confirmModal" hidden><div class="mbox" id="confirmBox" role="alertdialog" aria-modal="true" aria-labelledby="cfTitle" aria-describedby="cfBody"></div></div>
 <div class="modal" id="calModal" hidden><div class="mbox" id="calBox" role="dialog" aria-modal="true" aria-labelledby="calTitle"></div></div>
 <div class="drawer" id="drawer" hidden><div class="panel" id="panel" role="dialog" aria-modal="true"></div></div>
 
@@ -491,7 +506,7 @@ const I18N = {
   hr: {
     locale:'hr-HR',
     prevWeek:'Prethodni tjedan', nextWeek:'Sljedeći tjedan', thisWeek:'Ovaj tjedan', reload:'Osvježi podatke',
-    theme:'Tema', language:'Jezik', calendar:'Kalendar', leagues:'Lige', lg_pair:'Par', lg_P:'O', lg_playedT:'Odigrano', lg_WL:'P-I', lg_wlT:'Pobjede - izgubljeno', lg_sets:'Set', lg_setsT:'Razlika u setovima', lg_games:'Gem', lg_gamesT:'Razlika u gemovima', lg_pts:'Bod', lg_ptsT:'Bodovi', lg_played:'{p} / {n} odigrano', lg_up:'ide gore', lg_down:'ide dolje', lg_legend:'▲ ide u višu grupu · ▼ ide u nižu grupu', lg_none:'Lige će se pojaviti ovdje čim se u rasporedu pojavi ligaška utakmica.', lg_login:'Lige kluba su privatne. Prijavi se da vidiš grupe i tablice.', lg_fail:'Liga se nije mogla učitati.', lg_loading:'Učitavam ligu…', lg_noGroups:'Liga još nema grupa.', lg_emptyGroup:'Još nema parova.', lg_groups:'Grupe', lg_view:'Prikaz lige', lg_view_grid:'Sve grupe', lg_view_list:'Jedna grupa', lg_W:'P', lg_wonT:'Pobjede', lg_D:'N', lg_drawT:'Neriješeno', lg_L:'I', lg_lostT:'Porazi', lg_setsWL:'Setovi', lg_gamesWL:'Gemovi', prevMonth:'Prethodni mjesec', nextMonth:'Sljedeći mjesec', calHint:'Broj = slobodni termini', theme_light:'Svijetla tema', theme_dark:'Tamna tema',
+    theme:'Tema', language:'Jezik', calendar:'Kalendar', cancelBooking:'Otkaži rezervaciju', cancelQ:'Otkazati rezervaciju?', cancelKeep:'Odustani', cancelling:'Otkazujem…', cancelledOk:'Rezervacija je otkazana.', cancelFinal:'Ovo se ne može poništiti. Igrači s liste čekanja dobit će obavijest.', cancelUntil:'Možeš otkazati do {when} ({h} h ranije).', cancelLate:'Rok za otkazivanje je prošao', cancelLateHint:'Otkazivanje je bilo moguće do {when} ({h} h ranije). Za otkazivanje se javi klubu.', cancelOnly:'Otkazati može samo {name}', cancelOnlyHint:'Rezervaciju može otkazati samo onaj tko ju je napravio.', theBooker:'onaj tko je rezervirao', cancelRefused:'Sporty.plus nije otkazao rezervaciju: {msg}', leagues:'Lige', lg_pair:'Par', lg_P:'O', lg_playedT:'Odigrano', lg_WL:'P-I', lg_wlT:'Pobjede - izgubljeno', lg_sets:'Set', lg_setsT:'Razlika u setovima', lg_games:'Gem', lg_gamesT:'Razlika u gemovima', lg_pts:'Bod', lg_ptsT:'Bodovi', lg_played:'{p} / {n} odigrano', lg_up:'ide gore', lg_down:'ide dolje', lg_legend:'▲ ide u višu grupu · ▼ ide u nižu grupu', lg_none:'Lige će se pojaviti ovdje čim se u rasporedu pojavi ligaška utakmica.', lg_login:'Lige kluba su privatne. Prijavi se da vidiš grupe i tablice.', lg_fail:'Liga se nije mogla učitati.', lg_loading:'Učitavam ligu…', lg_noGroups:'Liga još nema grupa.', lg_emptyGroup:'Još nema parova.', lg_groups:'Grupe', lg_view:'Prikaz lige', lg_view_grid:'Sve grupe', lg_view_list:'Jedna grupa', lg_W:'P', lg_wonT:'Pobjede', lg_D:'N', lg_drawT:'Neriješeno', lg_L:'I', lg_lostT:'Porazi', lg_setsWL:'Setovi', lg_gamesWL:'Gemovi', prevMonth:'Prethodni mjesec', nextMonth:'Sljedeći mjesec', calHint:'Broj = slobodni termini', theme_light:'Svijetla tema', theme_dark:'Tamna tema',
     settings:'Postavke', home:'Početna', login:'Prijava', account:'Račun', liveFrom:'uživo sa Sporty.plus',
     schedule:'Raspored', results:'Rezultati', loading:'Učitavanje…', loadingWeek:'Učitavanje tjedna…',
     credit:'Vremenska prognoza: {yr}, Norveški meteorološki institut (MET Norway).',
@@ -505,7 +520,7 @@ const I18N = {
     rainDuring:'<b>Moguća kiša</b> u ovom terminu: {what}{six}.', rainAmount:'oko {mm} mm tijekom {min} minuta', rainSym:'prognoza: {desc}',
     rainSix:' (6-satna prognoza, manje precizna)', altSame:'{court} je slobodan u isto vrijeme.',
     altNear:'{court} je zauzet u {t}. Najbliži slobodan unutarnji termin je u {t2}.', playIndoors:'Igraj unutra u {t}{price}',
-    noIndoor:'Taj dan više nema slobodnih unutarnjih termina.', cancelOutdoor:'Ako prebaciš, otkaži ovu vanjsku rezervaciju u Sporty.plus da teren ne ostane prazan.',
+    noIndoor:'Taj dan više nema slobodnih unutarnjih termina.', cancelOutdoor:'Ako prebaciš, otkaži ovu vanjsku rezervaciju (gumb niže) da teren ne ostane prazan.',
     leagueN:'Liga #{id}', free:'Slobodno', freePrice:'Slobodno · €{p}', leagueMatch:'Ligaška utakmica', yourBooking:'Tvoja rezervacija',
     clubBooking:'Rezervacija kluba', booked:'Zauzeto', yourTeam:'Tvoj tim', teamN:'Tim #{id}',
     allCourts:'Svi tereni', showCourts:'Prikaži terene', freeToday_one:'{n} slobodan termin danas', freeToday_few:'{n} slobodna termina danas',
@@ -565,7 +580,7 @@ const I18N = {
   en: {
     locale:'en-GB',
     prevWeek:'Previous week', nextWeek:'Next week', thisWeek:'This week', reload:'Reload data',
-    theme:'Theme', language:'Language', calendar:'Calendar', leagues:'Leagues', lg_pair:'Pair', lg_P:'P', lg_playedT:'Played', lg_WL:'W-L', lg_wlT:'Won - lost', lg_sets:'Sets', lg_setsT:'Set difference', lg_games:'Games', lg_gamesT:'Game difference', lg_pts:'Pts', lg_ptsT:'Points', lg_played:'{p} / {n} played', lg_up:'moves up', lg_down:'moves down', lg_legend:'▲ moves up a group · ▼ moves down a group', lg_none:'Leagues show up here once a league match appears on the schedule.', lg_login:'The club\'s leagues are private. Log in to see groups and standings.', lg_fail:'Could not load this league.', lg_loading:'Loading league…', lg_noGroups:'This league has no groups yet.', lg_emptyGroup:'No pairs yet.', lg_groups:'Groups', lg_view:'League view', lg_view_grid:'All groups', lg_view_list:'One group', lg_W:'W', lg_wonT:'Won', lg_D:'D', lg_drawT:'Drawn', lg_L:'L', lg_lostT:'Lost', lg_setsWL:'Sets', lg_gamesWL:'Games', prevMonth:'Previous month', nextMonth:'Next month', calHint:'Number = free slots', theme_light:'Light theme', theme_dark:'Dark theme',
+    theme:'Theme', language:'Language', calendar:'Calendar', cancelBooking:'Cancel booking', cancelQ:'Cancel this booking?', cancelKeep:'Keep it', cancelling:'Cancelling…', cancelledOk:'Booking cancelled.', cancelFinal:"This can't be undone. Players on the waiting list will be notified.", cancelUntil:'You can cancel until {when} ({h} h before).', cancelLate:'The cancellation deadline has passed', cancelLateHint:'Cancelling was possible until {when} ({h} h before). Contact the club to cancel.', cancelOnly:'Only {name} can cancel', cancelOnlyHint:'Only the person who made the booking can cancel it.', theBooker:'the person who booked', cancelRefused:'Sporty.plus did not cancel the booking: {msg}', leagues:'Leagues', lg_pair:'Pair', lg_P:'P', lg_playedT:'Played', lg_WL:'W-L', lg_wlT:'Won - lost', lg_sets:'Sets', lg_setsT:'Set difference', lg_games:'Games', lg_gamesT:'Game difference', lg_pts:'Pts', lg_ptsT:'Points', lg_played:'{p} / {n} played', lg_up:'moves up', lg_down:'moves down', lg_legend:'▲ moves up a group · ▼ moves down a group', lg_none:'Leagues show up here once a league match appears on the schedule.', lg_login:'The club\'s leagues are private. Log in to see groups and standings.', lg_fail:'Could not load this league.', lg_loading:'Loading league…', lg_noGroups:'This league has no groups yet.', lg_emptyGroup:'No pairs yet.', lg_groups:'Groups', lg_view:'League view', lg_view_grid:'All groups', lg_view_list:'One group', lg_W:'W', lg_wonT:'Won', lg_D:'D', lg_drawT:'Drawn', lg_L:'L', lg_lostT:'Lost', lg_setsWL:'Sets', lg_gamesWL:'Games', prevMonth:'Previous month', nextMonth:'Next month', calHint:'Number = free slots', theme_light:'Light theme', theme_dark:'Dark theme',
     settings:'Settings', home:'Home', login:'Log in', account:'Account', liveFrom:'live from Sporty.plus',
     schedule:'Schedule', results:'Results', loading:'Loading…', loadingWeek:'Loading week…',
     credit:'Weather forecast from {yr}, delivered by the Norwegian Meteorological Institute (MET Norway).',
@@ -579,7 +594,7 @@ const I18N = {
     rainDuring:'<b>Rain likely</b> during this slot: {what}{six}.', rainAmount:'about {mm} mm over the {min} minutes', rainSym:'{desc} in the forecast',
     rainSix:' (6-hour forecast, so less precise)', altSame:'The {court} is free at the same time.',
     altNear:'The {court} is taken at {t}. The nearest free indoor slot is at {t2}.', playIndoors:'Play indoors at {t}{price}',
-    noIndoor:'No indoor court is free later that day.', cancelOutdoor:"If you switch, cancel this outdoor booking in Sporty.plus so the court isn't left empty.",
+    noIndoor:'No indoor court is free later that day.', cancelOutdoor:"If you switch, cancel this outdoor booking (button below) so the court isn't left empty.",
     leagueN:'League #{id}', free:'Free', freePrice:'Free · €{p}', leagueMatch:'League match', yourBooking:'Your booking',
     clubBooking:'Club booking', booked:'Booked', yourTeam:'Your team', teamN:'Team #{id}',
     allCourts:'All courts', showCourts:'Show courts', freeToday_one:'{n} free slot left today', freeToday_few:'{n} free slots left today',
@@ -695,6 +710,7 @@ async function api(path, body, method){
   if (cfg.token) h.Authorization = cfg.token.startsWith('Bearer') ? cfg.token : 'Bearer '+cfg.token;
   const opt = { headers:h };
   if (body !== undefined) { opt.method = method || 'POST'; h['Content-Type'] = 'application/json'; opt.body = JSON.stringify(body); }
+  else if (method) opt.method = method;
   const r = await fetch(API+path, opt);
   if (!r.ok) {
     let msg = ''; try { const j = await r.json(); msg = j.error || j.message || ''; } catch(_){}
@@ -1661,6 +1677,71 @@ function wireActions(s){
   };
 }
 
+/* ---------- cancelling your own booking ----------
+   Same rules as the official app: only the person who made the booking (the first player) can cancel, and only until
+   the membership's reservation_cancelable hours before the start. Sporty+ checks both again on its side.
+   Request: DELETE /v2/reservation/{id}?sendNotif=true (players on the waiting list get told the court is free). */
+function cancelInfo(s){
+  const me = state.me;
+  if (!cfg.token || !me || !s.booked || !s.id || s.kind === 'league' || !isMine(s) || slotDate(s) <= new Date()) return null;
+  const booker = s.players[0] || {};
+  const isBooker = (booker.id && booker.id === me.id) || (me.team?.id && booker.team_id === me.team.id);
+  const hours = Number(me.membership?.reservation_cancelable);
+  const deadline = Number.isFinite(hours) && hours > 0 ? new Date(slotDate(s).getTime() - hours * 3600e3) : null;
+  return { isBooker, booker, hours, deadline, late: !!(deadline && new Date() > deadline) };
+}
+const shortWhen = d => cap(d.toLocaleDateString(LOC(), { weekday:'short', day:'numeric', month:'numeric' })) + ' ' + d.toLocaleTimeString(LOC(), { hour:'2-digit', minute:'2-digit' });
+function cancelSection(s){
+  const c = cancelInfo(s); if (!c) return '';
+  if (!c.isBooker) return `<div class="cancelnote"><b>${t('cancelOnly', { name: esc(c.booker.display_name || t('theBooker')) })}</b><span class="hint">${t('cancelOnlyHint')}</span></div>`;
+  if (c.late) return `<div class="cancelnote"><b>${t('cancelLate')}</b><span class="hint">${t('cancelLateHint', { when: esc(shortWhen(c.deadline)), h: c.hours })}</span></div>`;
+  return `<div class="cancelrow"><button class="btn danger" id="cancelBtn" type="button" aria-haspopup="dialog">${t('cancelBooking')}</button>${c.deadline ? `<span class="hint">${t('cancelUntil', { when: esc(shortWhen(c.deadline)), h: c.hours })}</span>` : ''}</div>`;
+}
+const confirmModal = document.getElementById('confirmModal'), confirmBox = document.getElementById('confirmBox');
+let confirmReturn = null;
+function closeConfirm(){ confirmModal.hidden = true; confirmReturn?.focus?.(); }
+confirmModal.onclick = e => { if (e.target === confirmModal && !confirmModal.dataset.busy) closeConfirm(); };
+confirmModal.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { e.stopPropagation(); if (!confirmModal.dataset.busy) closeConfirm(); }
+  if (e.key === 'Tab') {   // keep focus inside the popup
+    const f = [...confirmBox.querySelectorAll('button:not([disabled])')], a = f[0], z = f[f.length - 1];
+    if (!f.length) return;
+    if (e.shiftKey && document.activeElement === a) { e.preventDefault(); z.focus(); } else if (!e.shiftKey && document.activeElement === z) { e.preventDefault(); a.focus(); }
+  }
+});
+function wireCancel(s){
+  const b = document.getElementById('cancelBtn'); if (!b) return;
+  b.onclick = () => {
+    const c = cancelInfo(s); if (!c || !c.isBooker || c.late) return openSlot(slotKey(s));
+    confirmReturn = b;
+    confirmBox.innerHTML = `<h2 id="cfTitle">${t('cancelQ')}</h2>
+      <div class="cfwhat"><b>${esc(cap(dateLong(s.date)))} · ${hm(s.start)}–${hm(s.end)}</b><span>${esc(courtLabel(s.court))}${s.players.length ? ' · ' + tn('players', s.players.length) : ''}</span></div>
+      <p class="hint" id="cfBody">${c.deadline ? t('cancelUntil', { when: esc(shortWhen(c.deadline)), h: c.hours }) + ' ' : ''}${t('cancelFinal')}</p>
+      <p class="msg" id="cfMsg" aria-live="polite"></p>
+      <div class="cfbtns"><button class="btn dangersolid" id="cfGo" type="button">${t('cancelBooking')}</button><button class="btn" id="cfNo" type="button">${t('cancelKeep')}</button></div>`;
+    confirmModal.hidden = false; delete confirmModal.dataset.busy;
+    const go = document.getElementById('cfGo'), no = document.getElementById('cfNo'), msg = document.getElementById('cfMsg');
+    no.focus();
+    no.onclick = closeConfirm;
+    go.onclick = async () => {
+      go.disabled = no.disabled = true; go.textContent = t('cancelling'); confirmModal.dataset.busy = '1';
+      msg.className = 'msg'; msg.textContent = '';
+      try {
+        await api(`/v2/reservation/${s.id}?sendNotif=true`, undefined, 'DELETE');
+        msg.className = 'msg ok'; msg.textContent = t('cancelledOk'); go.hidden = no.hidden = true;
+        profileCache.clear();
+        await loadWeek(); render();
+        setTimeout(() => { delete confirmModal.dataset.busy; confirmModal.hidden = true; closeDrawer(); }, 1100);
+      } catch(e) {
+        delete confirmModal.dataset.busy;
+        msg.className = 'msg err';
+        msg.textContent = e.status === 401 ? t('tokenRefusedShort') : t('cancelRefused', { msg: e.apiMessage || e.message });
+        go.disabled = no.disabled = false; go.textContent = t('tryAgain');
+      }
+    };
+  };
+}
+
 function openSlot(key){
   const s = allSlots().find(x=>slotKey(x)===key); if (!s) return;
   navPush('slot', key);
@@ -1695,6 +1776,7 @@ function openSlot(key){
   body += rainPlan(s);
   body += bookingSection(s);
   body += playersEditor(s);
+  body += cancelSection(s);
   body += resultSection(s);
   body += actionsSection(s);
   body += `<p class="hint"><a href="${bookUrl}" target="_blank" rel="noopener">${t('openInSporty')}</a></p>`;
@@ -1706,6 +1788,7 @@ function openSlot(key){
   wireBooking(s);
   wireResult(s);
   wirePlayersEditor(s);
+  wireCancel(s);
   wireActions(s);
   panel.querySelectorAll('[data-alt]').forEach(b => b.onclick = () => openSlot(b.dataset.alt));
   panel.dataset.key = key;
@@ -2124,7 +2207,7 @@ function setLang(l){
 }
 applyStaticText();
 document.addEventListener('keydown', e => {
-  if (!drawer.hidden || !calModal.hidden || e.target.closest('input,textarea')) return;
+  if (!drawer.hidden || !calModal.hidden || !confirmModal.hidden || e.target.closest('input,textarea')) return;
   if (e.key==='ArrowLeft') document.getElementById('prev').click();
   if (e.key==='ArrowRight') document.getElementById('next').click();
 });
