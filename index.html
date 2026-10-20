@@ -338,6 +338,24 @@ button{cursor:pointer}
 #lgBody .hint{margin:0}
 .lchips .chip{max-width:100%}
 .lchips .chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Tvoj put: what your pair needs in its group */
+.mypath{background:var(--surface);border:1px solid color-mix(in srgb,var(--court) 60%,var(--line));border-radius:var(--r-panel);padding:14px 16px;display:flex;flex-direction:column;gap:9px;max-width:560px}
+.mphead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.mphead h3{font:600 1.2rem var(--f-display);margin:0}
+.mypath .lbl{color:var(--muted);font-size:.8rem}
+.mypath .hint{margin:0}
+.mptrio{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:8px;text-align:center}
+.mptrio div{background:color-mix(in srgb,var(--surface) 60%,var(--bg));border-radius:10px;padding:8px 4px;display:flex;flex-direction:column}
+.mptrio b{font:700 1.7rem/1 var(--f-display);font-variant-numeric:tabular-nums}
+.mptrio span{color:var(--muted);font-size:.8rem}
+.mypath .g{color:var(--l3)}.mypath .r{color:var(--taken)}.mypath .n{color:var(--muted)}
+.mpneed{display:grid;grid-template-columns:auto minmax(40px,1fr) auto;gap:8px 10px;align-items:center;font-size:.9rem}
+.mpbar{display:flex;height:7px;border-radius:999px;overflow:hidden;background:var(--line)}
+.mpbar i{display:block}.mpbar i.g{background:var(--l3)}.mpbar i.r{background:var(--taken)}
+.mypath .mppill{font:600 .8rem var(--f-display);border-radius:999px;padding:2px 9px;white-space:nowrap;text-align:center}
+.mypath .mppill.pg{background:var(--free-bg);color:var(--free)}.mypath .mppill.pr{background:var(--taken-soft);color:var(--taken)}
+.mpm{display:flex;justify-content:space-between;gap:10px;border-top:1px solid color-mix(in srgb,var(--line) 60%,transparent);padding-top:6px;font-size:.9rem}
+.mpm small{color:var(--muted)}
 .lghero{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .lghero h2{font:600 1.43rem var(--f-display);margin:0;min-width:0}
 .vsw{flex:none}
@@ -564,7 +582,7 @@ const I18N = {
   hr: {
     locale:'hr-HR',
     prevWeek:'Prethodni tjedan', nextWeek:'Sljedeći tjedan', thisWeek:'Ovaj tjedan', reload:'Osvježi podatke',
-    theme:'Tema', language:'Jezik', calendar:'Kalendar', rating:'Rang', rt_newPair:'novi par', rt_former:'bivši par', rt_showFormer:'Prikaži i bivše parove', rt_pairsNote:'Trenutni parovi su oni u aktualnoj ploči ili, izvan lige, s mečem u zadnjih {d} dana. Novi par kreće od prosjeka ratinga svojih igrača.', pf_currentPair:'Trenutni par', pd_title:'Prognoza', pd_was:'Prognoza prije meča', pd_upset:'Iznenađenje', pd_upsetLine:'{who} pobijedili su uz samo {p}% šanse.', pd_loading:'Računam prognozu…', pd_aria:'{a} {pa}%, {b} {pb}%', rt_title:'Padel Radar rating', rt_yours:'Tvoj rating', rt_rankOf:'{r}. od {n}', rt_thisWeek:'ovaj tjedan', rt_best:'Najviše: {b}', rt_matches_one:'{n} meč', rt_matches_few:'{n} meča', rt_matches_many:'{n} mečeva', rt_provisional:'privremeno · još {n} do ljestvice', rt_around:'Oko tebe', rt_top:'Vrh ljestvice', rt_movers:'Najveći skok tjedna', rt_all:'Cijela ljestvica', rt_mine:'Moj rating', rt_kind:'Igrači ili parovi', rt_players:'Igrači', rt_pairs:'Parovi', rt_search:'Traži po imenu', rt_noneFound:'Nitko s tim imenom.', rt_minNote:'Na ljestvici su igrači i parovi s barem {n} mečeva.', rt_loading:'Računam rating iz svih rezultata kluba…', rt_loadingN:'Učitavam rezultate {d} / {n}… (samo prvi put)', rt_fail:'Rezultati se nisu mogli učitati. Pokušaj ponovno kasnije.', rt_loginHint:'Prijavi se da vidiš svoj rating i gdje si na ljestvici.', rt_noMatches:'Još nemaš upisanih rezultata. Rating kreće od 1500.', rt_upN:'{n} mjesta gore ovaj tjedan', rt_downN:'{n} mjesta dolje ovaj tjedan', rt_chartAria:'Kretanje ratinga kroz mečeve', rt_howQ:'Kako se računa?', rt_how:'Padel Radar rating je Elo za parove, izračunat iz svih {n} rezultata kluba. Snaga para je prosjek njegovih igrača; pobjeda protiv jačeg para donosi više bodova, a poraz od slabijeg oduzima više. Uvjerljiva pobjeda vrijedi malo više od tijesne, a prvih 10 mečeva rating se brže mijenja. Razina lige se računa: svaka ploča ima svoju razinu (A 1700, B1 1600, B2 1550, C1 1500 … E2 1250). Novi igrač kreće od razine ploče u kojoj prvi put igra (inače od 1500), a svaki meč u ploči povuče rating 5% prema razini te ploče. Isti meč upisan dvaput broji se jednom. Na ljestvici si nakon {min} mečeva.', cancelBooking:'Otkaži rezervaciju', cancelQ:'Otkazati rezervaciju?', cancelKeep:'Odustani', cancelling:'Otkazujem…', cancelledOk:'Rezervacija je otkazana.', cancelFinal:'Ovo se ne može poništiti. Igrači s liste čekanja dobit će obavijest.', cancelUntil:'Možeš otkazati do {when} ({h} h ranije).', cancelLate:'Rok za otkazivanje je prošao', cancelLateHint:'Otkazivanje je bilo moguće do {when} ({h} h ranije). Za otkazivanje se javi klubu.', cancelOnly:'Otkazati može samo {name}', cancelOnlyHint:'Rezervaciju može otkazati samo onaj tko ju je napravio.', theBooker:'onaj tko je rezervirao', cancelRefused:'Sporty.plus nije otkazao rezervaciju: {msg}', leagues:'Lige', lg_pair:'Par', lg_P:'O', lg_playedT:'Odigrano', lg_WL:'P-I', lg_wlT:'Pobjede - izgubljeno', lg_sets:'Set', lg_setsT:'Razlika u setovima', lg_games:'Gem', lg_gamesT:'Razlika u gemovima', lg_pts:'Bod', lg_ptsT:'Bodovi', lg_played:'{p} / {n} odigrano', lg_up:'ide gore', lg_down:'ide dolje', lg_legend:'▲ ide u višu grupu · ▼ ide u nižu grupu', lg_none:'Lige će se pojaviti ovdje čim se u rasporedu pojavi ligaška utakmica.', lg_login:'Lige kluba su privatne. Prijavi se da vidiš grupe i tablice.', lg_fail:'Liga se nije mogla učitati.', lg_loading:'Učitavam ligu…', lg_noGroups:'Liga još nema grupa.', lg_emptyGroup:'Još nema parova.', lg_groups:'Grupe', lg_view:'Prikaz lige', lg_view_grid:'Sve grupe', lg_view_list:'Jedna grupa', lg_W:'P', lg_wonT:'Pobjede', lg_D:'N', lg_drawT:'Neriješeno', lg_L:'I', lg_lostT:'Porazi', lg_setsWL:'Setovi', lg_gamesWL:'Gemovi', prevMonth:'Prethodni mjesec', nextMonth:'Sljedeći mjesec', calHint:'Broj = slobodni termini', theme_light:'Svijetla tema', theme_dark:'Tamna tema',
+    theme:'Tema', language:'Jezik', calendar:'Kalendar', rating:'Rang', mp_title:'Tvoj put', mp_now:'{pos}. mjesto · {pts} bod.', mp_first:'1. mjesto', mp_up:'gore', mp_stay:'ostaješ', mp_down:'ispadaš', mp_need:'Što ti treba', mp_winsOf:'{w} od {n}', mp_sureFirst:'sigurno 1. mjesto', mp_sureUp:'sigurno gore', mp_sureStay:'sigurno ostaješ', mp_sureDown:'sigurno ispadaš', mp_left:'Preostali mečevi', mp_vs:'protiv', mp_winChance:'{p}% za pobjedu', mp_doneMine:'Odigrali ste sve svoje mečeve. Još {n} mečeva drugih parova može promijeniti poredak.', mp_doneAll:'Svi mečevi u grupi su odigrani.', mp_note:'Bodovi kao u Sporty+: 1 za odigrani meč, 1 za pobjedu i 1 za svaki osvojeni set. Kod jednakih bodova odlučuje razlika setova, pa gemova. Šanse po Padel Radar ratingu.', rt_newPair:'novi par', rt_former:'bivši par', rt_showFormer:'Prikaži i bivše parove', rt_pairsNote:'Trenutni parovi su oni u aktualnoj ploči ili, izvan lige, s mečem u zadnjih {d} dana. Novi par kreće od prosjeka ratinga svojih igrača.', pf_currentPair:'Trenutni par', pd_title:'Prognoza', pd_was:'Prognoza prije meča', pd_upset:'Iznenađenje', pd_upsetLine:'{who} pobijedili su uz samo {p}% šanse.', pd_loading:'Računam prognozu…', pd_aria:'{a} {pa}%, {b} {pb}%', rt_title:'Padel Radar rating', rt_yours:'Tvoj rating', rt_rankOf:'{r}. od {n}', rt_thisWeek:'ovaj tjedan', rt_best:'Najviše: {b}', rt_matches_one:'{n} meč', rt_matches_few:'{n} meča', rt_matches_many:'{n} mečeva', rt_provisional:'privremeno · još {n} do ljestvice', rt_around:'Oko tebe', rt_top:'Vrh ljestvice', rt_movers:'Najveći skok tjedna', rt_all:'Cijela ljestvica', rt_mine:'Moj rating', rt_kind:'Igrači ili parovi', rt_players:'Igrači', rt_pairs:'Parovi', rt_search:'Traži po imenu', rt_noneFound:'Nitko s tim imenom.', rt_minNote:'Na ljestvici su igrači i parovi s barem {n} mečeva.', rt_loading:'Računam rating iz svih rezultata kluba…', rt_loadingN:'Učitavam rezultate {d} / {n}… (samo prvi put)', rt_fail:'Rezultati se nisu mogli učitati. Pokušaj ponovno kasnije.', rt_loginHint:'Prijavi se da vidiš svoj rating i gdje si na ljestvici.', rt_noMatches:'Još nemaš upisanih rezultata. Rating kreće od 1500.', rt_upN:'{n} mjesta gore ovaj tjedan', rt_downN:'{n} mjesta dolje ovaj tjedan', rt_chartAria:'Kretanje ratinga kroz mečeve', rt_howQ:'Kako se računa?', rt_how:'Padel Radar rating je Elo za parove, izračunat iz svih {n} rezultata kluba. Snaga para je prosjek njegovih igrača; pobjeda protiv jačeg para donosi više bodova, a poraz od slabijeg oduzima više. Uvjerljiva pobjeda vrijedi malo više od tijesne, a prvih 10 mečeva rating se brže mijenja. Razina lige se računa: svaka ploča ima svoju razinu (A 1700, B1 1600, B2 1550, C1 1500 … E2 1250). Novi igrač kreće od razine ploče u kojoj prvi put igra (inače od 1500), a svaki meč u ploči povuče rating 5% prema razini te ploče. Isti meč upisan dvaput broji se jednom. Na ljestvici si nakon {min} mečeva.', cancelBooking:'Otkaži rezervaciju', cancelQ:'Otkazati rezervaciju?', cancelKeep:'Odustani', cancelling:'Otkazujem…', cancelledOk:'Rezervacija je otkazana.', cancelFinal:'Ovo se ne može poništiti. Igrači s liste čekanja dobit će obavijest.', cancelUntil:'Možeš otkazati do {when} ({h} h ranije).', cancelLate:'Rok za otkazivanje je prošao', cancelLateHint:'Otkazivanje je bilo moguće do {when} ({h} h ranije). Za otkazivanje se javi klubu.', cancelOnly:'Otkazati može samo {name}', cancelOnlyHint:'Rezervaciju može otkazati samo onaj tko ju je napravio.', theBooker:'onaj tko je rezervirao', cancelRefused:'Sporty.plus nije otkazao rezervaciju: {msg}', leagues:'Lige', lg_pair:'Par', lg_P:'O', lg_playedT:'Odigrano', lg_WL:'P-I', lg_wlT:'Pobjede - izgubljeno', lg_sets:'Set', lg_setsT:'Razlika u setovima', lg_games:'Gem', lg_gamesT:'Razlika u gemovima', lg_pts:'Bod', lg_ptsT:'Bodovi', lg_played:'{p} / {n} odigrano', lg_up:'ide gore', lg_down:'ide dolje', lg_legend:'▲ ide u višu grupu · ▼ ide u nižu grupu', lg_none:'Lige će se pojaviti ovdje čim se u rasporedu pojavi ligaška utakmica.', lg_login:'Lige kluba su privatne. Prijavi se da vidiš grupe i tablice.', lg_fail:'Liga se nije mogla učitati.', lg_loading:'Učitavam ligu…', lg_noGroups:'Liga još nema grupa.', lg_emptyGroup:'Još nema parova.', lg_groups:'Grupe', lg_view:'Prikaz lige', lg_view_grid:'Sve grupe', lg_view_list:'Jedna grupa', lg_W:'P', lg_wonT:'Pobjede', lg_D:'N', lg_drawT:'Neriješeno', lg_L:'I', lg_lostT:'Porazi', lg_setsWL:'Setovi', lg_gamesWL:'Gemovi', prevMonth:'Prethodni mjesec', nextMonth:'Sljedeći mjesec', calHint:'Broj = slobodni termini', theme_light:'Svijetla tema', theme_dark:'Tamna tema',
     settings:'Postavke', home:'Početna', login:'Prijava', account:'Račun', liveFrom:'uživo sa Sporty.plus',
     schedule:'Raspored', results:'Rezultati', loading:'Učitavanje…', loadingWeek:'Učitavanje tjedna…',
     credit:'Vremenska prognoza: {yr}, Norveški meteorološki institut (MET Norway).',
@@ -638,7 +656,7 @@ const I18N = {
   en: {
     locale:'en-GB',
     prevWeek:'Previous week', nextWeek:'Next week', thisWeek:'This week', reload:'Reload data',
-    theme:'Theme', language:'Language', calendar:'Calendar', rating:'Rating', rt_newPair:'new pair', rt_former:'former pair', rt_showFormer:'Show former pairs too', rt_pairsNote:'Current pairs are those in the current Ploča round or, outside the league, with a match in the last {d} days. A new pair starts from the average rating of its players.', pf_currentPair:'Current pair', pd_title:'Prediction', pd_was:'Prediction before the match', pd_upset:'Upset', pd_upsetLine:'{who} won with only a {p}% chance.', pd_loading:'Working out the prediction…', pd_aria:'{a} {pa}%, {b} {pb}%', rt_title:'Padel Radar rating', rt_yours:'Your rating', rt_rankOf:'{r} of {n}', rt_thisWeek:'this week', rt_best:'Best: {b}', rt_matches_one:'{n} match', rt_matches_few:'{n} matches', rt_matches_many:'{n} matches', rt_provisional:'provisional · {n} more to be ranked', rt_around:'Around you', rt_top:'Top of the table', rt_movers:'Biggest climbers this week', rt_all:'Full leaderboard', rt_mine:'My rating', rt_kind:'Players or pairs', rt_players:'Players', rt_pairs:'Pairs', rt_search:'Search by name', rt_noneFound:'Nobody by that name.', rt_minNote:'Players and pairs with at least {n} matches are ranked.', rt_loading:'Calculating ratings from all club results…', rt_loadingN:'Loading results {d} / {n}… (first time only)', rt_fail:'Could not load results. Try again later.', rt_loginHint:'Log in to see your rating and where you stand.', rt_noMatches:'No results recorded for you yet. Ratings start at 1500.', rt_upN:'Up {n} places this week', rt_downN:'Down {n} places this week', rt_chartAria:'Rating over your matches', rt_howQ:'How is it calculated?', rt_how:'The Padel Radar rating is an Elo rating for doubles, calculated from all {n} club results. A pair is as strong as the average of its players; beating a stronger pair earns more, losing to a weaker one costs more. A clear win counts a little more than a close one, and ratings move faster during the first 10 matches. League level counts: each Ploča group has a level (A 1700, B1 1600, B2 1550, C1 1500 … E2 1250). New players start at the level of the group they first play in (otherwise 1500), and every Ploča match pulls the rating 5% towards that group\'s level. A match stored twice counts once. You appear on the leaderboard after {min} matches.', cancelBooking:'Cancel booking', cancelQ:'Cancel this booking?', cancelKeep:'Keep it', cancelling:'Cancelling…', cancelledOk:'Booking cancelled.', cancelFinal:"This can't be undone. Players on the waiting list will be notified.", cancelUntil:'You can cancel until {when} ({h} h before).', cancelLate:'The cancellation deadline has passed', cancelLateHint:'Cancelling was possible until {when} ({h} h before). Contact the club to cancel.', cancelOnly:'Only {name} can cancel', cancelOnlyHint:'Only the person who made the booking can cancel it.', theBooker:'the person who booked', cancelRefused:'Sporty.plus did not cancel the booking: {msg}', leagues:'Leagues', lg_pair:'Pair', lg_P:'P', lg_playedT:'Played', lg_WL:'W-L', lg_wlT:'Won - lost', lg_sets:'Sets', lg_setsT:'Set difference', lg_games:'Games', lg_gamesT:'Game difference', lg_pts:'Pts', lg_ptsT:'Points', lg_played:'{p} / {n} played', lg_up:'moves up', lg_down:'moves down', lg_legend:'▲ moves up a group · ▼ moves down a group', lg_none:'Leagues show up here once a league match appears on the schedule.', lg_login:'The club\'s leagues are private. Log in to see groups and standings.', lg_fail:'Could not load this league.', lg_loading:'Loading league…', lg_noGroups:'This league has no groups yet.', lg_emptyGroup:'No pairs yet.', lg_groups:'Groups', lg_view:'League view', lg_view_grid:'All groups', lg_view_list:'One group', lg_W:'W', lg_wonT:'Won', lg_D:'D', lg_drawT:'Drawn', lg_L:'L', lg_lostT:'Lost', lg_setsWL:'Sets', lg_gamesWL:'Games', prevMonth:'Previous month', nextMonth:'Next month', calHint:'Number = free slots', theme_light:'Light theme', theme_dark:'Dark theme',
+    theme:'Theme', language:'Language', calendar:'Calendar', rating:'Rating', mp_title:'Your path', mp_now:'{pos}. place · {pts} pts', mp_first:'1st place', mp_up:'up', mp_stay:'stay', mp_down:'drop', mp_need:'What you need', mp_winsOf:'{w} of {n}', mp_sureFirst:'1st for sure', mp_sureUp:'up for sure', mp_sureStay:'safe for sure', mp_sureDown:'down for sure', mp_left:'Matches left', mp_vs:'vs', mp_winChance:'{p}% to win', mp_doneMine:"You've played all your matches. {n} matches between other pairs can still change the table.", mp_doneAll:'Every match in the group has been played.', mp_note:'Points as in Sporty+: 1 for playing, 1 for a win and 1 for every set won. Level on points: set difference, then game difference. Chances from the Padel Radar rating.', rt_newPair:'new pair', rt_former:'former pair', rt_showFormer:'Show former pairs too', rt_pairsNote:'Current pairs are those in the current Ploča round or, outside the league, with a match in the last {d} days. A new pair starts from the average rating of its players.', pf_currentPair:'Current pair', pd_title:'Prediction', pd_was:'Prediction before the match', pd_upset:'Upset', pd_upsetLine:'{who} won with only a {p}% chance.', pd_loading:'Working out the prediction…', pd_aria:'{a} {pa}%, {b} {pb}%', rt_title:'Padel Radar rating', rt_yours:'Your rating', rt_rankOf:'{r} of {n}', rt_thisWeek:'this week', rt_best:'Best: {b}', rt_matches_one:'{n} match', rt_matches_few:'{n} matches', rt_matches_many:'{n} matches', rt_provisional:'provisional · {n} more to be ranked', rt_around:'Around you', rt_top:'Top of the table', rt_movers:'Biggest climbers this week', rt_all:'Full leaderboard', rt_mine:'My rating', rt_kind:'Players or pairs', rt_players:'Players', rt_pairs:'Pairs', rt_search:'Search by name', rt_noneFound:'Nobody by that name.', rt_minNote:'Players and pairs with at least {n} matches are ranked.', rt_loading:'Calculating ratings from all club results…', rt_loadingN:'Loading results {d} / {n}… (first time only)', rt_fail:'Could not load results. Try again later.', rt_loginHint:'Log in to see your rating and where you stand.', rt_noMatches:'No results recorded for you yet. Ratings start at 1500.', rt_upN:'Up {n} places this week', rt_downN:'Down {n} places this week', rt_chartAria:'Rating over your matches', rt_howQ:'How is it calculated?', rt_how:'The Padel Radar rating is an Elo rating for doubles, calculated from all {n} club results. A pair is as strong as the average of its players; beating a stronger pair earns more, losing to a weaker one costs more. A clear win counts a little more than a close one, and ratings move faster during the first 10 matches. League level counts: each Ploča group has a level (A 1700, B1 1600, B2 1550, C1 1500 … E2 1250). New players start at the level of the group they first play in (otherwise 1500), and every Ploča match pulls the rating 5% towards that group\'s level. A match stored twice counts once. You appear on the leaderboard after {min} matches.', cancelBooking:'Cancel booking', cancelQ:'Cancel this booking?', cancelKeep:'Keep it', cancelling:'Cancelling…', cancelledOk:'Booking cancelled.', cancelFinal:"This can't be undone. Players on the waiting list will be notified.", cancelUntil:'You can cancel until {when} ({h} h before).', cancelLate:'The cancellation deadline has passed', cancelLateHint:'Cancelling was possible until {when} ({h} h before). Contact the club to cancel.', cancelOnly:'Only {name} can cancel', cancelOnlyHint:'Only the person who made the booking can cancel it.', theBooker:'the person who booked', cancelRefused:'Sporty.plus did not cancel the booking: {msg}', leagues:'Leagues', lg_pair:'Pair', lg_P:'P', lg_playedT:'Played', lg_WL:'W-L', lg_wlT:'Won - lost', lg_sets:'Sets', lg_setsT:'Set difference', lg_games:'Games', lg_gamesT:'Game difference', lg_pts:'Pts', lg_ptsT:'Points', lg_played:'{p} / {n} played', lg_up:'moves up', lg_down:'moves down', lg_legend:'▲ moves up a group · ▼ moves down a group', lg_none:'Leagues show up here once a league match appears on the schedule.', lg_login:'The club\'s leagues are private. Log in to see groups and standings.', lg_fail:'Could not load this league.', lg_loading:'Loading league…', lg_noGroups:'This league has no groups yet.', lg_emptyGroup:'No pairs yet.', lg_groups:'Groups', lg_view:'League view', lg_view_grid:'All groups', lg_view_list:'One group', lg_W:'W', lg_wonT:'Won', lg_D:'D', lg_drawT:'Drawn', lg_L:'L', lg_lostT:'Lost', lg_setsWL:'Sets', lg_gamesWL:'Games', prevMonth:'Previous month', nextMonth:'Next month', calHint:'Number = free slots', theme_light:'Light theme', theme_dark:'Dark theme',
     settings:'Settings', home:'Home', login:'Log in', account:'Account', liveFrom:'live from Sporty.plus',
     schedule:'Schedule', results:'Results', loading:'Loading…', loadingWeek:'Loading week…',
     credit:'Weather forecast from {yr}, delivered by the Norwegian Meteorological Institute (MET Norway).',
@@ -987,6 +1005,90 @@ const LG_ICONS = {
   grid: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
   list: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="6" height="16" rx="1"/><path d="M13 6h8M13 10h8M13 14h8M13 18h8"/></svg>'
 };
+/* ---------- "Tvoj put": what your pair needs in its league group ----------
+   The group (public /v2/league_group/{id}) gives the pairs, their points, sets and games, and how many move up/down.
+   Points follow Modesto's rule, checked on every pair of a whole round: 1 per match played + 1 per win + 1 per set
+   won. Ties: set difference, then game difference (our assumption; Sporty+ doesn't say). Remaining matches = every
+   pairing the group still owes (round robin × rounds) minus the results we have. Each remaining match can end 2-0 or
+   2-1 either way (30% of league matches go to a third set), weighted by the Padel Radar win chance; up to 8 matches
+   are enumerated exactly, more are sampled. */
+const MP_THREE = 0.3, MP_EXACT = 8, MP_SAMPLES = 20000;
+const groupCache = new Map();   // id -> { at, g }
+async function loadGroup(id){
+  const c = groupCache.get(id); if (c && Date.now() - c.at < FRESH_PROFILE) return c.g;
+  const r = await api(`/v2/league_group/${id}`), g = r.data || r; groupCache.set(id, { at: Date.now(), g }); return g;
+}
+// Your pair's group: the current Ploča round, else (another league) the group of its latest league match.
+function myGroupId(){
+  const pair = state.me && state.rating?.pairOf.get(state.me.id);
+  return pair ? (pair.groupId || (pair.last >= Date.now() - RT_ACTIVE_DAYS*864e5 ? pair.lastLg : null)) : null;
+}
+function pathScenarios(g, history, myTeam){
+  const teams = (g.players || []).map(p => { const s = g.stats?.[p.id] || {};
+    return { id: p.id, name: p.display_name, pts: s.score ?? 0, sd: (s.sets?.wins||0) - (s.sets?.losses||0), gd: (s.points?.wins||0) - (s.points?.losses||0) }; });
+  const n = teams.length, pairsN = n * (n - 1) / 2, rounds = Math.max(1, Math.round(Number(g.total_number_of_games || pairsN) / (pairsN || 1)));
+  const key = (a, b) => [a, b].sort((x, y) => x - y).join('-'), done = new Map();
+  for (const r of history) if (r.lg === g.id && r.a && r.b) done.set(key(r.a.t, r.b.t), (done.get(key(r.a.t, r.b.t)) || 0) + 1);
+  const rem = [];
+  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
+    const a = teams[i], b = teams[j], left = rounds - (done.get(key(a.id, b.id)) || 0);
+    const ra = sideStrength(a.id) ?? RT_START, rb = sideStrength(b.id) ?? RT_START;
+    for (let k = 0; k < left; k++) rem.push({ a, b, p: 1 / (1 + Math.pow(10, (rb - ra) / 400)) });
+  }
+  const up = Math.max(0, Number(g.move_up) || 0), down = Math.max(0, Number(g.move_down) || 0);
+  const mine = rem.filter(m => m.a.id === myTeam || m.b.id === myTeam);
+  const outs = [[2, 0, 1 - MP_THREE], [2, 1, MP_THREE], [1, 2, MP_THREE], [0, 2, 1 - MP_THREE]];
+  const tally = { up: 0, down: 0, total: 0 }, byWins = mine.map(() => null).concat(null).map(() => ({ p: 0, up: 0, down: 0 }));
+  const play = (pick, weight) => {
+    const st = new Map(teams.map(x => [x.id, { ...x }])); let wins = 0;
+    rem.forEach((m, i) => { const [sa, sb] = outs[pick(i, m)], aw = sa > sb, A = st.get(m.a.id), B = st.get(m.b.id);
+      A.pts += 1 + (aw ? 1 : 0) + sa; B.pts += 1 + (aw ? 0 : 1) + sb; A.sd += sa - sb; B.sd += sb - sa;
+      if ((m.a.id === myTeam && aw) || (m.b.id === myTeam && !aw)) wins++; });
+    const order = [...st.values()].sort((x, y) => y.pts - x.pts || y.sd - x.sd || y.gd - x.gd), pos = order.findIndex(x => x.id === myTeam);
+    const isUp = pos < up, isDown = pos >= n - down;
+    tally.total += weight; if (isUp) tally.up += weight; if (isDown) tally.down += weight;
+    const b = byWins[wins]; b.p += weight; if (isUp) b.up += weight; if (isDown) b.down += weight;
+  };
+  const exact = rem.length <= MP_EXACT;
+  if (exact) for (let c = 0; c < 4 ** rem.length; c++) {
+    let w = 1, x = c; const picks = rem.map(m => { const o = x % 4; x = Math.floor(x / 4); w *= (o < 2 ? m.p : 1 - m.p) * outs[o][2]; return o; });
+    play(i => picks[i], w);
+  } else for (let s = 0; s < MP_SAMPLES; s++) play((i, m) => { const aw = Math.random() < m.p, three = Math.random() < MP_THREE; return aw ? (three ? 1 : 0) : (three ? 2 : 3); }, 1);
+  const me = teams.find(x => x.id === myTeam), pos = [...teams].sort((x, y) => y.pts - x.pts || y.sd - x.sd || y.gd - x.gd).findIndex(x => x.id === myTeam) + 1;
+  return { g, me, pos, n, up, down, exact, rem, mine, pUp: tally.up / tally.total, pDown: tally.down / tally.total,
+    byWins: byWins.map((b, w) => ({ w, ...b })).filter(b => b.p > 0).reverse() };
+}
+async function renderMyPath(){
+  const el = document.getElementById('lgMine'); if (!el) return;
+  if (!cfg.token || !state.me) { el.innerHTML = ''; return; }
+  try { await loadRatings(); } catch(e) { el.innerHTML = ''; return; }
+  const gid = myGroupId(), pair = state.rating.pairOf.get(state.me.id);
+  if (!gid || !pair) { el.innerHTML = ''; return; }
+  let s;
+  try { s = pathScenarios(await loadGroup(gid), store.get(HISTORY_KEY(), {}).list || [], pair.id); } catch(e) { el.innerHTML = ''; return; }
+  if (!document.getElementById('lgMine') || !s.me) return;
+  const top = Number(s.g.order) <= 1 || ladderLevel(s.g.name) === 0, pct = p => Math.round(p * 100) + '%';
+  const sure = p => s.exact && (p === 0 || p >= 0.9995);
+  const stayP = top ? 1 - s.pDown : 1 - s.pUp - s.pDown;   // in the top group, finishing first is also staying
+  const trio = `<div class="mptrio">${s.up ? `<div><b class="${s.pUp >= .5 ? 'g' : 'n'}">${pct(s.pUp)}</b><span>${top ? t('mp_first') : t('mp_up')}</span></div>` : ''}
+    <div><b class="g">${pct(stayP)}</b><span>${t('mp_stay')}</span></div>${s.down ? `<div><b class="${s.pDown >= .5 ? 'r' : 'n'}">${pct(s.pDown)}</b><span>${t('mp_down')}</span></div>` : ''}</div>`;
+  const line = b => {
+    const pd = b.down / b.p, pu = b.up / b.p, safe = 1 - pd;
+    const pill = sure(pu) && pu >= .9995 ? `<span class="mppill pg">${top ? t('mp_sureFirst') : t('mp_sureUp')}</span>`
+      : sure(pd) && pd === 0 ? `<span class="mppill pg">${t('mp_sureStay')}${s.up && pu > .005 ? ' · ' + pct(pu) + ' ' + (top ? t('mp_first') : t('mp_up')) : ''}</span>`
+      : sure(pd) && pd >= .9995 ? `<span class="mppill pr">${t('mp_sureDown')}</span>`
+      : pd >= .5 ? `<span class="mppill pr">${pct(pd)} ${t('mp_down')}</span>` : `<span class="mppill pg">${pct(safe)} ${t('mp_stay')}</span>`;
+    return `<span>${t('mp_winsOf', { w: b.w, n: s.mine.length })}</span><span class="mpbar"><i class="g" style="width:${safe*100}%"></i><i class="r" style="width:${pd*100}%"></i></span>${pill}`;
+  };
+  const opp = m => m.a.id === pair.id ? m.b : m.a, myP = m => m.a.id === pair.id ? m.p : 1 - m.p;
+  const when = m => { const sl = allSlots().find(x => x.kind === 'league' && x.teamIds?.includes(m.a.id) && x.teamIds?.includes(m.b.id) && slotEnd(x) >= new Date()); return sl ? ` · ${dayShort(sl.date)} ${hm(sl.start)}` : ''; };
+  el.innerHTML = `<section class="mypath"><div class="mphead"><h3>${t('mp_title')} · ${esc(String(s.g.name).trim())}</h3><span class="hint">${t('mp_now', { pos: s.pos, pts: s.me.pts })}</span></div>
+    ${s.mine.length ? trio + `<span class="lbl">${t('mp_need')}</span><div class="mpneed">${s.byWins.map(line).join('')}</div>
+      <span class="lbl">${t('mp_left')}</span>${s.mine.map(m => `<div class="mpm"><span>${t('mp_vs')} ${esc(opp(m).name || '—')}<small>${when(m)}</small></span><span>${t('mp_winChance', { p: Math.round(myP(m) * 100) })}</span></div>`).join('')}`
+      : (s.rem.length ? trio + `<p class="hint">${t('mp_doneMine', { n: s.rem.length })}</p>` : `<p class="hint">${t('mp_doneAll')}</p>`)}
+    <p class="hint">${t('mp_note')}</p></section>`;
+}
+
 let leaguesSeq = 0;
 async function renderLeagues(){
   const el = document.getElementById('leaguesView'), ids = knownLeagues(), seq = ++leaguesSeq;
@@ -994,7 +1096,8 @@ async function renderLeagues(){
   let sel = Number(store.get('league', 0)); if (!ids.includes(sel)) sel = ids[0];
   const chips = ids.length > 1 ? `<div class="filters lchips" role="group" aria-label="${t('leagues')}">${ids.map(id => `<button type="button" class="chip" data-league="${id}" aria-pressed="${id===sel}" style="--c:${leagueColor(id)}"><i></i><span>${esc(leagueName(id))}</span></button>`).join('')}</div>` : '';
   const c = standingsCache.get(sel);
-  el.innerHTML = chips + `<div id="lgBody">${c ? '' : `<p class="empty">${t('lg_loading')}</p>`}</div>`;
+  el.innerHTML = `<div id="lgMine"></div>` + chips + `<div id="lgBody">${c ? '' : `<p class="empty">${t('lg_loading')}</p>`}</div>`;
+  renderMyPath();
   el.querySelectorAll('[data-league]').forEach(b => b.onclick = () => { store.set('league', Number(b.dataset.league)); renderLeagues(); });
   const draw = res => {
     const body = document.getElementById('lgBody'); if (!body || seq !== leaguesSeq) return;
@@ -2124,7 +2227,7 @@ let historyPromise = null;
 const HISTORY_KEY = () => 'history3.' + cfg.club, LEVELS_KEY = () => 'lgLevels.' + cfg.club;
 async function loadHistory(onProgress){
   const key = HISTORY_KEY(), saved = store.get(key, null);
-  try { ['history.', 'history2.'].forEach(k => localStorage.removeItem('pw.' + k + cfg.club)); } catch(e) {}   // older formats
+  try { ['history.', 'history2.', 'roster.'].forEach(k => localStorage.removeItem('pw.' + k + cfg.club)); } catch(e) {}   // older formats
   let list = saved?.list || [], at = saved?.at || 0;
   const page = p => api(`/v2/result?filter[club]=${cfg.club}&limit=100&page=${p}`);
   if (!list.length || Date.now() - at > RT_FULL_MS) {
@@ -2158,7 +2261,7 @@ async function loadLevels(list){
 }
 // Pairs in the current Ploča round. Group ids are global (other clubs' groups sit next to ours), so start at the newest
 // Ploča group we have results for and walk to the neighbouring ids only while they are Ploča groups with the next order.
-const ROSTER_KEY = () => 'roster.' + cfg.club, RT_ACTIVE_DAYS = 45;
+const ROSTER_KEY = () => 'roster2.' + cfg.club, RT_ACTIVE_DAYS = 45;   // team id -> { name, id } of its group
 async function loadRoster(list, levels){
   const ids = list.map(r => r.lg).filter(id => id && levels[id] != null);
   if (!ids.length) return {};
@@ -2174,7 +2277,7 @@ async function loadRoster(list, levels){
     }
   }
   const roster = {};
-  for (const g of groups) for (const p of g.players || []) roster[p.id] = String(g.name).trim();
+  for (const g of groups) for (const p of g.players || []) roster[p.id] = { name: String(g.name).trim(), id: g.id };
   try { store.set(ROSTER_KEY(), roster); } catch(e) {}
   return roster;
 }
@@ -2202,7 +2305,7 @@ function computeRatings(list, levels = {}, roster = {}){
     if (lv !== null) for (const x of [...A, ...B]) if (!x.n) x.r = x.best = rtPar(lv);   // newcomer: start at the group's level
     const avg = xs => xs.reduce((s, x) => s + x.r, 0) / xs.length;
     if (pairs) [[pairs[0], A], [pairs[1], B]].forEach(([tp, xs]) => { if (!tp.n) tp.r = tp.best = avg(xs); });   // a new pair starts from its players
-    for (const x of [...A, ...B, ...(pairs || [])]) { x.last = when; x.lastLadder = lv !== null; }
+    for (const x of [...A, ...B, ...(pairs || [])]) { x.last = when; x.lastLadder = lv !== null; if (r.lg) x.lastLg = r.lg; }
     const ea = 1 / (1 + Math.pow(10, (avg(B) - avg(A)) / 400)), sa = r.w === 0 ? 1 : 0;
     if (r.g) {   // the chance we'd have shown before this match: pair rating once established, else the players' average
       const str = (tp, xs) => tp && tp.n >= RT_MIN ? tp.r : avg(xs);
@@ -2234,7 +2337,7 @@ function computeRatings(list, levels = {}, roster = {}){
   // Current pairs: in the current Ploča round; or, for pairs outside the league, a match in the last RT_ACTIVE_DAYS days.
   // A pair whose last match was in an earlier Ploča round has left the league.
   const recent = Date.now() - RT_ACTIVE_DAYS * 864e5, inRoster = Object.keys(roster).length > 0;
-  for (const x of T.values()) { x.group = roster[x.id] || null; x.current = !!x.group || (!(inRoster && x.lastLadder) && x.last >= recent); }
+  for (const x of T.values()) { const ro = roster[x.id]; x.group = ro?.name || null; x.groupId = ro?.id || null; x.current = !!x.group || (!(inRoster && x.lastLadder) && x.last >= recent); }
   const currentPairs = [...T.values()].filter(x => x.current).sort((a, b) => b.r - a.r);
   currentPairs.forEach((x, i) => x.crank = i + 1);
   currentPairs.filter(x => x.n > x.played7).sort((a, b) => (b.r - b.weekDelta) - (a.r - a.weekDelta)).forEach((x, i) => x.crankBefore = i + 1);
