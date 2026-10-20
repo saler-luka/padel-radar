@@ -286,6 +286,44 @@ button{cursor:pointer}
 
 /* Results */
 .results{display:flex;flex-direction:column;gap:18px}
+/* Rating tab */
+.rating{display:flex;flex-direction:column;gap:14px;max-width:720px}
+.rtcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-panel);padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.rtcard .btn{align-self:flex-start}
+.rtrow{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.rating .lbl,.rtprof .lbl{color:var(--muted);font-size:.85rem}
+.rating .big,.rtprof .big{font:700 2.6rem/1 var(--f-display);font-variant-numeric:tabular-nums}
+.rtcard .wk{font-size:.9rem}
+.rtchart{width:100%;height:70px;display:block}
+.rtchart .ln{fill:none;stroke:var(--court);stroke-width:2.2;vector-effect:non-scaling-stroke}
+.rtchart .base{stroke:var(--line);stroke-dasharray:4 4;vector-effect:non-scaling-stroke}
+.rtchart .dot{fill:var(--court)}
+:is(.rating,.rtprof) :is(.up){color:var(--l3)}:is(.rating,.rtprof) :is(.dn){color:var(--taken)}:is(.rating,.rtprof) :is(.eq){color:var(--muted)}
+.rtsec h3{font:500 1.1rem var(--f-display);margin:0 0 6px;color:var(--muted)}
+.rtlist{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-panel);overflow:hidden}
+.rtlist li{display:grid;grid-template-columns:2.2em 2.4em minmax(0,1fr) auto auto auto;gap:8px;align-items:center;padding:8px 12px;border-top:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
+.rtlist li:first-child{border-top:0}
+.rtlist li.me{background:var(--court-soft);box-shadow:inset 3px 0 0 var(--court)}
+.rtlist li.empty{display:block;color:var(--muted)}
+.rtlist .rk{font:400 .8rem var(--f-mono);color:var(--muted);text-align:right}
+.rtlist .mv{font-size:.72rem}
+.rtlist .nm{min-width:0;display:flex;flex-direction:column}
+.rtlist .nm .plink,.rtlist .nm>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
+.rtlist .nm small{color:var(--muted);font-size:.75rem}
+.rtlist .fm{display:flex;gap:3px}
+.rtlist .fm i{width:7px;height:7px;border-radius:50%}
+.rtlist .fm i.w{background:var(--l3)}.rtlist .fm i.l{background:var(--taken)}
+.rtlist em{font-style:normal;font-size:.8rem}
+.rtlist b{font:600 1.15rem var(--f-display);font-variant-numeric:tabular-nums;text-align:right;min-width:3.2em}
+.rtall{align-self:flex-start}
+.rthead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.rthead .seg{display:inline-flex;width:auto}
+.rtsearch{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px}
+.rthow summary{cursor:pointer;color:var(--muted);font-size:.85rem}
+.rthow p{color:var(--muted);font-size:.85rem;margin:6px 0 0}
+.rtprof{display:flex;flex-direction:column;gap:4px}
+@media (max-width:420px){.rtlist .fm{display:none}.rtlist li{grid-template-columns:2em 2.2em minmax(0,1fr) auto auto;padding-inline:10px}}
+@media (max-width:420px){.tabs .caltab span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}}
 /* Leagues: one standings card per group */
 .leagues{display:flex;flex-direction:column;gap:14px}
 #lgBody{display:flex;flex-direction:column;gap:14px}
@@ -477,6 +515,7 @@ button{cursor:pointer}
     <button role="tab" id="tabResults" aria-selected="false" data-i18n="results">Rezultati</button>
     <button role="tab" id="tabLeagues" aria-selected="false" data-i18n="leagues">Lige</button>
     <button type="button" id="tabCal" class="caltab" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span data-i18n="calendar">Kalendar</span></button>
+    <button role="tab" id="tabRating" aria-selected="false" data-i18n="rating">Rang</button>
   </div>
 
   <section id="weekView" class="wrap" style="gap:12px">
@@ -490,6 +529,7 @@ button{cursor:pointer}
 
   <section id="resultsView" class="results" hidden></section>
   <section id="leaguesView" class="leagues" hidden></section>
+  <section id="ratingView" class="rating" hidden></section>
   <p class="hint credit" id="credit">Vremenska prognoza: <a href="https://www.yr.no/" target="_blank" rel="noopener">Yr</a>, Norveški meteorološki institut (MET Norway).</p>
 </div>
 
@@ -506,7 +546,7 @@ const I18N = {
   hr: {
     locale:'hr-HR',
     prevWeek:'Prethodni tjedan', nextWeek:'Sljedeći tjedan', thisWeek:'Ovaj tjedan', reload:'Osvježi podatke',
-    theme:'Tema', language:'Jezik', calendar:'Kalendar', cancelBooking:'Otkaži rezervaciju', cancelQ:'Otkazati rezervaciju?', cancelKeep:'Odustani', cancelling:'Otkazujem…', cancelledOk:'Rezervacija je otkazana.', cancelFinal:'Ovo se ne može poništiti. Igrači s liste čekanja dobit će obavijest.', cancelUntil:'Možeš otkazati do {when} ({h} h ranije).', cancelLate:'Rok za otkazivanje je prošao', cancelLateHint:'Otkazivanje je bilo moguće do {when} ({h} h ranije). Za otkazivanje se javi klubu.', cancelOnly:'Otkazati može samo {name}', cancelOnlyHint:'Rezervaciju može otkazati samo onaj tko ju je napravio.', theBooker:'onaj tko je rezervirao', cancelRefused:'Sporty.plus nije otkazao rezervaciju: {msg}', leagues:'Lige', lg_pair:'Par', lg_P:'O', lg_playedT:'Odigrano', lg_WL:'P-I', lg_wlT:'Pobjede - izgubljeno', lg_sets:'Set', lg_setsT:'Razlika u setovima', lg_games:'Gem', lg_gamesT:'Razlika u gemovima', lg_pts:'Bod', lg_ptsT:'Bodovi', lg_played:'{p} / {n} odigrano', lg_up:'ide gore', lg_down:'ide dolje', lg_legend:'▲ ide u višu grupu · ▼ ide u nižu grupu', lg_none:'Lige će se pojaviti ovdje čim se u rasporedu pojavi ligaška utakmica.', lg_login:'Lige kluba su privatne. Prijavi se da vidiš grupe i tablice.', lg_fail:'Liga se nije mogla učitati.', lg_loading:'Učitavam ligu…', lg_noGroups:'Liga još nema grupa.', lg_emptyGroup:'Još nema parova.', lg_groups:'Grupe', lg_view:'Prikaz lige', lg_view_grid:'Sve grupe', lg_view_list:'Jedna grupa', lg_W:'P', lg_wonT:'Pobjede', lg_D:'N', lg_drawT:'Neriješeno', lg_L:'I', lg_lostT:'Porazi', lg_setsWL:'Setovi', lg_gamesWL:'Gemovi', prevMonth:'Prethodni mjesec', nextMonth:'Sljedeći mjesec', calHint:'Broj = slobodni termini', theme_light:'Svijetla tema', theme_dark:'Tamna tema',
+    theme:'Tema', language:'Jezik', calendar:'Kalendar', rating:'Rang', rt_title:'Padel Radar rating', rt_yours:'Tvoj rating', rt_rankOf:'{r}. od {n}', rt_thisWeek:'ovaj tjedan', rt_best:'Najviše: {b}', rt_matches_one:'{n} meč', rt_matches_few:'{n} meča', rt_matches_many:'{n} mečeva', rt_provisional:'privremeno · još {n} do ljestvice', rt_around:'Oko tebe', rt_top:'Vrh ljestvice', rt_movers:'Najveći skok tjedna', rt_all:'Cijela ljestvica', rt_mine:'Moj rating', rt_kind:'Igrači ili parovi', rt_players:'Igrači', rt_pairs:'Parovi', rt_search:'Traži po imenu', rt_noneFound:'Nitko s tim imenom.', rt_minNote:'Na ljestvici su igrači i parovi s barem {n} mečeva.', rt_loading:'Računam rating iz svih rezultata kluba…', rt_loadingN:'Učitavam rezultate {d} / {n}… (samo prvi put)', rt_fail:'Rezultati se nisu mogli učitati. Pokušaj ponovno kasnije.', rt_loginHint:'Prijavi se da vidiš svoj rating i gdje si na ljestvici.', rt_noMatches:'Još nemaš upisanih rezultata. Rating kreće od 1500.', rt_upN:'{n} mjesta gore ovaj tjedan', rt_downN:'{n} mjesta dolje ovaj tjedan', rt_chartAria:'Kretanje ratinga kroz mečeve', rt_howQ:'Kako se računa?', rt_how:'Padel Radar rating je Elo za parove, izračunat iz svih {n} rezultata kluba. Svi kreću od 1500. Snaga para je prosjek njegovih igrača; pobjeda protiv jačeg para donosi više bodova, a poraz od slabijeg oduzima više. Uvjerljiva pobjeda vrijedi malo više od tijesne. Prvih 10 mečeva rating se brže mijenja. Na ljestvici si nakon {min} mečeva.', cancelBooking:'Otkaži rezervaciju', cancelQ:'Otkazati rezervaciju?', cancelKeep:'Odustani', cancelling:'Otkazujem…', cancelledOk:'Rezervacija je otkazana.', cancelFinal:'Ovo se ne može poništiti. Igrači s liste čekanja dobit će obavijest.', cancelUntil:'Možeš otkazati do {when} ({h} h ranije).', cancelLate:'Rok za otkazivanje je prošao', cancelLateHint:'Otkazivanje je bilo moguće do {when} ({h} h ranije). Za otkazivanje se javi klubu.', cancelOnly:'Otkazati može samo {name}', cancelOnlyHint:'Rezervaciju može otkazati samo onaj tko ju je napravio.', theBooker:'onaj tko je rezervirao', cancelRefused:'Sporty.plus nije otkazao rezervaciju: {msg}', leagues:'Lige', lg_pair:'Par', lg_P:'O', lg_playedT:'Odigrano', lg_WL:'P-I', lg_wlT:'Pobjede - izgubljeno', lg_sets:'Set', lg_setsT:'Razlika u setovima', lg_games:'Gem', lg_gamesT:'Razlika u gemovima', lg_pts:'Bod', lg_ptsT:'Bodovi', lg_played:'{p} / {n} odigrano', lg_up:'ide gore', lg_down:'ide dolje', lg_legend:'▲ ide u višu grupu · ▼ ide u nižu grupu', lg_none:'Lige će se pojaviti ovdje čim se u rasporedu pojavi ligaška utakmica.', lg_login:'Lige kluba su privatne. Prijavi se da vidiš grupe i tablice.', lg_fail:'Liga se nije mogla učitati.', lg_loading:'Učitavam ligu…', lg_noGroups:'Liga još nema grupa.', lg_emptyGroup:'Još nema parova.', lg_groups:'Grupe', lg_view:'Prikaz lige', lg_view_grid:'Sve grupe', lg_view_list:'Jedna grupa', lg_W:'P', lg_wonT:'Pobjede', lg_D:'N', lg_drawT:'Neriješeno', lg_L:'I', lg_lostT:'Porazi', lg_setsWL:'Setovi', lg_gamesWL:'Gemovi', prevMonth:'Prethodni mjesec', nextMonth:'Sljedeći mjesec', calHint:'Broj = slobodni termini', theme_light:'Svijetla tema', theme_dark:'Tamna tema',
     settings:'Postavke', home:'Početna', login:'Prijava', account:'Račun', liveFrom:'uživo sa Sporty.plus',
     schedule:'Raspored', results:'Rezultati', loading:'Učitavanje…', loadingWeek:'Učitavanje tjedna…',
     credit:'Vremenska prognoza: {yr}, Norveški meteorološki institut (MET Norway).',
@@ -580,7 +620,7 @@ const I18N = {
   en: {
     locale:'en-GB',
     prevWeek:'Previous week', nextWeek:'Next week', thisWeek:'This week', reload:'Reload data',
-    theme:'Theme', language:'Language', calendar:'Calendar', cancelBooking:'Cancel booking', cancelQ:'Cancel this booking?', cancelKeep:'Keep it', cancelling:'Cancelling…', cancelledOk:'Booking cancelled.', cancelFinal:"This can't be undone. Players on the waiting list will be notified.", cancelUntil:'You can cancel until {when} ({h} h before).', cancelLate:'The cancellation deadline has passed', cancelLateHint:'Cancelling was possible until {when} ({h} h before). Contact the club to cancel.', cancelOnly:'Only {name} can cancel', cancelOnlyHint:'Only the person who made the booking can cancel it.', theBooker:'the person who booked', cancelRefused:'Sporty.plus did not cancel the booking: {msg}', leagues:'Leagues', lg_pair:'Pair', lg_P:'P', lg_playedT:'Played', lg_WL:'W-L', lg_wlT:'Won - lost', lg_sets:'Sets', lg_setsT:'Set difference', lg_games:'Games', lg_gamesT:'Game difference', lg_pts:'Pts', lg_ptsT:'Points', lg_played:'{p} / {n} played', lg_up:'moves up', lg_down:'moves down', lg_legend:'▲ moves up a group · ▼ moves down a group', lg_none:'Leagues show up here once a league match appears on the schedule.', lg_login:'The club\'s leagues are private. Log in to see groups and standings.', lg_fail:'Could not load this league.', lg_loading:'Loading league…', lg_noGroups:'This league has no groups yet.', lg_emptyGroup:'No pairs yet.', lg_groups:'Groups', lg_view:'League view', lg_view_grid:'All groups', lg_view_list:'One group', lg_W:'W', lg_wonT:'Won', lg_D:'D', lg_drawT:'Drawn', lg_L:'L', lg_lostT:'Lost', lg_setsWL:'Sets', lg_gamesWL:'Games', prevMonth:'Previous month', nextMonth:'Next month', calHint:'Number = free slots', theme_light:'Light theme', theme_dark:'Dark theme',
+    theme:'Theme', language:'Language', calendar:'Calendar', rating:'Rating', rt_title:'Padel Radar rating', rt_yours:'Your rating', rt_rankOf:'{r} of {n}', rt_thisWeek:'this week', rt_best:'Best: {b}', rt_matches_one:'{n} match', rt_matches_few:'{n} matches', rt_matches_many:'{n} matches', rt_provisional:'provisional · {n} more to be ranked', rt_around:'Around you', rt_top:'Top of the table', rt_movers:'Biggest climbers this week', rt_all:'Full leaderboard', rt_mine:'My rating', rt_kind:'Players or pairs', rt_players:'Players', rt_pairs:'Pairs', rt_search:'Search by name', rt_noneFound:'Nobody by that name.', rt_minNote:'Players and pairs with at least {n} matches are ranked.', rt_loading:'Calculating ratings from all club results…', rt_loadingN:'Loading results {d} / {n}… (first time only)', rt_fail:'Could not load results. Try again later.', rt_loginHint:'Log in to see your rating and where you stand.', rt_noMatches:'No results recorded for you yet. Ratings start at 1500.', rt_upN:'Up {n} places this week', rt_downN:'Down {n} places this week', rt_chartAria:'Rating over your matches', rt_howQ:'How is it calculated?', rt_how:'The Padel Radar rating is an Elo rating for doubles, calculated from all {n} club results. Everyone starts at 1500. A pair is as strong as the average of its players; beating a stronger pair earns more, losing to a weaker one costs more. A clear win counts a little more than a close one. Ratings move faster during the first 10 matches. You appear on the leaderboard after {min} matches.', cancelBooking:'Cancel booking', cancelQ:'Cancel this booking?', cancelKeep:'Keep it', cancelling:'Cancelling…', cancelledOk:'Booking cancelled.', cancelFinal:"This can't be undone. Players on the waiting list will be notified.", cancelUntil:'You can cancel until {when} ({h} h before).', cancelLate:'The cancellation deadline has passed', cancelLateHint:'Cancelling was possible until {when} ({h} h before). Contact the club to cancel.', cancelOnly:'Only {name} can cancel', cancelOnlyHint:'Only the person who made the booking can cancel it.', theBooker:'the person who booked', cancelRefused:'Sporty.plus did not cancel the booking: {msg}', leagues:'Leagues', lg_pair:'Pair', lg_P:'P', lg_playedT:'Played', lg_WL:'W-L', lg_wlT:'Won - lost', lg_sets:'Sets', lg_setsT:'Set difference', lg_games:'Games', lg_gamesT:'Game difference', lg_pts:'Pts', lg_ptsT:'Points', lg_played:'{p} / {n} played', lg_up:'moves up', lg_down:'moves down', lg_legend:'▲ moves up a group · ▼ moves down a group', lg_none:'Leagues show up here once a league match appears on the schedule.', lg_login:'The club\'s leagues are private. Log in to see groups and standings.', lg_fail:'Could not load this league.', lg_loading:'Loading league…', lg_noGroups:'This league has no groups yet.', lg_emptyGroup:'No pairs yet.', lg_groups:'Groups', lg_view:'League view', lg_view_grid:'All groups', lg_view_list:'One group', lg_W:'W', lg_wonT:'Won', lg_D:'D', lg_drawT:'Drawn', lg_L:'L', lg_lostT:'Lost', lg_setsWL:'Sets', lg_gamesWL:'Games', prevMonth:'Previous month', nextMonth:'Next month', calHint:'Number = free slots', theme_light:'Light theme', theme_dark:'Dark theme',
     settings:'Settings', home:'Home', login:'Log in', account:'Account', liveFrom:'live from Sporty.plus',
     schedule:'Schedule', results:'Results', loading:'Loading…', loadingWeek:'Loading week…',
     credit:'Weather forecast from {yr}, delivered by the Norwegian Meteorological Institute (MET Norway).',
@@ -1830,6 +1870,7 @@ async function useToken(raw){
   state.teams.clear(); state.resultsByGame.clear(); state.leagues.clear(); standingsCache.clear(); weekCache.clear();
   await loadMe(); updateAccountBtn(); boot();
   if (!document.getElementById('leaguesView').hidden) renderLeagues();
+  if (!document.getElementById('ratingView').hidden) renderRating();
 }
 function updateAccountBtn(){
   const b = document.getElementById('accountBtn'), me = state.me;
@@ -1895,6 +1936,7 @@ function logout(){
   state.teams.clear(); state.resultsByGame.clear(); state.leagues.clear(); standingsCache.clear(); weekCache.clear(); profileCache.clear();
   closeDrawer(); updateAccountBtn(); boot();
   if (!document.getElementById('leaguesView').hidden) renderLeagues();
+  if (!document.getElementById('ratingView').hidden) renderRating();
 }
 function openAccount(){
   if (state.me?.id) return openProfile(state.me.id);
@@ -2033,6 +2075,162 @@ function mastersSection(id){
     <p class="hint"><a href="${MASTERS_PAGE}" target="_blank" rel="noopener">${t('ms_open')}</a></p></div>`;
 }
 
+/* ---------- Padel Radar rating: our own Elo for doubles, from every club result ----------
+   History: all /v2/result pages (about 11 × 100), kept compact in localStorage. Each visit fetches page 1 for new results;
+   once a day everything is fetched again in case older results were entered late or corrected.
+   Elo: everyone starts at 1500. A side's strength is the average of its players. Expected score
+   E = 1 / (1 + 10^((Rb − Ra)/400)); every player on a side moves by K × margin × (result − E).
+   K is 40 for a player's first 10 matches (finds their level fast), then 24. margin goes from 0.75 (7-6 7-6)
+   to 1.25 (a 12-game difference or more). Pairs (team ids) get their own rating the same way. */
+const RT_START = 1500, RT_MIN = 5, RT_FULL_MS = 24*3600e3;
+function compactResult(r){
+  const sets = (r.sets||[]).filter(x => x && (x[0]||x[1]));
+  const side = tm => !tm ? null : { t: tm.id, p: (tm.players||[]).length ? tm.players.map(p => p.id) : [tm.id], n: (tm.players||[]).length ? tm.players.map(p => p.display_name || '') : [tm.display_name || ''], tn: tm.display_name || '' };
+  return { id: r.id, d: r.date, s: sets, w: r.winner_side, a: side(r.players?.[0]), b: side(r.players?.[1]) };
+}
+let historyPromise = null;
+async function loadHistory(onProgress){
+  const key = 'history.' + cfg.club, saved = store.get(key, null);
+  let list = saved?.list || [], at = saved?.at || 0;
+  const page = p => api(`/v2/result?filter[club]=${cfg.club}&limit=100&page=${p}`);
+  if (!list.length || Date.now() - at > RT_FULL_MS) {
+    const first = await page(1), last = first.meta?.last_page || 1, all = [first];
+    onProgress?.(1, last);
+    let done = 1;   // the endpoint is slow (~8 s a page), so ask for all the other pages at once
+    all.push(...await Promise.all(Array.from({ length: last - 1 }, (_, i) => page(i + 2).then(r => { onProgress?.(++done, last); return r; }))));
+    list = all.flatMap(r => (r.data||[]).map(compactResult)); at = Date.now();
+  } else {
+    const known = new Set(list.map(r => r.id));
+    for (let p = 1; p <= 5; p++) {   // newest first: stop at the first page we already have
+      const fresh = ((await page(p)).data||[]).map(compactResult), add = fresh.filter(r => !known.has(r.id));
+      list = add.concat(list); add.forEach(r => known.add(r.id));
+      if (add.length < fresh.length || !fresh.length) break;
+    }
+  }
+  try { store.set(key, { at, list }); } catch(e) {}
+  return list;
+}
+function computeRatings(list){
+  const P = new Map(), T = new Map(), weekAgo = Date.now() - 7*24*3600e3;
+  const get = (m, id, name) => { let x = m.get(id); if (!x) { x = { id, name, r: RT_START, n: 0, w: 0, hist: [], form: [], best: RT_START, week: null }; m.set(id, x); } if (name) x.name = name; return x; };
+  const games = r => r.s.reduce((a, x) => [a[0] + x[0], a[1] + x[1]], [0, 0]);
+  const sorted = list.filter(r => r.a && r.b && (r.w === 0 || r.w === 1) && r.s.length).sort((x, y) => x.d.localeCompare(y.d) || x.id - y.id);
+  for (const r of sorted) {
+    const when = new Date(r.d.replace(' ', 'T')).getTime();
+    const g = games(r), margin = 0.75 + 0.5 * Math.min(Math.abs(g[0] - g[1]), 12) / 12;
+    // players
+    const A = r.a.p.map((id, i) => get(P, id, r.a.n[i])), B = r.b.p.map((id, i) => get(P, id, r.b.n[i]));
+    const avg = xs => xs.reduce((s, x) => s + x.r, 0) / xs.length;
+    const ea = 1 / (1 + Math.pow(10, (avg(B) - avg(A)) / 400)), sa = r.w === 0 ? 1 : 0;
+    const move = (xs, s, e) => xs.forEach(x => {
+      if (when >= weekAgo && x.week === null) x.week = x.r;   // rating before this week's first match
+      const d = (x.n < 10 ? 40 : 24) * margin * (s - e);
+      x.r += d; x.n++; if (s) x.w++; x.best = Math.max(x.best, x.r); x.hist.push([when, x.r]); x.form.push(s ? 1 : 0); });
+    move(A, sa, ea); move(B, 1 - sa, 1 - ea);
+    // pairs
+    if (r.a.p.length > 1 && r.b.p.length > 1) {
+      const ta = get(T, r.a.t, r.a.tn), tb = get(T, r.b.t, r.b.tn);
+      ta.players = r.a.p.map((id, i) => ({ id, display_name: r.a.n[i] })); tb.players = r.b.p.map((id, i) => ({ id, display_name: r.b.n[i] }));
+      const et = 1 / (1 + Math.pow(10, (tb.r - ta.r) / 400));
+      move([ta], sa, et); move([tb], 1 - sa, 1 - et);
+    }
+  }
+  const rank = m => {
+    const all = [...m.values()];
+    for (const x of all) { x.weekDelta = x.week === null ? 0 : x.r - x.week; x.played7 = x.hist.filter(h => h[0] >= weekAgo).length; }
+    const ranked = all.filter(x => x.n >= RT_MIN).sort((a, b) => b.r - a.r);
+    ranked.forEach((x, i) => x.rank = i + 1);
+    const before = all.filter(x => x.n - x.played7 >= RT_MIN).sort((a, b) => (b.r - b.weekDelta) - (a.r - a.weekDelta));
+    before.forEach((x, i) => x.rankBefore = i + 1);
+    return ranked;
+  };
+  return { players: P, pairs: T, rankedPlayers: rank(P), rankedPairs: rank(T), count: sorted.length, at: Date.now() };
+}
+// With a saved history the rating is ready at once and refreshes in the background (page 1 alone takes ~8 s);
+// the very first time it has to wait for every page (~30 s, with progress).
+function loadRatings(onProgress){
+  if (historyPromise) return historyPromise;
+  const saved = store.get('history.' + cfg.club, null);
+  const fresh = loadHistory(saved?.list?.length ? null : onProgress).then(list => {
+    state.rating = computeRatings(list);
+    if (!document.getElementById('ratingView').hidden) renderRating();
+    return state.rating;
+  });
+  if (saved?.list?.length) { state.rating = computeRatings(saved.list); fresh.catch(() => {}); historyPromise = Promise.resolve(state.rating); }
+  else historyPromise = fresh.catch(e => { historyPromise = null; throw e; });
+  return historyPromise;
+}
+const rtNum = r => String(Math.round(r));   // no thousands dot: "1.617" reads like a decimal
+const rtMove = x => { if (!x.rank || !x.rankBefore) return x.rank ? '<span class="eq">–</span>' : ''; const d = x.rankBefore - x.rank;
+  return d > 0 ? `<span class="up" title="${t('rt_upN', { n: d })}">▲${d}</span>` : d < 0 ? `<span class="dn" title="${t('rt_downN', { n: -d })}">▼${-d}</span>` : '<span class="eq">–</span>'; };
+const rtDelta = d => { const v = Math.round(d); return v > 0 ? `<span class="up">▲ +${v}</span>` : v < 0 ? `<span class="dn">▼ ${v}</span>` : `<span class="eq">±0</span>`; };
+function rtChart(hist){
+  const pts = hist.slice(-40); if (pts.length < 2) return '';
+  const rs = pts.map(h => h[1]).concat(RT_START), lo = Math.min(...rs) - 10, hi = Math.max(...rs) + 10, W = 300, H = 70;
+  const x = i => (i / (pts.length - 1)) * W, y = r => H - 6 - ((r - lo) / (hi - lo)) * (H - 12);
+  const line = pts.map((h, i) => `${x(i).toFixed(1)},${y(h[1]).toFixed(1)}`).join(' ');
+  return `<svg class="rtchart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${t('rt_chartAria')}">
+    <line x1="0" x2="${W}" y1="${y(RT_START).toFixed(1)}" y2="${y(RT_START).toFixed(1)}" class="base"/><polyline points="${line}" class="ln"/>
+    <circle cx="${x(pts.length-1).toFixed(1)}" cy="${y(pts[pts.length-1][1]).toFixed(1)}" r="3.5" class="dot"/></svg>`;
+}
+function rtRow(x, kind, meRow, extra = ''){
+  const name = kind === 'pairs' ? (x.players ? teamLink(x.id, x.name || '—') : esc(x.name || '—')) : `<button type="button" class="plink" data-player="${x.id}">${esc(x.name || '—')}</button>`;
+  const form = x.form.slice(-5).map(f => `<i class="${f ? 'w' : 'l'}"></i>`).join('');
+  return `<li class="${meRow ? 'me' : ''}"><span class="rk">${x.rank ?? '–'}</span><span class="mv">${rtMove(x)}</span><span class="nm">${name}<small>${tn('rt_matches', x.n)} · ${x.w}-${x.n - x.w}</small></span><span class="fm" aria-hidden="true">${form}</span>${extra}<b>${rtNum(x.r)}</b></li>`;
+}
+let ratingSeq = 0;
+async function renderRating(){
+  const el = document.getElementById('ratingView'), seq = ++ratingSeq;
+  if (!state.rating) {
+    el.innerHTML = `<div class="rtcard"><p class="hint" id="rtProg">${t('rt_loading')}</p></div>`;
+    try { await loadRatings((d, n) => { const p = document.getElementById('rtProg'); if (p) p.textContent = t('rt_loadingN', { d, n }); }); }
+    catch(e) { if (seq === ratingSeq) el.innerHTML = `<p class="msg err">${t('rt_fail')}</p>`; return; }
+    if (seq !== ratingSeq) return;
+  }
+  const R = state.rating, full = state.ratingFull, kind = state.ratingKind || 'players';
+  if (full) {
+    const list = kind === 'pairs' ? R.rankedPairs : R.rankedPlayers, q = (state.ratingQ || '').trim().toLowerCase();
+    const mine = x => kind === 'pairs' ? (x.players||[]).some(p => p.id === state.me?.id) : x.id === state.me?.id;
+    const shown = q ? list.filter(x => (x.name || '').toLowerCase().includes(q)) : list;
+    el.innerHTML = `<div class="rthead"><button type="button" class="btn" id="rtBack">‹ ${t('rt_mine')}</button>
+      <div class="seg" role="group" aria-label="${t('rt_kind')}"><button type="button" data-rk="players" aria-pressed="${kind==='players'}">${t('rt_players')}</button><button type="button" data-rk="pairs" aria-pressed="${kind==='pairs'}">${t('rt_pairs')}</button></div></div>
+      <input class="rtsearch" id="rtQ" type="search" placeholder="${t('rt_search')}" value="${esc(state.ratingQ || '')}" aria-label="${t('rt_search')}">
+      <ol class="rtlist">${shown.map(x => rtRow(x, kind, mine(x))).join('') || `<li class="empty">${t('rt_noneFound')}</li>`}</ol>
+      <p class="hint">${t('rt_minNote', { n: RT_MIN })}</p>`;
+    document.getElementById('rtBack').onclick = () => { state.ratingFull = false; renderRating(); };
+    el.querySelectorAll('[data-rk]').forEach(b => b.onclick = () => { state.ratingKind = b.dataset.rk; renderRating(); });
+    const qi = document.getElementById('rtQ');
+    qi.oninput = () => { state.ratingQ = qi.value; const pos = qi.selectionStart; renderRating().then(() => { const n = document.getElementById('rtQ'); n.focus(); n.setSelectionRange(pos, pos); }); };
+    return;
+  }
+  const me = state.me ? R.players.get(state.me.id) : null, list = R.rankedPlayers;
+  let mineHtml;
+  if (!cfg.token || !state.me) mineHtml = `<div class="rtcard"><p class="hint">${t('rt_loginHint')}</p><button class="btn primary" id="rtLogin" type="button">${t('login')}</button></div>`;
+  else if (!me) mineHtml = `<div class="rtcard"><span class="lbl">${t('rt_yours')}</span><b class="big">${rtNum(RT_START)}</b><p class="hint">${t('rt_noMatches')}</p></div>`;
+  else {
+    const prov = me.n < RT_MIN;
+    mineHtml = `<div class="rtcard"><div class="rtrow"><span class="lbl">${t('rt_yours')}</span><span class="lbl">${prov ? t('rt_provisional', { n: RT_MIN - me.n }) : t('rt_rankOf', { r: me.rank, n: list.length })}</span></div>
+      <div class="rtrow"><b class="big">${rtNum(me.r)}</b><span class="wk">${rtDelta(me.weekDelta)} ${t('rt_thisWeek')}</span></div>
+      ${rtChart(me.hist)}
+      <span class="hint">${t('rt_best', { b: rtNum(me.best) })} · ${tn('rt_matches', me.n)} · ${me.w}-${me.n - me.w}</span></div>`;
+  }
+  let around = '';
+  if (me && me.rank) { const i = me.rank - 1; around = list.slice(Math.max(0, i - 2), i + 3).map(x => rtRow(x, 'players', x === me)).join(''); }
+  else around = list.slice(0, 5).map(x => rtRow(x, 'players', false)).join('');
+  const movers = R.rankedPlayers.filter(x => x.played7 && x.weekDelta > 0).sort((a, b) => b.weekDelta - a.weekDelta).slice(0, 3);
+  el.innerHTML = mineHtml
+    + `<section class="rtsec"><h3>${me && me.rank ? t('rt_around') : t('rt_top')}</h3><ol class="rtlist">${around}</ol></section>`
+    + (movers.length ? `<section class="rtsec"><h3>${t('rt_movers')}</h3><ol class="rtlist movers">${movers.map(x => rtRow(x, 'players', x === me, `<em>${rtDelta(x.weekDelta)}</em>`)).join('')}</ol></section>` : '')
+    + `<button type="button" class="btn rtall" id="rtAll">${t('rt_all')} ›</button>
+      <details class="rthow"><summary>${t('rt_howQ')}</summary><p>${t('rt_how', { n: R.count, min: RT_MIN })}</p></details>`;
+  document.getElementById('rtAll').onclick = () => { state.ratingFull = true; renderRating(); window.scrollTo({ top: 0 }); };
+  document.getElementById('rtLogin')?.addEventListener('click', openLogin);
+}
+function ratingSection(id){
+  const x = state.rating?.players.get(id); if (!x) return '';
+  return `<div class="psec rtprof"><h3>${t('rt_title')}</h3><div class="rtrow"><b class="big">${rtNum(x.r)}</b><span class="lbl">${x.rank ? t('rt_rankOf', { r: x.rank, n: state.rating.rankedPlayers.length }) : t('rt_provisional', { n: RT_MIN - x.n })}</span></div>${rtChart(x.hist)}<span class="hint">${rtDelta(x.weekDelta)} ${t('rt_thisWeek')} · ${t('rt_best', { b: rtNum(x.best) })}</span></div>`;
+}
+
 async function openProfile(id){
   id = Number(id);
   navPush('player', id);
@@ -2046,6 +2244,7 @@ async function openProfile(id){
   panel.dataset.key = '';
   const resultsP = loadPlayerResults(id);   // slow endpoint: start it now, render it when it lands
   const mastersP = loadMasters();
+  const ratingP = state.rating ? null : loadRatings().catch(() => null);
   let pl, data = null;
   try { pl = (await loadPlayer(id)).player; } catch(e) {
     if (openProfile.current !== token || drawer.hidden) return;
@@ -2054,6 +2253,7 @@ async function openProfile(id){
   if (openProfile.current !== token || drawer.hidden) return;
   renderProfile(id, pl, null, self);
   mastersP.then(m => { if (m && openProfile.current === token && !drawer.hidden) renderProfile(id, pl, data, self); });
+  ratingP?.then(r => { if (r && openProfile.current === token && !drawer.hidden) renderProfile(id, pl, data, self); });
   try { data = await resultsP; } catch(e) { data = { results: [], total: 0, failed: true }; }
   if (openProfile.current !== token || drawer.hidden) return;
   renderProfile(id, pl, data, self);
@@ -2071,6 +2271,7 @@ function renderProfile(id, pl, data, self){
   const av = pl.image ? `<img class="av" src="${esc(pl.image)}" alt="">` : `<span class="av ph" aria-hidden="true">${esc(initials(name))}</span>`;
   let body = `${self ? `<div class="hint">${t('myProfile')}</div>` : ''}<div class="prof">${av}<h2>${esc(name)}</h2><div class="where">${esc(where)}</div></div>`;
   body += mastersSection(id);
+  body += ratingSection(id);
   if (!data) body += `<p class="hint">${t('pf_loadingResults')}</p>`;
   else if (data.failed) body += `<p class="msg err">${t('profileFail')}</p>`;
   else if (mine.length) {
@@ -2132,7 +2333,7 @@ function openSettings(){
     cfg.sub = document.getElementById('sSub').value.trim() || 'modesto';
     cfg.token = document.getElementById('sTok').value.trim().replace(/^"|"$/g,'');
     store.set('club',cfg.club); store.set('sub',cfg.sub); store.set('token',cfg.token);
-    closeDrawer(); state.teams.clear(); state.resultsByGame.clear(); state.leagues.clear(); standingsCache.clear(); weekCache.clear(); boot();
+    closeDrawer(); state.teams.clear(); state.resultsByGame.clear(); state.leagues.clear(); standingsCache.clear(); weekCache.clear(); state.rating = null; historyPromise = null; boot();
   };
 }
 
@@ -2155,18 +2356,20 @@ function renderResults(){
 }
 
 /* ---------- wiring ---------- */
-const tabWeek = document.getElementById('tabWeek'), tabRes = document.getElementById('tabResults'), tabLg = document.getElementById('tabLeagues');
+const tabWeek = document.getElementById('tabWeek'), tabRes = document.getElementById('tabResults'), tabLg = document.getElementById('tabLeagues'), tabRt = document.getElementById('tabRating');
 function showTab(which){
-  if (!['week','results','leagues'].includes(which)) which = 'week';
-  tabWeek.setAttribute('aria-selected', which==='week'); tabRes.setAttribute('aria-selected', which==='results'); tabLg.setAttribute('aria-selected', which==='leagues');
+  if (!['week','results','leagues','rating'].includes(which)) which = 'week';
+  tabWeek.setAttribute('aria-selected', which==='week'); tabRes.setAttribute('aria-selected', which==='results'); tabLg.setAttribute('aria-selected', which==='leagues'); tabRt.setAttribute('aria-selected', which==='rating');
   document.getElementById('weekView').hidden = which!=='week';
   document.getElementById('resultsView').hidden = which!=='results';
   document.getElementById('leaguesView').hidden = which!=='leagues';
+  document.getElementById('ratingView').hidden = which!=='rating';
   if (which==='results') renderResults();
   if (which==='leagues') renderLeagues();
+  if (which==='rating') renderRating();
   store.set('tab', which);
 }
-tabWeek.onclick = ()=>showTab('week'); tabRes.onclick = ()=>showTab('results'); tabLg.onclick = ()=>showTab('leagues');
+tabWeek.onclick = ()=>showTab('week'); tabRes.onclick = ()=>showTab('results'); tabLg.onclick = ()=>showTab('leagues'); tabRt.onclick = ()=>showTab('rating');
 document.getElementById('tabCal').onclick = openCalendar;
 document.getElementById('prev').onclick = ()=>showWeek(addDays(state.monday,-7));
 document.getElementById('next').onclick = ()=>showWeek(addDays(state.monday,7));
@@ -2203,6 +2406,7 @@ function setLang(l){
   const openKey = !drawer.hidden ? panel.dataset.key : null;
   render(); if (!document.getElementById('resultsView').hidden) renderResults();
   if (!document.getElementById('leaguesView').hidden) renderLeagues();
+  if (!document.getElementById('ratingView').hidden) renderRating();
   if (openKey && allSlots().some(x => slotKey(x) === openKey)) openSlot(openKey); else if (!drawer.hidden) closeDrawer();
 }
 applyStaticText();
