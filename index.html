@@ -316,6 +316,14 @@ button{cursor:pointer}
 .rtlist em{font-style:normal;font-size:.8rem}
 .rtlist b{font:600 1.15rem var(--f-display);font-variant-numeric:tabular-nums;text-align:right;min-width:3.2em}
 .rtall{align-self:flex-start}
+.rtlist li.former{opacity:.6}
+.rtlist .tagnew{color:var(--court);font-weight:600}
+.rtlist .tagold{color:var(--muted)}
+.rtformer{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.88rem;cursor:pointer}
+.cpbadge{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px 10px;align-self:flex-start;border:1px solid color-mix(in srgb,var(--court) 55%,var(--line));background:var(--court-soft);border-radius:999px;padding:5px 14px}
+.cpbadge .lbl{color:var(--court);font:600 .78rem var(--f-display);text-transform:uppercase;letter-spacing:.04em}
+.cpbadge .plink{font-weight:600}
+.cpbadge .grp{font:600 .8rem var(--f-display);color:#fff;background:var(--court);border-radius:999px;padding:1px 9px}
 .rthead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .rthead .seg{display:inline-flex;width:auto}
 .rtsearch{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px}
@@ -556,7 +564,7 @@ const I18N = {
   hr: {
     locale:'hr-HR',
     prevWeek:'Prethodni tjedan', nextWeek:'Sljedeći tjedan', thisWeek:'Ovaj tjedan', reload:'Osvježi podatke',
-    theme:'Tema', language:'Jezik', calendar:'Kalendar', rating:'Rang', pd_title:'Prognoza', pd_was:'Prognoza prije meča', pd_upset:'Iznenađenje', pd_upsetLine:'{who} pobijedili su uz samo {p}% šanse.', pd_loading:'Računam prognozu…', pd_aria:'{a} {pa}%, {b} {pb}%', rt_title:'Padel Radar rating', rt_yours:'Tvoj rating', rt_rankOf:'{r}. od {n}', rt_thisWeek:'ovaj tjedan', rt_best:'Najviše: {b}', rt_matches_one:'{n} meč', rt_matches_few:'{n} meča', rt_matches_many:'{n} mečeva', rt_provisional:'privremeno · još {n} do ljestvice', rt_around:'Oko tebe', rt_top:'Vrh ljestvice', rt_movers:'Najveći skok tjedna', rt_all:'Cijela ljestvica', rt_mine:'Moj rating', rt_kind:'Igrači ili parovi', rt_players:'Igrači', rt_pairs:'Parovi', rt_search:'Traži po imenu', rt_noneFound:'Nitko s tim imenom.', rt_minNote:'Na ljestvici su igrači i parovi s barem {n} mečeva.', rt_loading:'Računam rating iz svih rezultata kluba…', rt_loadingN:'Učitavam rezultate {d} / {n}… (samo prvi put)', rt_fail:'Rezultati se nisu mogli učitati. Pokušaj ponovno kasnije.', rt_loginHint:'Prijavi se da vidiš svoj rating i gdje si na ljestvici.', rt_noMatches:'Još nemaš upisanih rezultata. Rating kreće od 1500.', rt_upN:'{n} mjesta gore ovaj tjedan', rt_downN:'{n} mjesta dolje ovaj tjedan', rt_chartAria:'Kretanje ratinga kroz mečeve', rt_howQ:'Kako se računa?', rt_how:'Padel Radar rating je Elo za parove, izračunat iz svih {n} rezultata kluba. Snaga para je prosjek njegovih igrača; pobjeda protiv jačeg para donosi više bodova, a poraz od slabijeg oduzima više. Uvjerljiva pobjeda vrijedi malo više od tijesne, a prvih 10 mečeva rating se brže mijenja. Razina lige se računa: svaka ploča ima svoju razinu (A 1700, B1 1600, B2 1550, C1 1500 … E2 1250). Novi igrač kreće od razine ploče u kojoj prvi put igra (inače od 1500), a svaki meč u ploči povuče rating 5% prema razini te ploče. Isti meč upisan dvaput broji se jednom. Na ljestvici si nakon {min} mečeva.', cancelBooking:'Otkaži rezervaciju', cancelQ:'Otkazati rezervaciju?', cancelKeep:'Odustani', cancelling:'Otkazujem…', cancelledOk:'Rezervacija je otkazana.', cancelFinal:'Ovo se ne može poništiti. Igrači s liste čekanja dobit će obavijest.', cancelUntil:'Možeš otkazati do {when} ({h} h ranije).', cancelLate:'Rok za otkazivanje je prošao', cancelLateHint:'Otkazivanje je bilo moguće do {when} ({h} h ranije). Za otkazivanje se javi klubu.', cancelOnly:'Otkazati može samo {name}', cancelOnlyHint:'Rezervaciju može otkazati samo onaj tko ju je napravio.', theBooker:'onaj tko je rezervirao', cancelRefused:'Sporty.plus nije otkazao rezervaciju: {msg}', leagues:'Lige', lg_pair:'Par', lg_P:'O', lg_playedT:'Odigrano', lg_WL:'P-I', lg_wlT:'Pobjede - izgubljeno', lg_sets:'Set', lg_setsT:'Razlika u setovima', lg_games:'Gem', lg_gamesT:'Razlika u gemovima', lg_pts:'Bod', lg_ptsT:'Bodovi', lg_played:'{p} / {n} odigrano', lg_up:'ide gore', lg_down:'ide dolje', lg_legend:'▲ ide u višu grupu · ▼ ide u nižu grupu', lg_none:'Lige će se pojaviti ovdje čim se u rasporedu pojavi ligaška utakmica.', lg_login:'Lige kluba su privatne. Prijavi se da vidiš grupe i tablice.', lg_fail:'Liga se nije mogla učitati.', lg_loading:'Učitavam ligu…', lg_noGroups:'Liga još nema grupa.', lg_emptyGroup:'Još nema parova.', lg_groups:'Grupe', lg_view:'Prikaz lige', lg_view_grid:'Sve grupe', lg_view_list:'Jedna grupa', lg_W:'P', lg_wonT:'Pobjede', lg_D:'N', lg_drawT:'Neriješeno', lg_L:'I', lg_lostT:'Porazi', lg_setsWL:'Setovi', lg_gamesWL:'Gemovi', prevMonth:'Prethodni mjesec', nextMonth:'Sljedeći mjesec', calHint:'Broj = slobodni termini', theme_light:'Svijetla tema', theme_dark:'Tamna tema',
+    theme:'Tema', language:'Jezik', calendar:'Kalendar', rating:'Rang', rt_newPair:'novi par', rt_former:'bivši par', rt_showFormer:'Prikaži i bivše parove', rt_pairsNote:'Trenutni parovi su oni u aktualnoj ploči ili, izvan lige, s mečem u zadnjih {d} dana. Novi par kreće od prosjeka ratinga svojih igrača.', pf_currentPair:'Trenutni par', pd_title:'Prognoza', pd_was:'Prognoza prije meča', pd_upset:'Iznenađenje', pd_upsetLine:'{who} pobijedili su uz samo {p}% šanse.', pd_loading:'Računam prognozu…', pd_aria:'{a} {pa}%, {b} {pb}%', rt_title:'Padel Radar rating', rt_yours:'Tvoj rating', rt_rankOf:'{r}. od {n}', rt_thisWeek:'ovaj tjedan', rt_best:'Najviše: {b}', rt_matches_one:'{n} meč', rt_matches_few:'{n} meča', rt_matches_many:'{n} mečeva', rt_provisional:'privremeno · još {n} do ljestvice', rt_around:'Oko tebe', rt_top:'Vrh ljestvice', rt_movers:'Najveći skok tjedna', rt_all:'Cijela ljestvica', rt_mine:'Moj rating', rt_kind:'Igrači ili parovi', rt_players:'Igrači', rt_pairs:'Parovi', rt_search:'Traži po imenu', rt_noneFound:'Nitko s tim imenom.', rt_minNote:'Na ljestvici su igrači i parovi s barem {n} mečeva.', rt_loading:'Računam rating iz svih rezultata kluba…', rt_loadingN:'Učitavam rezultate {d} / {n}… (samo prvi put)', rt_fail:'Rezultati se nisu mogli učitati. Pokušaj ponovno kasnije.', rt_loginHint:'Prijavi se da vidiš svoj rating i gdje si na ljestvici.', rt_noMatches:'Još nemaš upisanih rezultata. Rating kreće od 1500.', rt_upN:'{n} mjesta gore ovaj tjedan', rt_downN:'{n} mjesta dolje ovaj tjedan', rt_chartAria:'Kretanje ratinga kroz mečeve', rt_howQ:'Kako se računa?', rt_how:'Padel Radar rating je Elo za parove, izračunat iz svih {n} rezultata kluba. Snaga para je prosjek njegovih igrača; pobjeda protiv jačeg para donosi više bodova, a poraz od slabijeg oduzima više. Uvjerljiva pobjeda vrijedi malo više od tijesne, a prvih 10 mečeva rating se brže mijenja. Razina lige se računa: svaka ploča ima svoju razinu (A 1700, B1 1600, B2 1550, C1 1500 … E2 1250). Novi igrač kreće od razine ploče u kojoj prvi put igra (inače od 1500), a svaki meč u ploči povuče rating 5% prema razini te ploče. Isti meč upisan dvaput broji se jednom. Na ljestvici si nakon {min} mečeva.', cancelBooking:'Otkaži rezervaciju', cancelQ:'Otkazati rezervaciju?', cancelKeep:'Odustani', cancelling:'Otkazujem…', cancelledOk:'Rezervacija je otkazana.', cancelFinal:'Ovo se ne može poništiti. Igrači s liste čekanja dobit će obavijest.', cancelUntil:'Možeš otkazati do {when} ({h} h ranije).', cancelLate:'Rok za otkazivanje je prošao', cancelLateHint:'Otkazivanje je bilo moguće do {when} ({h} h ranije). Za otkazivanje se javi klubu.', cancelOnly:'Otkazati može samo {name}', cancelOnlyHint:'Rezervaciju može otkazati samo onaj tko ju je napravio.', theBooker:'onaj tko je rezervirao', cancelRefused:'Sporty.plus nije otkazao rezervaciju: {msg}', leagues:'Lige', lg_pair:'Par', lg_P:'O', lg_playedT:'Odigrano', lg_WL:'P-I', lg_wlT:'Pobjede - izgubljeno', lg_sets:'Set', lg_setsT:'Razlika u setovima', lg_games:'Gem', lg_gamesT:'Razlika u gemovima', lg_pts:'Bod', lg_ptsT:'Bodovi', lg_played:'{p} / {n} odigrano', lg_up:'ide gore', lg_down:'ide dolje', lg_legend:'▲ ide u višu grupu · ▼ ide u nižu grupu', lg_none:'Lige će se pojaviti ovdje čim se u rasporedu pojavi ligaška utakmica.', lg_login:'Lige kluba su privatne. Prijavi se da vidiš grupe i tablice.', lg_fail:'Liga se nije mogla učitati.', lg_loading:'Učitavam ligu…', lg_noGroups:'Liga još nema grupa.', lg_emptyGroup:'Još nema parova.', lg_groups:'Grupe', lg_view:'Prikaz lige', lg_view_grid:'Sve grupe', lg_view_list:'Jedna grupa', lg_W:'P', lg_wonT:'Pobjede', lg_D:'N', lg_drawT:'Neriješeno', lg_L:'I', lg_lostT:'Porazi', lg_setsWL:'Setovi', lg_gamesWL:'Gemovi', prevMonth:'Prethodni mjesec', nextMonth:'Sljedeći mjesec', calHint:'Broj = slobodni termini', theme_light:'Svijetla tema', theme_dark:'Tamna tema',
     settings:'Postavke', home:'Početna', login:'Prijava', account:'Račun', liveFrom:'uživo sa Sporty.plus',
     schedule:'Raspored', results:'Rezultati', loading:'Učitavanje…', loadingWeek:'Učitavanje tjedna…',
     credit:'Vremenska prognoza: {yr}, Norveški meteorološki institut (MET Norway).',
@@ -630,7 +638,7 @@ const I18N = {
   en: {
     locale:'en-GB',
     prevWeek:'Previous week', nextWeek:'Next week', thisWeek:'This week', reload:'Reload data',
-    theme:'Theme', language:'Language', calendar:'Calendar', rating:'Rating', pd_title:'Prediction', pd_was:'Prediction before the match', pd_upset:'Upset', pd_upsetLine:'{who} won with only a {p}% chance.', pd_loading:'Working out the prediction…', pd_aria:'{a} {pa}%, {b} {pb}%', rt_title:'Padel Radar rating', rt_yours:'Your rating', rt_rankOf:'{r} of {n}', rt_thisWeek:'this week', rt_best:'Best: {b}', rt_matches_one:'{n} match', rt_matches_few:'{n} matches', rt_matches_many:'{n} matches', rt_provisional:'provisional · {n} more to be ranked', rt_around:'Around you', rt_top:'Top of the table', rt_movers:'Biggest climbers this week', rt_all:'Full leaderboard', rt_mine:'My rating', rt_kind:'Players or pairs', rt_players:'Players', rt_pairs:'Pairs', rt_search:'Search by name', rt_noneFound:'Nobody by that name.', rt_minNote:'Players and pairs with at least {n} matches are ranked.', rt_loading:'Calculating ratings from all club results…', rt_loadingN:'Loading results {d} / {n}… (first time only)', rt_fail:'Could not load results. Try again later.', rt_loginHint:'Log in to see your rating and where you stand.', rt_noMatches:'No results recorded for you yet. Ratings start at 1500.', rt_upN:'Up {n} places this week', rt_downN:'Down {n} places this week', rt_chartAria:'Rating over your matches', rt_howQ:'How is it calculated?', rt_how:'The Padel Radar rating is an Elo rating for doubles, calculated from all {n} club results. A pair is as strong as the average of its players; beating a stronger pair earns more, losing to a weaker one costs more. A clear win counts a little more than a close one, and ratings move faster during the first 10 matches. League level counts: each Ploča group has a level (A 1700, B1 1600, B2 1550, C1 1500 … E2 1250). New players start at the level of the group they first play in (otherwise 1500), and every Ploča match pulls the rating 5% towards that group\'s level. A match stored twice counts once. You appear on the leaderboard after {min} matches.', cancelBooking:'Cancel booking', cancelQ:'Cancel this booking?', cancelKeep:'Keep it', cancelling:'Cancelling…', cancelledOk:'Booking cancelled.', cancelFinal:"This can't be undone. Players on the waiting list will be notified.", cancelUntil:'You can cancel until {when} ({h} h before).', cancelLate:'The cancellation deadline has passed', cancelLateHint:'Cancelling was possible until {when} ({h} h before). Contact the club to cancel.', cancelOnly:'Only {name} can cancel', cancelOnlyHint:'Only the person who made the booking can cancel it.', theBooker:'the person who booked', cancelRefused:'Sporty.plus did not cancel the booking: {msg}', leagues:'Leagues', lg_pair:'Pair', lg_P:'P', lg_playedT:'Played', lg_WL:'W-L', lg_wlT:'Won - lost', lg_sets:'Sets', lg_setsT:'Set difference', lg_games:'Games', lg_gamesT:'Game difference', lg_pts:'Pts', lg_ptsT:'Points', lg_played:'{p} / {n} played', lg_up:'moves up', lg_down:'moves down', lg_legend:'▲ moves up a group · ▼ moves down a group', lg_none:'Leagues show up here once a league match appears on the schedule.', lg_login:'The club\'s leagues are private. Log in to see groups and standings.', lg_fail:'Could not load this league.', lg_loading:'Loading league…', lg_noGroups:'This league has no groups yet.', lg_emptyGroup:'No pairs yet.', lg_groups:'Groups', lg_view:'League view', lg_view_grid:'All groups', lg_view_list:'One group', lg_W:'W', lg_wonT:'Won', lg_D:'D', lg_drawT:'Drawn', lg_L:'L', lg_lostT:'Lost', lg_setsWL:'Sets', lg_gamesWL:'Games', prevMonth:'Previous month', nextMonth:'Next month', calHint:'Number = free slots', theme_light:'Light theme', theme_dark:'Dark theme',
+    theme:'Theme', language:'Language', calendar:'Calendar', rating:'Rating', rt_newPair:'new pair', rt_former:'former pair', rt_showFormer:'Show former pairs too', rt_pairsNote:'Current pairs are those in the current Ploča round or, outside the league, with a match in the last {d} days. A new pair starts from the average rating of its players.', pf_currentPair:'Current pair', pd_title:'Prediction', pd_was:'Prediction before the match', pd_upset:'Upset', pd_upsetLine:'{who} won with only a {p}% chance.', pd_loading:'Working out the prediction…', pd_aria:'{a} {pa}%, {b} {pb}%', rt_title:'Padel Radar rating', rt_yours:'Your rating', rt_rankOf:'{r} of {n}', rt_thisWeek:'this week', rt_best:'Best: {b}', rt_matches_one:'{n} match', rt_matches_few:'{n} matches', rt_matches_many:'{n} matches', rt_provisional:'provisional · {n} more to be ranked', rt_around:'Around you', rt_top:'Top of the table', rt_movers:'Biggest climbers this week', rt_all:'Full leaderboard', rt_mine:'My rating', rt_kind:'Players or pairs', rt_players:'Players', rt_pairs:'Pairs', rt_search:'Search by name', rt_noneFound:'Nobody by that name.', rt_minNote:'Players and pairs with at least {n} matches are ranked.', rt_loading:'Calculating ratings from all club results…', rt_loadingN:'Loading results {d} / {n}… (first time only)', rt_fail:'Could not load results. Try again later.', rt_loginHint:'Log in to see your rating and where you stand.', rt_noMatches:'No results recorded for you yet. Ratings start at 1500.', rt_upN:'Up {n} places this week', rt_downN:'Down {n} places this week', rt_chartAria:'Rating over your matches', rt_howQ:'How is it calculated?', rt_how:'The Padel Radar rating is an Elo rating for doubles, calculated from all {n} club results. A pair is as strong as the average of its players; beating a stronger pair earns more, losing to a weaker one costs more. A clear win counts a little more than a close one, and ratings move faster during the first 10 matches. League level counts: each Ploča group has a level (A 1700, B1 1600, B2 1550, C1 1500 … E2 1250). New players start at the level of the group they first play in (otherwise 1500), and every Ploča match pulls the rating 5% towards that group\'s level. A match stored twice counts once. You appear on the leaderboard after {min} matches.', cancelBooking:'Cancel booking', cancelQ:'Cancel this booking?', cancelKeep:'Keep it', cancelling:'Cancelling…', cancelledOk:'Booking cancelled.', cancelFinal:"This can't be undone. Players on the waiting list will be notified.", cancelUntil:'You can cancel until {when} ({h} h before).', cancelLate:'The cancellation deadline has passed', cancelLateHint:'Cancelling was possible until {when} ({h} h before). Contact the club to cancel.', cancelOnly:'Only {name} can cancel', cancelOnlyHint:'Only the person who made the booking can cancel it.', theBooker:'the person who booked', cancelRefused:'Sporty.plus did not cancel the booking: {msg}', leagues:'Leagues', lg_pair:'Pair', lg_P:'P', lg_playedT:'Played', lg_WL:'W-L', lg_wlT:'Won - lost', lg_sets:'Sets', lg_setsT:'Set difference', lg_games:'Games', lg_gamesT:'Game difference', lg_pts:'Pts', lg_ptsT:'Points', lg_played:'{p} / {n} played', lg_up:'moves up', lg_down:'moves down', lg_legend:'▲ moves up a group · ▼ moves down a group', lg_none:'Leagues show up here once a league match appears on the schedule.', lg_login:'The club\'s leagues are private. Log in to see groups and standings.', lg_fail:'Could not load this league.', lg_loading:'Loading league…', lg_noGroups:'This league has no groups yet.', lg_emptyGroup:'No pairs yet.', lg_groups:'Groups', lg_view:'League view', lg_view_grid:'All groups', lg_view_list:'One group', lg_W:'W', lg_wonT:'Won', lg_D:'D', lg_drawT:'Drawn', lg_L:'L', lg_lostT:'Lost', lg_setsWL:'Sets', lg_gamesWL:'Games', prevMonth:'Previous month', nextMonth:'Next month', calHint:'Number = free slots', theme_light:'Light theme', theme_dark:'Dark theme',
     settings:'Settings', home:'Home', login:'Log in', account:'Account', liveFrom:'live from Sporty.plus',
     schedule:'Schedule', results:'Results', loading:'Loading…', loadingWeek:'Loading week…',
     credit:'Weather forecast from {yr}, delivered by the Norwegian Meteorological Institute (MET Norway).',
@@ -2148,6 +2156,28 @@ async function loadLevels(list){
   }
   return levels;
 }
+// Pairs in the current Ploča round. Group ids are global (other clubs' groups sit next to ours), so start at the newest
+// Ploča group we have results for and walk to the neighbouring ids only while they are Ploča groups with the next order.
+const ROSTER_KEY = () => 'roster.' + cfg.club, RT_ACTIVE_DAYS = 45;
+async function loadRoster(list, levels){
+  const ids = list.map(r => r.lg).filter(id => id && levels[id] != null);
+  if (!ids.length) return {};
+  const fetchG = id => api(`/v2/league_group/${id}`).then(g => g.data || g).catch(() => null), max = Math.max(...ids);
+  const top = await fetchG(max); if (!top || ladderLevel(top.name) === null) return {};
+  const groups = [top];
+  for (const dir of [-1, 1]) {
+    let prev = top;
+    for (let id = max + dir; Math.abs(id - max) < 15; id += dir) {
+      const g = await fetchG(id);
+      if (!g || ladderLevel(g.name) === null || g.order !== prev.order + dir) break;
+      groups.push(g); prev = g;
+    }
+  }
+  const roster = {};
+  for (const g of groups) for (const p of g.players || []) roster[p.id] = String(g.name).trim();
+  try { store.set(ROSTER_KEY(), roster); } catch(e) {}
+  return roster;
+}
 function dedupeResults(list){
   const seen = new Map();
   for (const r of list) {
@@ -2159,7 +2189,7 @@ function dedupeResults(list){
   }
   return [...seen.values()];
 }
-function computeRatings(list, levels = {}){
+function computeRatings(list, levels = {}, roster = {}){
   const P = new Map(), T = new Map(), pre = new Map(), weekAgo = Date.now() - 7*24*3600e3;
   const get = (m, id, name) => { let x = m.get(id); if (!x) { x = { id, name, r: RT_START, n: 0, w: 0, hist: [], form: [], best: RT_START, week: null }; m.set(id, x); } if (name) x.name = name; return x; };
   const games = r => r.s.reduce((a, x) => [a[0] + x[0], a[1] + x[1]], [0, 0]);
@@ -2169,8 +2199,10 @@ function computeRatings(list, levels = {}){
     const g = games(r), margin = 0.75 + 0.5 * Math.min(Math.abs(g[0] - g[1]), 12) / 12;
     const A = r.a.p.map((id, i) => get(P, id, r.a.n[i])), B = r.b.p.map((id, i) => get(P, id, r.b.n[i]));
     const pairs = r.a.p.length > 1 && r.b.p.length > 1 ? [get(T, r.a.t, r.a.tn), get(T, r.b.t, r.b.tn)] : null;
-    if (lv !== null) for (const x of [...A, ...B, ...(pairs || [])]) if (!x.n) x.r = x.best = rtPar(lv);   // newcomer: start at the group's level
+    if (lv !== null) for (const x of [...A, ...B]) if (!x.n) x.r = x.best = rtPar(lv);   // newcomer: start at the group's level
     const avg = xs => xs.reduce((s, x) => s + x.r, 0) / xs.length;
+    if (pairs) [[pairs[0], A], [pairs[1], B]].forEach(([tp, xs]) => { if (!tp.n) tp.r = tp.best = avg(xs); });   // a new pair starts from its players
+    for (const x of [...A, ...B, ...(pairs || [])]) { x.last = when; x.lastLadder = lv !== null; }
     const ea = 1 / (1 + Math.pow(10, (avg(B) - avg(A)) / 400)), sa = r.w === 0 ? 1 : 0;
     if (r.g) {   // the chance we'd have shown before this match: pair rating once established, else the players' average
       const str = (tp, xs) => tp && tp.n >= RT_MIN ? tp.r : avg(xs);
@@ -2198,7 +2230,18 @@ function computeRatings(list, levels = {}){
     before.forEach((x, i) => x.rankBefore = i + 1);
     return ranked;
   };
-  return { players: P, pairs: T, pre, rankedPlayers: rank(P), rankedPairs: rank(T), count: sorted.length, at: Date.now() };
+  const rankedPlayers = rank(P), rankedPairs = rank(T);
+  // Current pairs: in the current Ploča round; or, for pairs outside the league, a match in the last RT_ACTIVE_DAYS days.
+  // A pair whose last match was in an earlier Ploča round has left the league.
+  const recent = Date.now() - RT_ACTIVE_DAYS * 864e5, inRoster = Object.keys(roster).length > 0;
+  for (const x of T.values()) { x.group = roster[x.id] || null; x.current = !!x.group || (!(inRoster && x.lastLadder) && x.last >= recent); }
+  const currentPairs = [...T.values()].filter(x => x.current).sort((a, b) => b.r - a.r);
+  currentPairs.forEach((x, i) => x.crank = i + 1);
+  currentPairs.filter(x => x.n > x.played7).sort((a, b) => (b.r - b.weekDelta) - (a.r - a.weekDelta)).forEach((x, i) => x.crankBefore = i + 1);
+  // each player's current pair (the most recent one, if several)
+  const pairOf = new Map();
+  for (const x of currentPairs) for (const p of x.players || []) { const o = pairOf.get(p.id); if (!o || x.last > o.last) pairOf.set(p.id, x); }
+  return { players: P, pairs: T, pre, pairOf, currentPairs, rankedPlayers, rankedPairs, count: sorted.length, at: Date.now() };
 }
 // With a saved history the rating is ready at once and refreshes in the background (page 1 alone takes ~8 s);
 // the very first time it has to wait for every page (~30 s, with progress).
@@ -2206,16 +2249,19 @@ function loadRatings(onProgress){
   if (historyPromise) return historyPromise;
   const saved = store.get(HISTORY_KEY(), null);
   const fresh = loadHistory(saved?.list?.length ? null : onProgress).then(async list => {
-    state.rating = computeRatings(list, await loadLevels(list));
+    const levels = await loadLevels(list);
+    state.rating = computeRatings(list, levels, await loadRoster(list, levels).catch(() => store.get(ROSTER_KEY(), {})));
     if (!document.getElementById('ratingView').hidden) renderRating();
     return state.rating;
   });
-  if (saved?.list?.length) { state.rating = computeRatings(saved.list, store.get(LEVELS_KEY(), {})); fresh.catch(() => {}); historyPromise = Promise.resolve(state.rating); }
+  if (saved?.list?.length) { state.rating = computeRatings(saved.list, store.get(LEVELS_KEY(), {}), store.get(ROSTER_KEY(), {})); fresh.catch(() => {}); historyPromise = Promise.resolve(state.rating); }
   else historyPromise = fresh.catch(e => { historyPromise = null; throw e; });
   return historyPromise;
 }
 const rtNum = r => String(Math.round(r));   // no thousands dot: "1.617" reads like a decimal
-const rtMove = x => { if (!x.rank || !x.rankBefore) return x.rank ? '<span class="eq">–</span>' : ''; const d = x.rankBefore - x.rank;
+// Movement only for those who played this week: without a match, a rank change just means someone else moved.
+const rtMove = (x, cur) => { const r = cur ? x.crank : x.rank, b = cur ? x.crankBefore : x.rankBefore;
+  if (!r) return ''; if (!x.played7 || !b) return '<span class="eq">–</span>'; const d = b - r;
   return d > 0 ? `<span class="up" title="${t('rt_upN', { n: d })}">▲${d}</span>` : d < 0 ? `<span class="dn" title="${t('rt_downN', { n: -d })}">▼${-d}</span>` : '<span class="eq">–</span>'; };
 const rtDelta = d => { const v = Math.round(d); return v > 0 ? `<span class="up">▲ +${v}</span>` : v < 0 ? `<span class="dn">▼ ${v}</span>` : `<span class="eq">±0</span>`; };
 function rtChart(hist){
@@ -2227,10 +2273,13 @@ function rtChart(hist){
     <line x1="0" x2="${W}" y1="${y(RT_START).toFixed(1)}" y2="${y(RT_START).toFixed(1)}" class="base"/><polyline points="${line}" class="ln"/>
     <circle cx="${x(pts.length-1).toFixed(1)}" cy="${y(pts[pts.length-1][1]).toFixed(1)}" r="3.5" class="dot"/></svg>`;
 }
-function rtRow(x, kind, meRow, extra = ''){
+function rtRow(x, kind, meRow, extra = '', mode = ''){
   const name = kind === 'pairs' ? (x.players ? teamLink(x.id, x.name || '—') : esc(x.name || '—')) : `<button type="button" class="plink" data-player="${x.id}">${esc(x.name || '—')}</button>`;
   const form = x.form.slice(-5).map(f => `<i class="${f ? 'w' : 'l'}"></i>`).join('');
-  return `<li class="${meRow ? 'me' : ''}"><span class="rk">${x.rank ?? '–'}</span><span class="mv">${rtMove(x)}</span><span class="nm">${name}<small>${tn('rt_matches', x.n)} · ${x.w}-${x.n - x.w}</small></span><span class="fm" aria-hidden="true">${form}</span>${extra}<b>${rtNum(x.r)}</b></li>`;
+  const cur = mode === 'cur', rk = cur ? x.crank : mode === 'all' ? x.allRank : x.rank;
+  const tags = kind !== 'pairs' ? '' : (x.n < RT_MIN && x.current ? ` · <span class="tagnew">${t('rt_newPair')}</span>` : '')
+    + (!x.current ? ` · <span class="tagold">${t('rt_former')}</span>` : '') + (x.group ? ` · ${esc(x.group)}` : '');
+  return `<li class="${meRow ? 'me' : ''}${kind === 'pairs' && !x.current ? ' former' : ''}"><span class="rk">${rk ?? '–'}</span><span class="mv">${mode === 'all' ? '' : rtMove(x, cur)}</span><span class="nm">${name}<small>${tn('rt_matches', x.n)} · ${x.w}-${x.n - x.w}${tags}</small></span><span class="fm" aria-hidden="true">${form}</span>${extra}<b>${rtNum(x.r)}</b></li>`;
 }
 let ratingSeq = 0;
 async function renderRating(){
@@ -2243,16 +2292,21 @@ async function renderRating(){
   }
   const R = state.rating, full = state.ratingFull, kind = state.ratingKind || 'players';
   if (full) {
-    const list = kind === 'pairs' ? R.rankedPairs : R.rankedPlayers, q = (state.ratingQ || '').trim().toLowerCase();
+    const former = kind === 'pairs' && state.ratingFormer;
+    let list = kind === 'pairs' ? R.currentPairs : R.rankedPlayers;
+    if (former) { list = [...new Set([...R.currentPairs, ...R.rankedPairs])].sort((a, b) => b.r - a.r); list.forEach((x, i) => x.allRank = i + 1); }
+    const mode = kind !== 'pairs' ? '' : former ? 'all' : 'cur', q = (state.ratingQ || '').trim().toLowerCase();
     const mine = x => kind === 'pairs' ? (x.players||[]).some(p => p.id === state.me?.id) : x.id === state.me?.id;
     const shown = q ? list.filter(x => (x.name || '').toLowerCase().includes(q)) : list;
     el.innerHTML = `<div class="rthead"><button type="button" class="btn" id="rtBack">‹ ${t('rt_mine')}</button>
       <div class="seg" role="group" aria-label="${t('rt_kind')}"><button type="button" data-rk="players" aria-pressed="${kind==='players'}">${t('rt_players')}</button><button type="button" data-rk="pairs" aria-pressed="${kind==='pairs'}">${t('rt_pairs')}</button></div></div>
       <input class="rtsearch" id="rtQ" type="search" placeholder="${t('rt_search')}" value="${esc(state.ratingQ || '')}" aria-label="${t('rt_search')}">
-      <ol class="rtlist">${shown.map(x => rtRow(x, kind, mine(x))).join('') || `<li class="empty">${t('rt_noneFound')}</li>`}</ol>
-      <p class="hint">${t('rt_minNote', { n: RT_MIN })}</p>`;
+      ${kind === 'pairs' ? `<label class="rtformer"><input type="checkbox" id="rtFormer"${former ? ' checked' : ''}> ${t('rt_showFormer')}</label>` : ''}
+      <ol class="rtlist">${shown.map(x => rtRow(x, kind, mine(x), '', mode)).join('') || `<li class="empty">${t('rt_noneFound')}</li>`}</ol>
+      <p class="hint">${kind === 'pairs' ? t('rt_pairsNote', { d: RT_ACTIVE_DAYS, n: RT_MIN }) : t('rt_minNote', { n: RT_MIN })}</p>`;
     document.getElementById('rtBack').onclick = () => { state.ratingFull = false; renderRating(); };
     el.querySelectorAll('[data-rk]').forEach(b => b.onclick = () => { state.ratingKind = b.dataset.rk; renderRating(); });
+    document.getElementById('rtFormer')?.addEventListener('change', e => { state.ratingFormer = e.target.checked; renderRating(); });
     const qi = document.getElementById('rtQ');
     qi.oninput = () => { state.ratingQ = qi.value; const pos = qi.selectionStart; renderRating().then(() => { const n = document.getElementById('rtQ'); n.focus(); n.setSelectionRange(pos, pos); }); };
     return;
@@ -2279,6 +2333,10 @@ async function renderRating(){
       <details class="rthow"><summary>${t('rt_howQ')}</summary><p>${t('rt_how', { n: R.count, min: RT_MIN })}</p></details>`;
   document.getElementById('rtAll').onclick = () => { state.ratingFull = true; renderRating(); window.scrollTo({ top: 0 }); };
   document.getElementById('rtLogin')?.addEventListener('click', openLogin);
+}
+function currentPairBadge(id){
+  const x = state.rating?.pairOf.get(id); if (!x) return '';
+  return `<div class="cpbadge"><span class="lbl">${t('pf_currentPair')}</span>${teamLink(x.id, x.name || '—')}${x.group ? `<span class="grp">${esc(x.group)}</span>` : ''}</div>`;
 }
 function ratingSection(id){
   const x = state.rating?.players.get(id); if (!x) return '';
@@ -2363,6 +2421,7 @@ function renderProfile(id, pl, data, self){
   const where = [pl.city?.name, pl.country ? ((pl.country.emoji ? pl.country.emoji+' ' : '') + pl.country.name) : null].filter(Boolean).join(' · ');
   const av = pl.image ? `<img class="av" src="${esc(pl.image)}" alt="">` : `<span class="av ph" aria-hidden="true">${esc(initials(name))}</span>`;
   let body = `${self ? `<div class="hint">${t('myProfile')}</div>` : ''}<div class="prof">${av}<h2>${esc(name)}</h2><div class="where">${esc(where)}</div></div>`;
+  body += currentPairBadge(id);
   body += mastersSection(id);
   body += ratingSection(id);
   if (!data) body += `<p class="hint">${t('pf_loadingResults')}</p>`;
