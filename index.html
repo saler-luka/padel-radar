@@ -409,7 +409,9 @@ body.noscroll{overflow:hidden}
 .wrpath b{font:700 1.8rem/1 var(--f-display)}.wrpath small{font-size:.75rem;color:rgba(255,255,255,.8)}
 .wrpath i{font-style:normal;color:rgba(255,255,255,.6)}
 .wrshare{align-self:flex-start;border:0;border-radius:999px;background:#fff;color:#0b5f80;font:600 1.05rem var(--f-display);padding:10px 22px}
-.wrnav{display:flex;justify-content:space-between;font-size:.85rem;color:rgba(255,255,255,.75)}
+.wrnav{display:flex;justify-content:space-between;align-items:center;font-size:.85rem;color:rgba(255,255,255,.75)}
+.wrnav button{border:0;background:rgba(0,0,0,.18);color:#fff;border-radius:999px;padding:8px 16px;font:500 .9rem var(--f-body)}
+.wrnav button:hover{background:rgba(0,0,0,.3)}
 .wrbtn{align-self:flex-start}
 .lghero{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .lghero h2{font:600 1.43rem var(--f-display);margin:0;min-width:0}
@@ -624,7 +626,7 @@ body.noscroll{overflow:hidden}
   <p class="hint credit" id="credit">Vremenska prognoza: <a href="https://www.yr.no/" target="_blank" rel="noopener">Yr</a>, Norveški meteorološki institut (MET Norway).</p>
 </div>
 
-<div class="wrstory" id="story" hidden role="dialog" aria-modal="true" data-i18n-aria="wr_aria" aria-label="Sezona"><div class="wrbars"></div><button type="button" class="wrclose" data-i18n-aria="close" aria-label="Zatvori">✕</button><div class="wrcard"></div><div class="wrnav"><span data-i18n="wr_back">‹ natrag</span><span class="wrcount"></span><span data-i18n="wr_next">dalje ›</span></div></div>
+<div class="wrstory" id="story" hidden role="dialog" aria-modal="true" data-i18n-aria="wr_aria" aria-label="Sezona"><div class="wrbars"></div><button type="button" class="wrclose" data-i18n-aria="close" aria-label="Zatvori">✕</button><div class="wrcard"></div><div class="wrnav"><button type="button" class="wrprev" data-i18n="wr_back">‹ natrag</button><span class="wrcount"></span><button type="button" class="wrnext" data-i18n="wr_next">dalje ›</button></div></div>
 <div class="modal" id="confirmModal" hidden><div class="mbox" id="confirmBox" role="alertdialog" aria-modal="true" aria-labelledby="cfTitle" aria-describedby="cfBody"></div></div>
 <div class="modal" id="calModal" hidden><div class="mbox" id="calBox" role="dialog" aria-modal="true" aria-labelledby="calTitle"></div></div>
 <div class="drawer" id="drawer" hidden><div class="panel" id="panel" role="dialog" aria-modal="true"></div></div>
@@ -2766,6 +2768,8 @@ function storyShow(i){
   story.querySelector('.wrbars').innerHTML = storyCards.map((_, j) => `<i class="${j <= storyAt ? 'on' : ''}"></i>`).join('');
   story.querySelector('.wrcard').innerHTML = c.html;
   story.querySelector('.wrcount').textContent = `${storyAt + 1} / ${storyCards.length}`;
+  story.querySelector('.wrprev').style.visibility = storyAt === 0 ? 'hidden' : '';   // nothing to go back to on the first card
+  story.querySelector('.wrnext').style.visibility = storyAt === storyCards.length - 1 ? 'hidden' : '';
   document.getElementById('wrShare')?.addEventListener('click', e => { e.stopPropagation(); shareWrapped(); });
 }
 let storyData = null;
@@ -2780,8 +2784,11 @@ async function openWrapped(id){
 function closeWrapped(){ story.hidden = true; document.body.classList.remove('noscroll'); storyReturn?.focus?.(); }
 story.addEventListener('click', e => {
   if (e.target.closest('.wrclose')) return closeWrapped();
+  if (e.target.closest('.wrprev')) return storyShow(storyAt - 1);
+  if (e.target.closest('.wrnext')) return storyShow(storyAt + 1);
   if (e.target.closest('button, a')) return;
-  const r = story.getBoundingClientRect(); storyShow(storyAt + (e.clientX - r.left < r.width / 3 ? -1 : 1));   // left third: back, else: next
+  // Tap zones follow the card column (centred on wide screens): its left third goes back, the rest goes forward.
+  const r = story.querySelector('.wrcard').getBoundingClientRect(); storyShow(storyAt + (e.clientX < r.left + r.width / 3 ? -1 : 1));
 });
 story.addEventListener('keydown', e => {
   if (e.key === 'Escape') { e.stopPropagation(); closeWrapped(); }
