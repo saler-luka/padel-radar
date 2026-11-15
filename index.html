@@ -61,7 +61,6 @@ button{cursor:pointer}
 .brand h1{font:600 1.87rem/1.1 var(--f-display);margin:0;letter-spacing:-.01em}
 .brand p{margin:2px 0 0;color:var(--band-soft);font-size:.85rem}
 .nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.nav .range{font:500 1.16rem var(--f-display);min-width:11ch;text-align:center;font-variant-numeric:tabular-nums}
 .pill{border:1px solid color-mix(in srgb,var(--on-band) 70%,transparent);background:transparent;color:var(--on-band);border-radius:999px;padding:5px 13px;font-size:.85rem}
 .pill:hover{background:color-mix(in srgb,var(--on-band) 14%,transparent)}
 .pill.solid{background:var(--on-band);color:var(--band);border-color:var(--on-band)}
@@ -163,6 +162,18 @@ button{cursor:pointer}
 
 /* Week board */
 .board-scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-panel)}
+/* Week bar on the schedule's top edge: ‹ dates [Ovaj tjedan] ↻ › */
+.sched{display:flex;flex-direction:column}
+.weekbar{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-bottom:0;border-radius:var(--r-panel) var(--r-panel) 0 0;padding:8px 10px}
+.weekbar + .board-scroll{border-top-left-radius:0;border-top-right-radius:0}
+.weekbar .range{font:600 1.25rem var(--f-display);font-variant-numeric:tabular-nums;margin-right:auto;padding-left:4px}
+.wbtn{width:38px;height:38px;flex:none;border-radius:50%;border:1px solid var(--line);background:none;color:var(--fg);font-size:1.25rem;line-height:1;display:grid;place-items:center}
+.wbtn:hover{border-color:var(--court);color:var(--court)}
+.wbtn#refresh{font-size:1rem;color:var(--muted)}
+.wbtn#prev{order:-1}
+.wchip{border:1px solid var(--line);background:none;color:var(--muted);border-radius:999px;padding:5px 14px;font:500 .95rem var(--f-display)}
+.wchip.away{background:var(--court);border-color:var(--court);color:#fff}
+.wchip:hover{border-color:var(--court)}
 .board{display:grid;grid-template-columns:52px repeat(7,minmax(176px,1fr));min-width:1290px;position:relative}
 .dayhead{position:sticky;top:0;z-index:3;background:var(--surface);border-bottom:1px solid var(--line);border-left:1px solid var(--line);padding:10px 8px 0}
 .dayhead .d{font:500 1.1rem var(--f-display);display:flex;justify-content:space-between;align-items:baseline}
@@ -280,7 +291,8 @@ button{cursor:pointer}
 }
 @media (max-width:760px){.board-scroll{display:none}.agenda{display:flex}.brand{display:grid;grid-template-columns:auto 1fr;column-gap:12px;align-items:center}
 .brand .logo{grid-row:span 2;width:44px;height:44px;border-radius:11px;box-shadow:0 0 0 2px color-mix(in srgb,#fff 70%,transparent)}
-.brand h1{font-size:1.55rem}.nav .range{min-width:0}
+.brand h1{font-size:1.55rem}
+.sched{gap:12px}.weekbar{border-bottom:1px solid var(--line);border-radius:var(--r-panel);padding:6px 8px;gap:6px}.weekbar .range{font-size:1.1rem;padding-left:2px}.wbtn{width:34px;height:34px}.wchip{padding:4px 10px;font-size:.88rem}
 /* Phones: the account button sits in the top-right corner, beside the logo */
 .band .wrap{position:relative}.brand{padding-right:124px}.acts{position:absolute;top:16px;right:16px;min-height:44px}}
 
@@ -595,11 +607,6 @@ body.noscroll{overflow:hidden}
       <p id="clubSub">Padel Radar · uživo sa Sporty.plus</p>
     </a>
     <div class="nav">
-      <button class="pill" id="prev" data-i18n-aria="prevWeek" aria-label="Prethodni tjedan">←</button>
-      <button class="pill solid" id="today" data-i18n="thisWeek">Ovaj tjedan</button>
-      <span class="range" id="range"></span>
-      <button class="pill" id="next" data-i18n-aria="nextWeek" aria-label="Sljedeći tjedan">→</button>
-      <button class="pill" id="refresh" data-i18n-title="reload" data-i18n-aria="reload" title="Osvježi podatke" aria-label="Osvježi podatke">↻</button>
       <div class="acts">
         <button class="pill icon" id="settingsBtn" data-i18n-aria="settings" data-i18n-title="settings" aria-label="Postavke" title="Postavke"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></button>
         <button class="pill solid" id="accountBtn">Prijava</button>
@@ -621,8 +628,17 @@ body.noscroll{overflow:hidden}
     <div class="summary" id="summary"></div>
     <div class="filters" id="filters"></div>
     <div class="status" id="status" aria-live="polite"></div>
-    <div class="board-scroll"><div class="board" id="board"></div></div>
-    <div class="agenda" id="agenda"></div>
+    <div class="sched">
+      <div class="weekbar" id="weekBar">
+        <button type="button" class="wbtn" id="prev" data-i18n-aria="prevWeek" aria-label="Prethodni tjedan">‹</button>
+        <span class="range" id="range"></span>
+        <button type="button" class="wchip" id="today" data-i18n="thisWeek">Ovaj tjedan</button>
+        <button type="button" class="wbtn" id="refresh" data-i18n-title="reload" data-i18n-aria="reload" title="Osvježi podatke" aria-label="Osvježi podatke">↻</button>
+        <button type="button" class="wbtn" id="next" data-i18n-aria="nextWeek" aria-label="Sljedeći tjedan">›</button>
+      </div>
+      <div class="board-scroll"><div class="board" id="board"></div></div>
+      <div class="agenda" id="agenda"></div>
+    </div>
   </section>
 
   <section id="resultsView" class="results" hidden></section>
@@ -1427,6 +1443,8 @@ function jumpToDay(key){
 /* ---------- render ---------- */
 function render(){
   document.getElementById('range').textContent = rangeText(state.monday);
+  // 'Ovaj tjedan' stands out only when another week is shown
+  document.getElementById('today').classList.toggle('away', ymd(state.monday) !== ymd(mondayOf(new Date())));
   const fp = freePrices(); state.peak = fp.length ? Math.max(...fp) : 0; state.low = fp.length ? Math.min(...fp) : 0;
   renderCourtBar(); renderSummary(); renderFilters(); renderBoard(); renderAgenda();
 }
