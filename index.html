@@ -297,9 +297,10 @@ button{cursor:pointer}
 .band .wrap{position:relative}.brand{padding-right:124px}.acts{position:absolute;top:16px;right:16px;min-height:44px}}
 
 /* Results */
-.results{display:flex;flex-direction:column;gap:18px}
+/* Results, Lige and Rang: a centred column on wide screens instead of the full page width */
+.results{display:flex;flex-direction:column;gap:18px;width:100%;max-width:760px;margin-inline:auto}
 /* Rating tab */
-.rating{display:flex;flex-direction:column;gap:14px;max-width:720px}
+.rating{display:flex;flex-direction:column;gap:14px;width:100%;max-width:720px;margin-inline:auto}
 .rtcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-panel);padding:14px 16px;display:flex;flex-direction:column;gap:6px}
 .rtcard .btn{align-self:flex-start}
 .rtrow{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
@@ -359,7 +360,7 @@ button{cursor:pointer}
 @media (max-width:420px){.rtlist .fm{display:none}.rtlist li{grid-template-columns:2em 2.2em minmax(0,1fr) auto auto;padding-inline:10px}}
 @media (max-width:420px){.tabs .caltab span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}}
 /* Leagues: one standings card per group */
-.leagues{display:flex;flex-direction:column;gap:14px}
+.leagues{display:flex;flex-direction:column;gap:14px;width:100%;max-width:1040px;margin-inline:auto}
 #lgBody{display:flex;flex-direction:column;gap:14px}
 #lgBody .hint{margin:0}
 .lchips .chip{max-width:100%}
